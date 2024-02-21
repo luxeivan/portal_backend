@@ -32,11 +32,12 @@ router.post(
       return res.status(400).json({ status: "error", message: "нет нужной информации" });
     }
     const founduser = await getUserByEmail(req.body.email.toLowerCase());
-    if (founduser && await bcrypt.compare(req.body.password, founduser.password)) {
+    console.log(founduser)
+    if (founduser && await bcrypt.compare(req.body.password, founduser.attributes.password)) {
       req.session.founduser = founduser;
       console.log(req.session.founduser)
       try {
-        req.session.pincode = await sendCodeToPhone(founduser.phone);
+        req.session.pincode = await sendCodeToPhone(founduser.attributes.phone);
         return res.json({ status: "ok", message: "Ожидается пин код" });
       } catch (error) {
         return res.status(500).json({ status: "error", message: "Не удалось совершить звонок" });
