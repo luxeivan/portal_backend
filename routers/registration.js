@@ -3,7 +3,7 @@ const router = express.Router();
 const { check, validationResult } = require("express-validator");
 const sendCodeToMail = require('../services/sendCodeToMail')
 const sendCodeToPhone = require('../services/sendCodeToPhone')
-const { createNewUser, updateUser, checkUserByEmail } = require('../services/usersonec')
+const { createNewUser, updateUser, checkUserByEmail } = require('../services/strapi')
 
 
 const attempts = 3 //Количество попыток

@@ -3,24 +3,24 @@ require('dotenv').config()
 
 const serverStrapi = process.env.SERVER_DB
 
-const strapi = {
+const storage = {
     getUserByEmail: async (email) => {
-        const response = await axios.get(`${serverStrapi}/api/profiles?filters[email][$eq]=${email}&populate=password`)
+        const response = await axios.get(`${serverStrapi}/api/user-portals?filters[email][$eq]=${email}&populate=password`)
         //console.log(response.data.data[0])
         return response.data.data[0]
     },
     checkUserByEmail: async (email) => {
-        const response = await axios.get(`${serverStrapi}/api/profiles?filters[email][$eq]=${email}&populate=password`)
+        const response = await axios.get(`${serverStrapi}/api/user-portals?filters[email][$eq]=${email}&populate=password`)
         //console.log(response.data.data[0])
         return response.data.data[0] ? response.data.data[0].id : false
     },
     getUserById: async (id) => {
-        const response = await axios.get(`${serverStrapi}/api/profiles/${id}?populate=*`)
+        const response = await axios.get(`${serverStrapi}/api/user-portals/${id}?populate=*`)
         console.log(response.data.data)
         return response.data.data
     },
     createNewUser: async (email, phone, password) => {
-        const response = await axios.post(`${serverStrapi}/api/profiles?`, {
+        const response = await axios.post(`${serverStrapi}/api/user-portals?`, {
             data: {
                 email,
                 phone,
@@ -31,7 +31,7 @@ const strapi = {
         return response.data
     },
     updateUser: async (checkUser, phone, password) => {
-        const response = await axios.put(`${serverStrapi}/api/profiles/${checkUser}`, {
+        const response = await axios.put(`${serverStrapi}/api/user-portals/${checkUser}`, {
             data: {
                 phone,
                 password
@@ -42,4 +42,4 @@ const strapi = {
     }
 }
 
-module.exports = strapi;
+module.exports = storage;
