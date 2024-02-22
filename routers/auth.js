@@ -67,16 +67,16 @@ router.post(
   async (req, res) => {
     console.log(req.session)
     if (!req.body.pincode) {
-      return res.json({ status: "error", message: "нет нужной информации" });
+      return res.status(400).json({ status: "error", message: "нет нужной информации" });
     }
     if (!req.session.founduser) {
-      return res.json({ status: "error", message: "Не найден пользователь" });
+      return res.status(400).json({ status: "error", message: "Не найден пользователь" });
     }
     if (req.session.pincode == req.body.pincode) {
       const userjwt = jwt.sign({ id: req.session.founduser.id, email: req.session.founduser.email, phone: req.session.founduser.phone }, privateKey, { expiresIn: `${process.env.JWT_LIVE_HOURS}h` });
       return res.json({ status: "ok", jwt: userjwt, userid: req.session.founduser.userid, email: req.session.founduser.email, phone: req.session.founduser.phone });
     } else {
-      return res.json({ status: "error", message: "Не верный пин код" });
+      return res.status(418).json({ status: "error", message: "Не верный пин код" });
     }
   }
 );
