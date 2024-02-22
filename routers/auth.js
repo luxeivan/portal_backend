@@ -20,8 +20,8 @@ router.post(
     const result = validationResult(req);
     //console.log(result)
     if (!result.isEmpty()) {
-      console.log("Failed validation");
-      return res.json({ status: "error", errors: result.errors });
+      //console.log("Failed validation");
+      return res.status(400).json({ status: "error", errors: result.errors });
     }
     next();
   },
@@ -43,7 +43,7 @@ router.post(
         return res.status(500).json({ status: "error", message: "Не удалось совершить звонок" });
       }
     } else {
-      return res.json({ status: "error", message: "Логин или пароль неверные" });
+      return res.status(418).json({ status: "error", message: "Логин или пароль неверные" });
     }
   }
 );
