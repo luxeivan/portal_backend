@@ -59,7 +59,7 @@ router.post(
     //console.log(result)
     if (!result.isEmpty()) {
       console.log("Failed validation");
-      return res.json({ status: "error", errors: result.errors });
+      return res.status(400).json({ status: "error", errors: result.errors });
     }
     next();
   },
