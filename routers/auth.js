@@ -104,6 +104,11 @@ router.post('/test', async function (req, res) {
     res.json(user)
   }
 })
+router.post('/checkjwt', async function (req, res) {
+  if (!req.body.jwt) return res.json('не указан jwt в теле')
+  const valid = jwt.verify(req.body.jwt, privateKey);
+  console.log(valid)
+})
 
 
 
