@@ -9,7 +9,7 @@ const { createNewUser, updateUser, checkUserByEmail } = require('../services/str
 const privateKey = process.env.JWT_SECRET;
 
 const attempts = 3 //Количество попыток
-const timeAttempts = 60 //Время попыток
+const timeAttempts = 5 //Время попыток
 
 //Прием телефона и звонок с кодом------------------------------------------------------------------------------
 router.post('/phone', async (req, res) => {
@@ -34,7 +34,7 @@ router.post('/phone', async (req, res) => {
     //Пытаемся отправить код на телефон
     try {
         const code = await sendCodeToPhone(req.body.phone)
-
+console.log('code',code)
         //Блокируем на время
         req.session.phoneBlock = true
         setTimeout(() => {
@@ -67,6 +67,7 @@ router.post('/phonecode', async (req, res) => {
         return res.json({ status: 'error', message: "закончились попытки подтверждения телефона" })
     }
     //Сравниваем пришедший код и код из сессии если совпадает то подтверждаем проверку телефона
+    console.log('phoneCode',req.session.phoneCode)
     if (req.body.phoneCode == req.session.phoneCode) {
         req.session.phoneCheck = true
         req.session.phoneCount = 0

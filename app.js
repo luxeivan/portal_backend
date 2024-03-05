@@ -19,13 +19,21 @@ const options = {
 
 
 const app = express()
-app.set('trust proxy', 1)
-app.use(cors({credentials: true, origin: true}));
+//app.set('trust proxy', 1)
+app.use(cors(
+{
+	credentials: true, 
+origin: true
+}
+));
 app.use(
     session({
         cookie: {
-            httpOnly: false,
-            maxAge: 100000
+            httpOnly: true,
+            maxAge: 100000,
+			sameSite: 'none',
+			domain: 'luxeivan.ru',
+			secure: true
         },
         store: new FileStore({ retries: 1 }),
         secret: 'secret123435667gfgghfgfggfg',
