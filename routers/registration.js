@@ -5,6 +5,7 @@ const sendCodeToMail = require('../services/sendCodeToMail')
 const sendCodeToPhone = require('../services/sendCodeToPhone')
 const { createNewUser, updateUser, checkUserByEmail } = require('../services/strapi')
 
+const privateKey = process.env.JWT_SECRET;
 
 const attempts = 3 //Количество попыток
 const timeAttempts = 60 //Время попыток
@@ -162,10 +163,12 @@ router.post('/newuser', async (req, res) => {
     if (checkUser) {
         //Обновление пароля и телефона пользователя с указанным email
         try {
-            await updateUser(checkUser, req.session.phone, req.body.password)
-            const email = req.session.email
+            const newuser = await updateUser(checkUser, req.session.phone, req.body.password)
+            //const email = req.session.email
             req.session.destroy()
-            return res.json({ status: 'ok', message: `Пароль и телефон обновлен у пользователя: ${email}` })
+            const userjwt = jwt.sign({ id: newuser.id, email: newuser.attributes.email, phone: newuser.attributes.phone }, privateKey, { expiresIn: `${process.env.JWT_LIVE_HOURS}h` });
+            return res.json({ status: "ok", jwt: userjwt });
+            // return res.json({ status: 'ok', message: `Пароль и телефон обновлен у пользователя: ${email}` })
         } catch (error) {
             console.log(error.message)
             return res.status(500).json({ status: 'error', message: "ошибка обновления пользователя", error: error.message })
@@ -176,7 +179,9 @@ router.post('/newuser', async (req, res) => {
     try {
         const newuser = await createNewUser(req.session.email, req.session.phone, req.body.password)
         req.session.destroy()
-        return res.json({ status: 'ok', message: "пользователь создан", data: newuser.data })
+        const userjwt = jwt.sign({ id: newuser.id, email: newuser.attributes.email, phone: newuser.attributes.phone }, privateKey, { expiresIn: `${process.env.JWT_LIVE_HOURS}h` });
+        return res.json({ status: "ok", jwt: userjwt });
+        // return res.json({ status: 'ok', message: "пользователь создан", data: newuser.data })
     } catch (error) {
         console.log(error.message)
         return res.status(500).json({ status: 'error', message: "ошибка создания пользователя", error: error.message })
