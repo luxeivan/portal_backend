@@ -1,7 +1,10 @@
 const axios = require('axios')
+const bcrypt = require('bcrypt');
 require('dotenv').config()
 
 const serverStrapi = process.env.SERVER_DB
+
+const saltRounds = Number(process.env.PASSWORD_SALT_ROUNDS)
 
 const strapi = {
     getUserByEmail: async (email) => {
@@ -20,21 +23,23 @@ const strapi = {
         return response.data.data
     },
     createNewUser: async (email, phone, password) => {
+        const hashPassword = await bcrypt.hash(password, saltRounds)
         const response = await axios.post(`${serverStrapi}/api/profiles?`, {
             data: {
                 email,
                 phone,
-                password
+                password: hashPassword
             }
         })
         console.log(response.data)
         return response.data
     },
     updateUser: async (checkUser, phone, password) => {
+        const hashPassword = await bcrypt.hash(password, saltRounds)
         const response = await axios.put(`${serverStrapi}/api/profiles/${checkUser}`, {
             data: {
                 phone,
-                password
+                password: hashPassword
             }
         })
         console.log(response.data)
