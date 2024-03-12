@@ -2,7 +2,7 @@ const axios = require("axios");
 const bcrypt = require("bcrypt");
 require("dotenv").config();
 
-const strapiSubjects = require("./strapi/strapiSubjects");
+const strapiSubjects = require("../services/strapi/strapiSubjects");
 
 const serverStrapi = process.env.SERVER_DB;
 
