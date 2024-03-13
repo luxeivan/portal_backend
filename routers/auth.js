@@ -66,7 +66,7 @@ router.post(
   },
   //Проверка отправленного пользователем пинкода сравниваем его из сессии если все верно выдаем JWT токен-----------------------------------------
   async (req, res) => {
-    console.log(req.session)
+    //console.log(req.session)
     if (!req.body.pincode) {
       return res.status(400).json({ status: "error", message: "нет нужной информации" });
     }
@@ -98,7 +98,7 @@ router.post('/test', async function (req, res) {
   if (!req.body.email) return res.json('не указан email в теле')
   const user = await getUserByEmail(req.body.email)
   if (user) {
-    console.log(user)
+    //console.log(user)
     res.json(user)
   } else {
     console.log(`пользователь с email:${req.body.email} не найден`)
@@ -109,7 +109,7 @@ router.post('/checkjwt', async function (req, res) {
   if (!req.body.jwt) return res.json('не указан jwt в теле')
   try {
     const valid = await jwt.verify(req.body.jwt, privateKey);
-    console.log(valid)
+    //console.log(valid)
     res.json(valid)
     
   } catch (error) {
