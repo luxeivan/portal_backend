@@ -33,6 +33,7 @@ router.get('/:id', async (req, res) => {
     const idSubject = req.params.id
     const subject = await getSubjectItem(idSubject);
     if(subject.attributes.profil.data.id===userId){
+      subject.attributes.profil = undefined
       res.json(subject);
     }else{
       res.status(404).json({status:"error", message: 'субъект с данным id не найден' });
