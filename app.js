@@ -14,6 +14,8 @@ const session = require('express-session');
 const bodyParser = require('body-parser');
 const FileStore = require('session-file-store')(session);
 
+const checkAuth = require('./middleware/checkAuth')
+
 
 const options = {
     cert: fs.readFileSync('./ssl/luxeivan.ru_cert.pem'),
@@ -23,7 +25,7 @@ const options = {
 
 const app = express()
 app.set('trust proxy', 1)
-app.use(cors({credentials: true, origin: true}));
+app.use(cors({ credentials: true, origin: true }));
 app.use(
     session({
         cookie: {
@@ -40,8 +42,8 @@ app.use(bodyParser.json())
 
 app.use('/api/auth', auth)
 app.use('/api/registration', registration)
-app.use('/api/sendmail', sendMail)
-app.use('/api/cabinet', cabinet)
+// app.use('/api/sendmail', sendMail)
+app.use('/api/cabinet', checkAuth, cabinet)
 
 const httpServer = http.createServer(app);
 const httpsServer = https.createServer(options, app);

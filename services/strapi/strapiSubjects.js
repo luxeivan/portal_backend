@@ -3,15 +3,15 @@ require("dotenv").config();
 
 const serverStrapi = process.env.SERVER_DB;
 
-const strapi = {
+const strapiSubjects = {
   
-  addSubject: async (subjectData, userId) => {
+  addSubject: async (subjectData, profileId) => {
     try {
       // Предполагается, что у нас есть сущность 'subjects' в Strapi
       const response = await axios.post(`${serverStrapi}/api/subjects`, {
         data: {
           ...subjectData,
-          user: userId, // Привязываем субъекта к пользователю, если требуется
+          profil: profileId, // Привязываем субъекта к пользователю, если требуется
         },
       });
       console.log(response.data);
@@ -22,14 +22,14 @@ const strapi = {
     }
   },
 
-  getSubjects: async (userId) => {
+  getSubjects: async (profileId) => {
     try {
       // Получаем субъектов, связанных с пользователем
       const response = await axios.get(
-        `${serverStrapi}/api/subjects?filters[user][$eq]=${userId}`
+        `${serverStrapi}/api/profiles/${profileId}?populate=subjects`
       );
-      console.log(response.data.data);
-      return response.data.data;
+      // console.log(response.data.data);
+      return response.data.data.attributes.subjects.data;
     } catch (error) {
       console.error("Error getting subjects", error);
       throw error;
