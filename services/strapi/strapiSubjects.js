@@ -35,6 +35,19 @@ const strapiSubjects = {
       throw error;
     }
   },
+  getSubjectItem: async (id) => {
+    try {
+      // Получаем субъектов, связанных с пользователем
+      const response = await axios.get(
+        `${serverStrapi}/api/subjects/${id}?populate=profil`
+      );
+      // console.log(response.data.data);
+      return response.data.data
+    } catch (error) {
+      console.error("Error getting subjects", error);
+      throw error;
+    }
+  },
 };
 
 module.exports = strapiSubjects;

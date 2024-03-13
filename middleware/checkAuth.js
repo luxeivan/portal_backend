@@ -12,6 +12,7 @@ module.exports = (req, res, next) => {
         if (!userData) {
             return res.status(401).json({ status: 'error', message: 'нет авторизации' })
         }
+        req.userId = userData.id
         next();
 
     } catch (e) {

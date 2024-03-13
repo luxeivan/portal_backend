@@ -1,7 +1,7 @@
 const express = require('express');
 const jwt = require('jsonwebtoken')
 const router = express.Router();
-const { addSubject, getSubjects } = require('../../services/strapi/strapiSubjects');
+const { addSubject, getSubjects, getSubjectItem } = require('../../services/strapi/strapiSubjects');
 
 // Маршрут для добавления нового субъекта
 router.post('/', async (req, res) => {
@@ -10,7 +10,7 @@ router.post('/', async (req, res) => {
     const subject = await addSubject(body, files); // Вызывает функцию для добавления субъекта
     res.status(201).json(subject);
   } catch (error) {
-    res.status(500).json({ message: 'Internal server error', error });
+    res.status(500).json({ message: 'Internal server error' });
   }
 });
 
@@ -20,11 +20,26 @@ router.get('/', async (req, res) => {
     const authHeader = req.headers.authorization;
     const accessToken = authHeader.split(' ')[1];
     const userData = jwt.verify(accessToken, process.env.JWT_SECRET);
-    console.log(userData)
+    //console.log(userData)
     const subjects = await getSubjects(userData.id);
     res.json(subjects);
   } catch (error) {
-    res.status(500).json({ message: 'Internal server error', error });
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
+router.get('/:id', async (req, res) => {
+  try {
+    const userId = req.userId
+    const idSubject = req.params.id
+    const subject = await getSubjectItem(idSubject);
+    if(subject.attributes.profil.data.id===userId){
+      res.json(subject);
+    }else{
+      res.status(404).json({status:"error", message: 'субъект с данным id не найден' });
+    }
+  } catch (error) {
+    //console.log(error.message)
+    res.status(500).json({ message: 'Internal server error' });
   }
 });
 
