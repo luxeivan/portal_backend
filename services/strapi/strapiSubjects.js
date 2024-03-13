@@ -39,7 +39,7 @@ const strapiSubjects = {
     try {
       // Получаем субъектов, связанных с пользователем
       const response = await axios.get(
-        `${serverStrapi}/api/subjects/${id}?populate=profil`
+        `${serverStrapi}/api/subjects/${id}?populate[0]=profil&populate[1]=counterparty`
       );
       // console.log(response.data.data);
       return response.data.data
