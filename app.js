@@ -12,6 +12,7 @@ const cabinet = require('./routers/cabinet');
 const session = require('express-session');
 
 const bodyParser = require('body-parser');
+const fileUpload = require('express-fileupload');
 const FileStore = require('session-file-store')(session);
 
 const checkAuth = require('./middleware/checkAuth')
@@ -40,6 +41,10 @@ app.use(
     })
 )
 app.use(bodyParser.json())
+app.use(fileUpload({
+    limits: { fileSize: 50 * 1024 * 1024 },
+  }))
+
 //app.use(express.urlencoded({ extended: true }));
 
 app.use('/api/auth', auth)
