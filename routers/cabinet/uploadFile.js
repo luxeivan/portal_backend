@@ -4,16 +4,32 @@ const router = express.Router();
 const path = require('path');
 const fs = require('fs');
 const { v4: uuidv4 } = require('uuid');
+const multer = require('multer')
+const upload = multer({ dest: 'uploads/' })
 
 const pathFileStorage = process.env.PATH_FILESTORAGE
+const maxSizeFile = 10 //Максимальный размер файла в мегабайтах
 
 router.post('/',
     async function (req, res) {
         const uuid = uuidv4()
         const userId = req.userId
         const dirName = `${pathFileStorage}/${userId}`
+        //console.log(req.files)
         if (!req.files || Object.keys(req.files).length === 0) {
-            return res.status(400).send('No files were uploaded.');
+            return res.status(400).json({ status: "error", message: 'Нет файлов для загрузки', files: req.files });
+        }
+        let bigFile = false
+        Object.keys(req.files).map(item => {
+            console.log(req.files[item].size)
+            if (req.files[item].size > maxSizeFile * 1024 * 1024) {
+                bigFile = true
+            }
+            
+        })
+        if(bigFile){
+            return res.status(400).json({ status: "error", message: 'Файлы больше 10МБ не принимаются' });
+
         }
         try {
             await fs.promises.access(dirName)
