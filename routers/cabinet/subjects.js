@@ -6,8 +6,9 @@ const { addSubject, getSubjects, getSubjectItem } = require('../../services/stra
 // Маршрут для добавления нового субъекта
 router.post('/', async (req, res) => {
   try {
-    const { body, files } = req; // Допустим, вы получаете файлы и данные формы
-    const subject = await addSubject(body, files); // Вызывает функцию для добавления субъекта
+    const userId = req.userId
+    const { body } = req;
+    const subject = await addSubject(body, userId); // Вызывает функцию для добавления субъекта
     res.status(201).json(subject);
   } catch (error) {
     res.status(500).json({ message: 'Internal server error' });
@@ -27,6 +28,7 @@ router.get('/', async (req, res) => {
     res.status(500).json({ message: 'Internal server error' });
   }
 });
+// Маршрут для получения одного субъекта
 router.get('/:id', async (req, res) => {
   try {
     const userId = req.userId
