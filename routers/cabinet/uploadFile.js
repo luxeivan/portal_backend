@@ -12,17 +12,29 @@ router.post('/',
         const uuid = uuidv4()
         const userId = req.userId
         const dirName = `${pathFileStorage}/${userId}`
-
         if (!req.files || Object.keys(req.files).length === 0) {
             return res.status(400).send('No files were uploaded.');
         }
+        try {
+            await fs.promises.access(dirName)
+        } catch (err) {
+            if (err && err.code === 'ENOENT') {
+                try {
+                    await fs.promises.mkdir(dirName)
+                } catch (error) {
+                    console.log(error)
+                    return res.status(500).json({ status: "error", message: 'Ошибка при записи файлов' });
+                }
+            }
+        }
+
         const arrayWriteFile = Object.keys(req.files).map(item => {
             return new Promise(function (resolve, reject) {
                 const filename = `${item}_${uuid}.${req.files[item].name.split('.')[1]}`
                 fs.promises.writeFile(`${dirName}/${filename}`, req.files[item].data).then(() => {
                     resolve(`/${userId}/${filename}`)
-                }).catch(() => {
-                    reject('Ошибка при записи файлов')
+                }).catch((error) => {
+                    reject({ status: "error", message: 'Ошибка при записи файлов', error })
                 })
             })
         })
@@ -30,11 +42,13 @@ router.post('/',
         Promise.all(arrayWriteFile)
             .then((responses) => {
                 // console.log(responses)
-                return res.json({ success: true, files: responses });
+                return res.json({ status: "ok", files: responses });
             })
             .catch(error => {
                 console.error(error)
+                return res.status(500).json({ status: "error", message: 'Ошибка при записи файлов' });
             })
+
 
     }
 )
