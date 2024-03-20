@@ -18,7 +18,15 @@ const strapiSubjects = {
         firstname: data.firstname,
         lastname: data.lastname,
         secondname: data.secondname,
-        snils: data.snils
+        snils: data.snils,
+        fileDoc: data.fileDoc,
+        addressRegistration: data.addressRegistration,
+        addressRegistrationFias: data.addressRegistrationFias,
+        addressResidential: data.addressResidential,
+        addressResidentialFias: data.addressResidentialFias,
+        serialPassport: data.serialPassport,
+        numberPassport: data.numberPassport,
+        numberOtherDoc: data.numberOtherDoc,
       }]
     } else if (data.type === "ИП") {
       counterparty = [{
@@ -38,10 +46,12 @@ const strapiSubjects = {
 
     try {
       const newSubject = await strapi.create('subjects', {
-        name: `${data.lastname} ${data.firstname} ${data.secondname}`,
+        name: `${data.lastname} ${data.firstname}${data.secondname ? ' ' + data.secondname : ''}`,
         type: data.type,
         profil: profileId,
         counterparty
+      }, {
+        populate: ['counterparty']
       }).then(res => res.data)
       return newSubject;
     } catch (error) {
