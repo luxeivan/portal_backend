@@ -4,8 +4,8 @@ const router = express.Router();
 const path = require('path');
 const fs = require('fs');
 const { v4: uuidv4 } = require('uuid');
-const multer = require('multer')
-const upload = multer({ dest: 'uploads/' })
+// const multer = require('multer')
+// const upload = multer({ dest: 'uploads/' })
 
 const pathFileStorage = process.env.PATH_FILESTORAGE
 const maxSizeFile = 10 //Максимальный размер файла в мегабайтах
@@ -25,9 +25,9 @@ router.post('/',
             if (req.files[item].size > maxSizeFile * 1024 * 1024) {
                 bigFile = true
             }
-            
+
         })
-        if(bigFile){
+        if (bigFile) {
             return res.status(400).json({ status: "error", message: 'Файлы больше 10МБ не принимаются' });
 
         }
@@ -47,11 +47,16 @@ router.post('/',
         const arrayWriteFile = Object.keys(req.files).map(item => {
             return new Promise(function (resolve, reject) {
                 const filename = `${item}_${uuid}.${req.files[item].name.split('.')[1]}`
-                fs.promises.writeFile(`${dirName}/${filename}`, req.files[item].data).then(() => {
+                console.log(req.files[item])
+                req.files[item].mv(`${dirName}/${filename}`, function (err) {
+                    if (err) reject({ status: "error", message: 'Ошибка при записи файлов', error })
                     resolve(`/${userId}/${filename}`)
-                }).catch((error) => {
-                    reject({ status: "error", message: 'Ошибка при записи файлов', error })
                 })
+                // fs.promises.writeFile(`${dirName}/${filename}`, req.files[item].data).then(() => {
+                //     resolve(`/${userId}/${filename}`)
+                // }).catch((error) => {
+                //     reject({ status: "error", message: 'Ошибка при записи файлов', error })
+                // })
             })
         })
 
