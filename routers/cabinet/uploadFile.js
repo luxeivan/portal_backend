@@ -47,10 +47,10 @@ router.post('/',
         const arrayWriteFile = Object.keys(req.files).map(item => {
             return new Promise(function (resolve, reject) {
                 const filename = `${item}_${uuid}.${req.files[item].name.split('.')[1]}`
-                console.log(req.files[item])
+                //console.log(req.files[item])
                 req.files[item].mv(`${dirName}/${filename}`, function (err) {
                     if (err) reject({ status: "error", message: 'Ошибка при записи файлов', error })
-                    resolve(`/${userId}/${filename}`)
+                    resolve(`${filename}`)
                 })
                 // fs.promises.writeFile(`${dirName}/${filename}`, req.files[item].data).then(() => {
                 //     resolve(`/${userId}/${filename}`)
