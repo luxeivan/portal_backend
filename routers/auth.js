@@ -110,8 +110,9 @@ router.post('/checkjwt', async function (req, res) {
   try {
     const valid = await jwt.verify(req.body.jwt, privateKey);
     const user = await getUserById(valid.id)
+    if(!user) throw new Error('Пользователь не найден')
     //console.log(valid)
-    res.json(user)
+    res.json({id:user.id, email: user.attributes.email, phone: user.attributes.phone, firstname: user.attributes.firstname, lastname: user.attributes.lastname})
     
   } catch (error) {
     console.log(error)
