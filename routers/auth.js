@@ -109,13 +109,13 @@ router.post('/checkjwt', async function (req, res) {
   if (!req.body.jwt) return res.json('не указан jwt в теле')
   try {
     const valid = await jwt.verify(req.body.jwt, privateKey);
+    const user = await getUserById(valid.id)
     //console.log(valid)
-    res.json(valid)
+    res.json(user)
     
   } catch (error) {
     console.log(error)
-    res.json(false)
-
+    res.status(401).json({status:'unauthorized'})
   }
 })
 
