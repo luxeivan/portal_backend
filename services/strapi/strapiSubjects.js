@@ -20,6 +20,7 @@ const strapiSubjects = {
         secondname: data.secondname,
         snils: data.snils,
         fileDoc: data.fileDoc,
+        typeDoc: data.typeDoc,
         addressRegistration: data.addressRegistration,
         addressRegistrationFias: data.addressRegistrationFias,
         addressResidential: data.addressResidential,
