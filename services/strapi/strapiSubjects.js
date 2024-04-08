@@ -25,9 +25,22 @@ const strapiSubjects = {
         addressRegistrationFias: data.addressRegistrationFias,
         addressResidential: data.addressResidential,
         addressResidentialFias: data.addressResidentialFias,
-        serialPassport: data.serialPassport,
-        numberPassport: data.numberPassport,
-        numberOtherDoc: data.numberOtherDoc,
+        phone: data.phone,
+        email: data.email,
+        passport: {
+          serialPassport: data.serialPassport,
+          numberPassport: data.numberPassport,
+          kodPodrazdelenia: data.kodPodrazdelenia,
+          kemVidan: data.kemVidan,
+          dateIssue: data.dateIssue,
+        },
+        otherDoc: {
+          numberOtherDoc: data.numberOtherDoc,
+          typeOtherDoc: data.typeOtherDoc,
+          recvizityOthetDoc: data.recvizityOthetDoc,
+          kemVidan: data.kemVidan,
+          dateIssue: data.dateIssue,
+        }
       }]
     } else if (data.type === "ИП") {
       counterparty = [{
