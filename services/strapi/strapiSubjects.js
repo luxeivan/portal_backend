@@ -38,8 +38,8 @@ const strapiSubjects = {
           numberOtherDoc: data.numberOtherDoc,
           typeOtherDoc: data.typeOtherDoc,
           recvizityOthetDoc: data.recvizityOthetDoc,
-          kemVidanOthetDoc: data.kemVidan,
-          dateIssueOthetDoc: data.dateIssue,
+          kemVidanOthetDoc: data.kemVidanOthetDoc,
+          dateIssueOthetDoc: data.dateIssueOthetDoc,
         }
       }]
     } else if (data.type === "ИП") {
