@@ -3,6 +3,7 @@ const router = express.Router();
 
 const subjectsRouter = require('./cabinet/subjects');
 const objectsRouter = require('./cabinet/objects');
+const profileRouter = require('./cabinet/profile');
 const uploadFile = require('./cabinet/uploadFile');
 const getFile = require('./cabinet/getFile');
 const getFias = require('./cabinet/getFias');
@@ -10,6 +11,7 @@ const getFias = require('./cabinet/getFias');
 
 router.use('/subjects', subjectsRouter);
 router.use('/objects', objectsRouter);
+router.use('/profile', profileRouter);
 router.use('/upload-file', uploadFile);
 router.use('/get-file', getFile);
 router.use('/get-fias', getFias);
