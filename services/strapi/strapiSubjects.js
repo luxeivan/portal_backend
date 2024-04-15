@@ -92,7 +92,7 @@ const strapiSubjects = {
         populate: ['profil', 'counterparty']
       })
         .then(res => {
-          console.log(res.data)
+          //console.log(res.data)
           return res.data
         })
     } catch (error) {
@@ -100,6 +100,19 @@ const strapiSubjects = {
       throw error;
     }
   },
+  deleteSubjectItem: async (id) => {
+    try {
+      return await strapi.delete('subjects', id)
+        .then(res => {
+          //console.log(res.data)
+          return res.data
+        })
+    } catch (error) {
+      console.error("Error delete subject", error);
+      throw error;
+    }
+  },
+
 };
 
 module.exports = strapiSubjects;
