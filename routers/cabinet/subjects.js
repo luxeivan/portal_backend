@@ -1,7 +1,7 @@
 const express = require('express');
 const jwt = require('jsonwebtoken')
 const router = express.Router();
-const { addSubject, getSubjects, getSubjectItem } = require('../../services/strapi/strapiSubjects');
+const { addSubject, getSubjects, getSubjectItem, deleteSubjectItem } = require('../../services/strapi/strapiSubjects');
 
 // Маршрут для добавления нового субъекта
 router.post('/', async (req, res) => {
@@ -34,16 +34,33 @@ router.get('/:id', async (req, res) => {
     const userId = req.userId
     const idSubject = req.params.id
     const subject = await getSubjectItem(idSubject);
-    if(subject.attributes.profil.data.id===userId){
+    if (subject.attributes.profil.data.id === userId) {
       subject.attributes.profil = undefined
       res.json(subject);
-    }else{
-      res.status(404).json({status:"error", message: 'субъект с данным id не найден' });
+    } else {
+      res.status(404).json({ status: "error", message: 'субъект с данным id не найден' });
     }
   } catch (error) {
     //console.log(error.message)
     res.status(500).json({ message: 'Internal server error' });
   }
 });
+router.delete('/:id', async (req, res) => {
+  try {
+    const userId = req.userId
+    const idSubject = req.params.id
+    const subject = await getSubjectItem(idSubject);
+    console.log(subject.attributes.profil.data.id)
+    if (subject.attributes.profil.data.id === userId) {
+      const statusDel = await deleteSubjectItem(idSubject)
+      res.json({ status: "ok", message: `Субъект ${statusDel.attributes.name} удален`})
+    } else {
+      res.status(400).json({ status: "error", message: "Неверный id субъекта" })
+    }
+  } catch (error) {
+    //console.log(error.message)
+    res.status(500).json({ message: 'Internal server error' });
+  }
+})
 
 module.exports = router;
