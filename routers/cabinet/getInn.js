@@ -31,7 +31,7 @@ getInn.get('/',
             })
             .catch(error => {
                 console.log("error", error)
-                res.json({ status: "error", message: "ошибка получения ФИАС" })
+                res.json({ status: "error", message: "ошибка получения организации" })
             });
     })
 
