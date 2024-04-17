@@ -7,6 +7,7 @@ const profileRouter = require('./cabinet/profile');
 const uploadFile = require('./cabinet/uploadFile');
 const getFile = require('./cabinet/getFile');
 const getFias = require('./cabinet/getFias');
+const getInn = require('./cabinet/getInn');
 // ... и так далее для всех остальных файлов в папке cabinet ...
 
 router.use('/subjects', subjectsRouter);
@@ -15,6 +16,7 @@ router.use('/profile', profileRouter);
 router.use('/upload-file', uploadFile);
 router.use('/get-file', getFile);
 router.use('/get-fias', getFias);
+router.use('/get-inn', getInn);
 // ... и так далее для всех остальных импортированных роутеров ...
 
 module.exports = router;
