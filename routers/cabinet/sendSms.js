@@ -18,7 +18,7 @@ sendSms.get('/',
         const userId = req.userId
         try {
             console.log(req.query)
-            await axios.post('https://a2p-api.megalabs.ru/sms/v1/sms', {
+            const response = await axios.post('https://a2p-api.megalabs.ru/sms/v1/sms', {
                 from: "M-OBLENERGO",
                 to: req.query.to,
                 sms: req.query.sms,
@@ -28,6 +28,7 @@ sendSms.get('/',
                     "Authorization": authMegafon
                 },
             })
+            console.log(response.data)
             res.json({ status: "ок", message: "СМС отправлена" }); // Set disposition and send it.
         } catch (error) {
             console.log(error)
