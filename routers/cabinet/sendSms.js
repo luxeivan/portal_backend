@@ -20,7 +20,7 @@ sendSms.get('/',
             console.log(req.query)
             const response = await axios.post('https://a2p-api.megalabs.ru/sms/v1/sms', {
                 from: "M-OBLENERGO",
-                to: req.query.to,
+                to: Number(req.query.to),
                 sms: req.query.sms,
             }, {
                 headers: {
