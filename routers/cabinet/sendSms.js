@@ -1,0 +1,32 @@
+const { default: axios } = require('axios');
+const express = require('express');
+const sendSms = express.Router();
+const { query } = require("express-validator");
+
+const authMegafon = process.env.AUTH_MEGAFON_SMS
+
+sendSms.get('/',
+    query('to').notEmpty(),
+    query('sms').notEmpty(),
+    async function (req, res) {
+        const userId = req.userId
+        try {
+            console.log(req.query)
+            await axios.post('https://a2p-api.megalabs.ru/sms/v1/sms', {
+                from: "M-OBLENERGO",
+                to: req.query.to,
+                sms: req.query.sms,
+            }, {
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": authMegafon
+                },
+            })
+            res.json({ status: "ок", message: "СМС отправлена" }); // Set disposition and send it.
+        } catch (error) {
+            console.log(error)
+            res.json({ status: "error", message: "Ошибка отправки СМС" });
+        }
+    })
+
+module.exports = sendSms;
