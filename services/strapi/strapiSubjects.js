@@ -18,29 +18,13 @@ const strapiSubjects = {
         firstname: data.firstname,
         lastname: data.lastname,
         secondname: data.secondname,
-        snils: data.snils,
         fileDoc: data.fileDoc,
-        typeDoc: data.typeDoc,
+        confirmationDocument:data.confirmationDocument,
         addressRegistration: data.addressRegistration,
-        addressRegistrationFias: data.addressRegistrationFias,
         addressResidential: data.addressResidential,
-        addressResidentialFias: data.addressResidentialFias,
+        snils: data.snils,
         phone: data.phone,
-        email: data.email,
-        passport: {
-          serialPassport: data.serialPassport,
-          numberPassport: data.numberPassport,
-          kodPodrazdelenia: data.kodPodrazdelenia,
-          kemVidan: data.kemVidan,
-          dateIssue: data.dateIssue,
-        },
-        otherDoc: {
-          numberOtherDoc: data.numberOtherDoc,
-          typeOtherDoc: data.typeOtherDoc,
-          recvizityOthetDoc: data.recvizityOthetDoc,
-          kemVidanOthetDoc: data.kemVidanOthetDoc,
-          dateIssueOthetDoc: data.dateIssueOthetDoc,
-        }
+        email: data.email,        
       }]
     } else if (data.type === "ИП") {
       counterparty = [{
