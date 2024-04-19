@@ -1,7 +1,7 @@
 const { default: axios } = require('axios');
 const express = require('express');
 const sendSms = express.Router();
-const { query } = require("express-validator");
+const { query,validationResult } = require("express-validator");
 
 const authMegafon = process.env.AUTH_MEGAFON_SMS
 
