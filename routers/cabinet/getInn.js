@@ -5,17 +5,17 @@ const getInn = express.Router();
 const url = "http://suggestions.dadata.ru/suggestions/api/4_1/rs/findById/party";
 
 const token = process.env.DADATA_TOKEN
-getInn.get('/',
-    query('searchString').notEmpty(),
-
+getInn.get('/:type',
+    query('inn').notEmpty(),
     async (req, res) => {
+        const type = req.params.type
         // Проверка-------------------------
         const result = validationResult(req);
         if (!result.isEmpty()) {
             return res.json({ status: "error", message: "Пустое поле поиска" })
         }
         // -------------------------
-        const { searchString } = req.query
+        const { inn } = req.query
         const options = {
             mode: "cors",
             headers: {
@@ -24,7 +24,7 @@ getInn.get('/',
                 "Authorization": "Token " + token
             },
         }
-        axios.post(url, { query: searchString }, options)
+        axios.post(url, { query: inn, type: type }, options)
             .then(result => {
                 //console.log(result.data)
                 res.json({ status: "ok", data: result.data.suggestions })
