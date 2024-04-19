@@ -9,6 +9,12 @@ sendSms.get('/',
     query('to').notEmpty(),
     query('sms').notEmpty(),
     async function (req, res) {
+         // Проверка-------------------------
+         const result = validationResult(req);
+         if (!result.isEmpty()) {
+             return res.json({ status: "error", message: "Нехватает нужных полей" })
+         }
+         // -------------------------
         const userId = req.userId
         try {
             console.log(req.query)
