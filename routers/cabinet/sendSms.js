@@ -7,7 +7,7 @@ const authMegafon = process.env.AUTH_MEGAFON_SMS
 
 sendSms.get('/',
     query('to').notEmpty(),
-    query('sms').notEmpty(),
+    query('message').notEmpty(),
     async function (req, res) {
          // Проверка-------------------------
          const result = validationResult(req);
@@ -21,7 +21,7 @@ sendSms.get('/',
             const response = await axios.post('https://a2p-api.megalabs.ru/sms/v1/sms', {
                 from: "M-OBLENERGO",
                 to: Number(req.query.to),
-                sms: req.query.sms,
+                message: req.query.message,
             }, {
                 headers: {
                     "Content-Type": "application/json",
