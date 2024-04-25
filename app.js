@@ -3,6 +3,7 @@ const cors = require('cors');
 const fs = require('fs');
 const http = require('http')
 const https = require('https')
+require("dotenv").config();
 
 const auth = require('./routers/auth')
 const registration = require('./routers/registration')
