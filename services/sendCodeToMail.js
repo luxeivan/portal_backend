@@ -1,5 +1,6 @@
 
 const nodemailer = require('nodemailer');
+require("dotenv").config();
 
 const smtpHost = process.env.SMTP_HOST
 const smtpPort = process.env.SMTP_PORT
