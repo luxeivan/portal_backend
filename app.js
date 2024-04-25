@@ -22,6 +22,9 @@ const options = {
     cert: fs.readFileSync('./ssl/luxeivan.ru_cert.pem'),
     key: fs.readFileSync('./ssl/luxeivan.ru_private_key.pem')
 };
+const secretSession = process.env.SECRET_SESSION
+const port = process.env.PORT
+const portSSL = process.env.PORT_SSL
 
 
 const app = express()
@@ -31,21 +34,21 @@ app.use(
         cookie: {
             httpOnly: true,
             maxAge: 100000,
-			sameSite: 'none',
-			domain: 'luxeivan.ru',
-			secure: true
+            sameSite: 'none',
+            domain: 'luxeivan.ru',
+            secure: true
         },
         store: new FileStore({ retries: 1 }),
-        secret: 'secret123435667gfgghfgfggfg',
+        secret: secretSession,
         saveUninitialized: true,
     })
 )
 app.use(bodyParser.json())
 app.use(fileUpload({
     limits: { fileSize: 50 * 1024 * 1024 },
-    useTempFiles : true , 
-    tempFileDir : '/tmp/' 
-  }))
+    useTempFiles: true,
+    tempFileDir: '/tmp/'
+}))
 
 //app.use(express.urlencoded({ extended: true }));
 
@@ -56,11 +59,7 @@ app.use('/api/cabinet', checkAuth, cabinet)
 
 const httpServer = http.createServer(app);
 const httpsServer = https.createServer(options, app);
-httpServer.listen(5000,()=>{
-console.log('Listen port 5000...')
+httpServer.listen(port, () => {
+    console.log('Listen port 5000...')
 });
-httpsServer.listen(5443);
-
-// app.listen(5000, () => {
-//     console.log('Listen port 5000...')
-// })
+httpsServer.listen(portSSL);
