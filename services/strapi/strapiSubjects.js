@@ -7,7 +7,7 @@ const strapi = new Strapi({
 });
 
 const strapiSubjects = {
-  createSubjectData: (data, profileId) => {
+  createSubjectData: function (data, profileId) {
     // Общая структура для всех типов субъектов
     const subjectData = {
       name:
