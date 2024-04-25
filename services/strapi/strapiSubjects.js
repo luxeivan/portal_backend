@@ -7,7 +7,7 @@ const strapi = new Strapi({
 });
 
 const strapiSubjects = {
-  createSubjectData: function (data, profileId) {
+  createSubjectData: (data, profileId) => {
     // Общая структура для всех типов субъектов
     const subjectData = {
       name:
@@ -80,7 +80,7 @@ const strapiSubjects = {
   },
 
   addSubject: async (data, profileId) => {
-    const subjectData = this.createSubjectData(data, profileId);
+    const subjectData = strapiSubjects.createSubjectData(data, profileId);
     try {
       const newSubject = await strapi.create("subjects", subjectData, {
         populate: ["counterparty"],
