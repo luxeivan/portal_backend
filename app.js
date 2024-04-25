@@ -61,6 +61,6 @@ app.use('/api/cabinet', checkAuth, cabinet)
 const httpServer = http.createServer(app);
 const httpsServer = https.createServer(options, app);
 httpServer.listen(port, () => {
-    console.log('Listen port 5000...')
+    console.log(`Listen port ${port}...`)
 });
 httpsServer.listen(portSSL);
