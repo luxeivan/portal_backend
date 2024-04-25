@@ -1,5 +1,11 @@
 
 const nodemailer = require('nodemailer');
+require("dotenv").config();
+
+const smtpHost = process.env.SMTP_HOST
+const smtpPort = process.env.SMTP_PORT
+const smtpLogin = process.env.SMTP_LOGIN
+const smtpPass = process.env.SMTP_PASS
 
 function generateRandomCode() {
   return Math.floor(Math.random() * 9001) + 1001;
@@ -8,12 +14,12 @@ function generateRandomCode() {
 const sendCodeToMail = async (to) => {
 const code = generateRandomCode()
   let transporter = nodemailer.createTransport({
-    host: 'smtp.yandex.ru',
-    port: 465,
+    host: smtpHost,
+    port: smtpPort,
     secure: true,
     auth: {
-      user: "luxeivan",
-      pass: "kbndqbbvecabphxz",
+      user: smtpLogin,
+      pass: smtpPass,
     },
   });
 

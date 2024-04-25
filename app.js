@@ -1,9 +1,9 @@
+const express = require('express')
+const cors = require('cors');
+const fs = require('fs');
+const http = require('http')
+const https = require('https')
 require("dotenv").config();
-const express = require("express");
-const cors = require("cors");
-const fs = require("fs");
-const http = require("http");
-const https = require("https");
 
 const auth = require("./routers/auth");
 const registration = require("./routers/registration");
