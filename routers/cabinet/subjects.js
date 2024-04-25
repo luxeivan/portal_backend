@@ -28,6 +28,7 @@ router.get('/', async (req, res) => {
     res.status(500).json({ message: 'Internal server error' });
   }
 });
+
 // Маршрут для получения одного субъекта
 router.get('/:id', async (req, res) => {
   try {
@@ -45,6 +46,7 @@ router.get('/:id', async (req, res) => {
     res.status(500).json({ message: 'Internal server error' });
   }
 });
+
 router.delete('/:id', async (req, res) => {
   try {
     const userId = req.userId
