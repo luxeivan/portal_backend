@@ -80,7 +80,7 @@ const strapiSubjects = {
   },
 
   addSubject: async (data, profileId) => {
-    const subjectData = createSubjectData(data, profileId);
+    const subjectData = this.createSubjectData(data, profileId);
     try {
       const newSubject = await strapi.create("subjects", subjectData, {
         populate: ["counterparty"],
