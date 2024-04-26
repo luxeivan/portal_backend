@@ -12,15 +12,14 @@ const strapiSubjects = {
     const subjectData = {
       name:
         data.type === "Физическое лицо"
-          ? `${data.lastname} ${data.firstname}${
-              data.secondname ? " " + data.secondname : ""
-            }`
-          : data.fullName || data.shortName,
+          ? `${data.lastname} ${data.firstname}${data.secondname ? " " + data.secondname : ""
+          }`
+          : data.shortName || data.fullName,
       type: data.type,
       profil: profileId,
       counterparty: [],
     };
-    
+
     switch (data.type) {
       case "Физическое лицо":
         subjectData.counterparty.push({
@@ -80,7 +79,7 @@ const strapiSubjects = {
   },
 
   addSubject: async (data, profileId) => {
-    const subjectData = this.createSubjectData(data, profileId);
+    const subjectData = strapiSubjects.createSubjectData(data, profileId);
     try {
       const newSubject = await strapi.create("subjects", subjectData, {
         populate: ["counterparty"],
