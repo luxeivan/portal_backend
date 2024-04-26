@@ -41,6 +41,7 @@ const strapiSubjects = {
         subjectData.counterparty.push({
           __component: "subject.ip",
           inn: data.inn,
+          fullName: data.fullName,
           okved: data.okved,
           firstname: data.firstname,
           lastname: data.lastname,
