@@ -26,3 +26,4 @@ for (let index = 0; index < 1000; index++) {
 }
 const endTimeScript = performance.now()
 console.log('END=', endTimeScript - startTimeScript)
+console.log('Стас деплоит')
