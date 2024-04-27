@@ -3,6 +3,8 @@ const bcrypt = require("bcrypt");
 require("dotenv").config();
 
 const strapiSubjects = require("../services/strapi/strapiSubjects");
+const strapiRelations = require("../services/strapi/strapiRelations");
+
 
 const serverStrapi = process.env.SERVER_DB;
 
@@ -60,6 +62,10 @@ const strapi = {
 
 strapi.addSubject = strapiSubjects.addSubject;
 strapi.getSubjects = strapiSubjects.getSubjects;
+
+// strapi.addRelation = strapiRelations.addRelation;
+strapi.getRelations = strapiRelations.getRelations;
+
 
 
 module.exports = strapi;

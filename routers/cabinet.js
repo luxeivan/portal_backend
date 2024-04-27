@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 
 const subjectsRouter = require('./cabinet/subjects');
+const relationsRouter = require('./cabinet/relation');
 const objectsRouter = require('./cabinet/objects');
 const profileRouter = require('./cabinet/profile');
 const uploadFile = require('./cabinet/uploadFile');
@@ -13,6 +14,7 @@ const sendSms = require('./cabinet/sendSms');
 // ... и так далее для всех остальных файлов в папке cabinet ...
 
 router.use('/subjects', subjectsRouter);
+router.use('/subjects', relationsRouter);
 router.use('/objects', objectsRouter);
 router.use('/profile', profileRouter);
 router.use('/upload-file', uploadFile);
