@@ -1,0 +1,110 @@
+const Strapi = require("strapi-sdk-js");
+require("dotenv").config();
+
+const serverStrapi = process.env.SERVER_DB;
+const strapi = new Strapi({
+  url: serverStrapi,
+});
+
+const strapiObjects = {
+  // Функция для создания структуры данных объекта
+  createObjectData: (data, profileId) => {
+    // Общая структура для всех типов объектов
+    const objectData = {
+      name:
+        data.type === "Объект"
+          ? data.fullName
+          : data.shortName || data.fullName,
+      type: data.type,
+      profil: profileId,
+      counterparty: [],
+    };
+
+    switch (data.type) {
+      case "Объект":
+        objectData.counterparty.push({
+          __component: "object",
+        //   inn: data.inn,
+        //   fullName: data.fullName,
+        //   shortName: data.shortName,
+        //   numberEgrul: data.numberEgrul,
+        //   dateIssueEgrul: data.dateIssueEgrul,
+        //   kpp: data.kpp,
+        //   okved: data.okved,
+        //   fullNameDirector: data.fullNameDirector,
+        //   jobTitle: data.jobTitle,
+        //   foundingPosition: data.foundingPosition,
+        //   fullNameRepresentative: data.fullNameRepresentative,
+        //   jobTitleRepresentative: data.jobTitleRepresentative,
+        //   foundingRepresentative: data.foundingRepresentative,
+        //   urAddress: data.urAddress,
+        //   mailingAddress: data.mailingAddress,
+        //   fileDoc: data.fileDoc,
+        });
+        break;
+    }
+    return objectData;
+  },
+
+  // Функция для добавления нового объекта в систему с использованием Strapi API.
+  addObject: async (data, profileId) => {
+    const objectData = strapiObjects.createObjectData(data, profileId);
+    try {
+      const newObject = await strapi.create("objects", objectData, {
+        populate: ["counterparty"],
+      });
+      return newObject.data;
+    } catch (error) {
+      console.error("Ошибка создания объекта", error);
+      return error;
+    }
+  },
+
+  // Функция для получения списка всех объектов, связанных с определенным профилем пользователя.
+  getObjects: async (profileId) => {
+    try {
+      // Получаем объекты, связанные с пользователем
+      return await strapi
+        .findOne("profiles", profileId, {
+          populate: ["objects"],
+        })
+        .then((res) => res.data.attributes.objects.data);
+    } catch (error) {
+      console.error("Error getting objects", error);
+      throw error;
+    }
+  },
+
+ // Функция для получения детальной информации о конкретном объекте по его ID.
+ getObjectItem: async (id) => {
+    try {
+      return await strapi
+        .findOne("objects", id, {
+          populate: ["profil", "counterparty"],
+        })
+        .then((res) => {
+          //console.log(res.data)
+          return res.data;
+        });
+    } catch (error) {
+      console.error("Error getting objects", error);
+      throw error;
+    }
+  },
+
+  // Функция для удаления объекта из системы по его ID.
+  deleteObjectItem: async (id) => {
+    try {
+      return await strapi.delete("objects", id).then((res) => {
+        //console.log(res.data)
+        return res.data;
+      });
+    } catch (error) {
+      console.error("Error delete object", error);
+      throw error;
+    }
+  },
+
+};
+
+module.exports = strapiObjects;

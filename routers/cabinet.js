@@ -14,7 +14,7 @@ const sendSms = require('./cabinet/sendSms');
 // ... и так далее для всех остальных файлов в папке cabinet ...
 
 router.use('/subjects', subjectsRouter);
-router.use('/subjects', relationsRouter);
+router.use('/relations', relationsRouter);
 router.use('/objects', objectsRouter);
 router.use('/profile', profileRouter);
 router.use('/upload-file', uploadFile);
