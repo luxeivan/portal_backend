@@ -4,6 +4,7 @@ require("dotenv").config();
 
 const strapiSubjects = require("../services/strapi/strapiSubjects");
 const strapiRelations = require("../services/strapi/strapiRelations");
+const strapiObjects = require("../services/strapi/strapiObjects");
 
 
 const serverStrapi = process.env.SERVER_DB;
@@ -62,6 +63,9 @@ const strapi = {
 
 strapi.addSubject = strapiSubjects.addSubject;
 strapi.getSubjects = strapiSubjects.getSubjects;
+
+strapi.addObject = strapiObjects.addObject;
+strapi.getObjects = strapiObjects.getObjects;
 
 // strapi.addRelation = strapiRelations.addRelation;
 strapi.getRelations = strapiRelations.getRelations;
