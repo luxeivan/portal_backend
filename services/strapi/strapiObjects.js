@@ -23,9 +23,10 @@ const strapiObjects = {
     switch (data.type) {
       case "Объект":
         objectData.counterparty.push({
-          __component: "object",
         //   inn: data.inn,
-        //   fullName: data.fullName,
+          fullName: data.fullName,
+          сadastralNumber: data.сadastralNumber,
+          addressObject: data.addressObject
         //   shortName: data.shortName,
         //   numberEgrul: data.numberEgrul,
         //   dateIssueEgrul: data.dateIssueEgrul,
