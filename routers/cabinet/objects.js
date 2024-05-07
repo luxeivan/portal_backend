@@ -10,11 +10,24 @@ const {
 } = require("../../services/strapi/strapiObjects");
 
 // Маршрут для добавления нового объекта
+// router.post("/", async (req, res) => {
+//   try {
+//     const userId = req.userId;
+//     const { body } = req;
+//     const object = await addObject(body, userId); // Вызывает функцию для добавления объекта
+//     res.status(201).json(object);
+//   } catch (error) {
+//     console.log(error.message);
+//     res.status(500).json({ message: "Internal server error" });
+//   }
+// });
+
 router.post("/", async (req, res) => {
   try {
-    const userId = req.userId;
+    const userId = req.userId; // Убедитесь, что userId действительно извлекается правильно
     const { body } = req;
-    const object = await addObject(body, userId); // Вызывает функцию для добавления объекта
+    console.log("Received data:", body); // Добавьте логирование полученных данных
+    const object = await addObject(body, userId);
     res.status(201).json(object);
   } catch (error) {
     console.log(error.message);
@@ -69,9 +82,7 @@ router.delete("/:id", async (req, res) => {
         message: `Объект ${statusDel.attributes.name} удален`,
       });
     } else {
-      res
-        .status(400)
-        .json({ status: "error", message: "Неверный id объекта" });
+      res.status(400).json({ status: "error", message: "Неверный id объекта" });
     }
   } catch (error) {
     //console.log(error.message)

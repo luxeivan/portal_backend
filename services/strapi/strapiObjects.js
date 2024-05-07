@@ -23,24 +23,9 @@ const strapiObjects = {
     switch (data.type) {
       case "Объект":
         objectData.counterparty.push({
-        //   inn: data.inn,
           fullName: data.fullName,
           сadastralNumber: data.сadastralNumber,
           addressObject: data.addressObject
-        //   shortName: data.shortName,
-        //   numberEgrul: data.numberEgrul,
-        //   dateIssueEgrul: data.dateIssueEgrul,
-        //   kpp: data.kpp,
-        //   okved: data.okved,
-        //   fullNameDirector: data.fullNameDirector,
-        //   jobTitle: data.jobTitle,
-        //   foundingPosition: data.foundingPosition,
-        //   fullNameRepresentative: data.fullNameRepresentative,
-        //   jobTitleRepresentative: data.jobTitleRepresentative,
-        //   foundingRepresentative: data.foundingRepresentative,
-        //   urAddress: data.urAddress,
-        //   mailingAddress: data.mailingAddress,
-        //   fileDoc: data.fileDoc,
         });
         break;
     }
