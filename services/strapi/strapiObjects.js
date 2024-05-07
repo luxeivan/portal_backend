@@ -33,12 +33,10 @@ const strapiObjects = {
   // },
   createObjectData: (data, profileId) => {
     const objectData = {
-      data: {
-        profile: profileId,
-        fullName: data.fullName,
-        cadastralNumber: data.cadastralNumber,
-        addressObject: data.addressObject,
-      },
+      fullName: data.fullName || "Значение по умолчанию",
+      cadastralNumber: data.cadastralNumber || "Значение по умолчанию",
+      addressObject: data.addressObject || "Значение по умолчанию",
+      profile: profileId,
     };
     return objectData;
   },
@@ -66,7 +64,6 @@ const strapiObjects = {
       return error;
     }
   },
-
 
   // Функция для получения списка всех объектов, связанных с определенным профилем пользователя.
   getObjects: async (profileId) => {
