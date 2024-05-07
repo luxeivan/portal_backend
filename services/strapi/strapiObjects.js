@@ -34,12 +34,11 @@ const strapiObjects = {
   createObjectData: (data, profileId) => {
     const objectData = {
       data: {
-        name: data.fullName, 
-        profile: profileId,   
+        profile: profileId,
+        fullName: data.fullName,
         cadastralNumber: data.cadastralNumber,
-        address: data.addressObject.fullAddress, 
-        fiasId: data.addressObject.fiasId 
-      }
+        addressObject: data.addressObject,
+      },
     };
     return objectData;
   },
@@ -59,16 +58,15 @@ const strapiObjects = {
   // },
   addObject: async (data, profileId) => {
     const objectData = strapiObjects.createObjectData(data, profileId);
-    console.log('objectData',objectData)
     try {
       const newObject = await strapi.create("objects", objectData);
-      console.log('newObject',newObject)
       return newObject.data;
     } catch (error) {
       console.error("Ошибка создания объекта", error);
       return error;
     }
   },
+
 
   // Функция для получения списка всех объектов, связанных с определенным профилем пользователя.
   getObjects: async (profileId) => {
@@ -85,8 +83,8 @@ const strapiObjects = {
     }
   },
 
- // Функция для получения детальной информации о конкретном объекте по его ID.
- getObjectItem: async (id) => {
+  // Функция для получения детальной информации о конкретном объекте по его ID.
+  getObjectItem: async (id) => {
     try {
       return await strapi
         .findOne("objects", id, {
@@ -114,7 +112,6 @@ const strapiObjects = {
       throw error;
     }
   },
-
 };
 
 module.exports = strapiObjects;
