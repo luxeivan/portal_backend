@@ -35,10 +35,10 @@ const strapiObjects = {
   // Функция для добавления нового объекта в систему с использованием Strapi API.
   addObject: async (data, profileId) => {
     const objectData = strapiObjects.createObjectData(data, profileId);
+    console.log('objectData',objectData)
     try {
-      const newObject = await strapi.create("objects", objectData, {
-        populate: ["counterparty"],
-      });
+      const newObject = await strapi.create("objects", objectData);
+      console.log('newObject',newObject)
       return newObject.data;
     } catch (error) {
       console.error("Ошибка создания объекта", error);
