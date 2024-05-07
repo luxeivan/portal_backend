@@ -8,37 +8,59 @@ const strapi = new Strapi({
 
 const strapiObjects = {
   // Функция для создания структуры данных объекта
-  createObjectData: (data, profileId) => {
-    // Общая структура для всех типов объектов
-    const objectData = {
-      name:
-        data.type === "Объект"
-          ? data.fullName
-          : data.shortName || data.fullName,
-      type: data.type,
-      profil: profileId,
-      counterparty: [],
-    };
+  // createObjectData: (data, profileId) => {
+  //   // Общая структура для всех типов объектов
+  //   const objectData = {
+  //     name:
+  //       data.type === "Объект"
+  //         ? data.fullName
+  //         : data.shortName || data.fullName,
+  //     type: data.type,
+  //     profil: profileId,
+  //     counterparty: [],
+  //   };
 
-    switch (data.type) {
-      case "Объект":
-        objectData.counterparty.push({
-          fullName: data.fullName,
-          сadastralNumber: data.сadastralNumber,
-          addressObject: data.addressObject
-        });
-        break;
-    }
+  //   switch (data.type) {
+  //     case "Объект":
+  //       objectData.counterparty.push({
+  //         fullName: data.fullName,
+  //         сadastralNumber: data.сadastralNumber,
+  //         addressObject: data.addressObject
+  //       });
+  //       break;
+  //   }
+  //   return objectData;
+  // },
+  createObjectData: (data, profileId) => {
+    const objectData = {
+      data: {
+        name: data.fullName, 
+        profile: profileId,   
+        cadastralNumber: data.cadastralNumber,
+        address: data.addressObject.fullAddress, 
+        fiasId: data.addressObject.fiasId 
+      }
+    };
     return objectData;
   },
 
   // Функция для добавления нового объекта в систему с использованием Strapi API.
+  // addObject: async (data, profileId) => {
+  //   const objectData = strapiObjects.createObjectData(data, profileId);
+  //   try {
+  //     const newObject = await strapi.create("objects", objectData, {
+  //       populate: ["counterparty"],
+  //     });
+  //     return newObject.data;
+  //   } catch (error) {
+  //     console.error("Ошибка создания объекта", error);
+  //     return error;
+  //   }
+  // },
   addObject: async (data, profileId) => {
     const objectData = strapiObjects.createObjectData(data, profileId);
     try {
-      const newObject = await strapi.create("objects", objectData, {
-        populate: ["counterparty"],
-      });
+      const newObject = await strapi.create('objects', objectData);
       return newObject.data;
     } catch (error) {
       console.error("Ошибка создания объекта", error);
