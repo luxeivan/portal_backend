@@ -24,6 +24,7 @@
     "moment": "^2.29.4",
     "multer": "^1.4.5-lts.1",
     "nodemailer": "^6.9.7",
+    "react-yandex-maps": "^4.6.0",
     "session-file-store": "^1.5.0",
     "strapi-sdk-js": "^2.3.3",
     "uuid": "^9.0.1"
