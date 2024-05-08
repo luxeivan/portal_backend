@@ -36,7 +36,7 @@ const strapiObjects = {
       fullName: data.fullName || "Значение по умолчанию",
       cadastralNumber: data.cadastralNumber || "Значение по умолчанию",
       addressObject: data.addressObject || "Значение по умолчанию",
-      profile: profileId,
+      profil: profileId,
     };
     return objectData;
   },
