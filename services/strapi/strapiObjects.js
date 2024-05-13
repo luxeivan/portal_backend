@@ -8,34 +8,13 @@ const strapi = new Strapi({
 
 const strapiObjects = {
   // Функция для создания структуры данных объекта
-  // createObjectData: (data, profileId) => {
-  //   // Общая структура для всех типов объектов
-  //   const objectData = {
-  //     name:
-  //       data.type === "Объект"
-  //         ? data.fullName
-  //         : data.shortName || data.fullName,
-  //     type: data.type,
-  //     profil: profileId,
-  //     counterparty: [],
-  //   };
-
-  //   switch (data.type) {
-  //     case "Объект":
-  //       objectData.counterparty.push({
-  //         fullName: data.fullName,
-  //         сadastralNumber: data.сadastralNumber,
-  //         addressObject: data.addressObject
-  //       });
-  //       break;
-  //   }
-  //   return objectData;
-  // },
   createObjectData: (data, profileId) => {
     const objectData = {
       fullName: data.fullName || "Значение по умолчанию",
       cadastralNumber: data.cadastralNumber || "Значение по умолчанию",
       addressObject: data.addressObject || "Значение по умолчанию",
+      latitude: data.latitude || "Значение по умолчанию",
+      longitude: data.longitude || "Значение по умолчанию",
       profil: profileId,
     };
     return objectData;

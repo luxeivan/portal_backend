@@ -10,23 +10,11 @@ const {
 } = require("../../services/strapi/strapiObjects");
 
 // Маршрут для добавления нового объекта
-// router.post("/", async (req, res) => {
-//   try {
-//     const userId = req.userId;
-//     const { body } = req;
-//     const object = await addObject(body, userId); // Вызывает функцию для добавления объекта
-//     res.status(201).json(object);
-//   } catch (error) {
-//     console.log(error.message);
-//     res.status(500).json({ message: "Internal server error" });
-//   }
-// });
-
 router.post("/", async (req, res) => {
   try {
-    const userId = req.userId; // Убедитесь, что userId действительно извлекается правильно
+    const userId = req.userId; 
     const { body } = req;
-    console.log("Received data:", body); // Добавьте логирование полученных данных
+    console.log("Received data:", body);
     const object = await addObject(body, userId);
     res.status(201).json(object);
   } catch (error) {
