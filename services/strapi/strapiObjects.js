@@ -10,8 +10,17 @@ const strapiObjects = {
   // Функция для создания структуры данных объекта
   createObjectData: (data, profileId) => {
     const objectData = {
+      // fullName: data.fullName || "Значение по умолчанию",
+      // cadastralNumber: data.cadastralNumber || "Значение по умолчанию",
+      // addressObject: data.addressObject || "Значение по умолчанию",
+      // latitude: data.latitude || "Значение по умолчанию",
+      // longitude: data.longitude || "Значение по умолчанию",
+      // profil: profileId,
+
       fullName: data.fullName || "Значение по умолчанию",
-      cadastralNumber: data.cadastralNumber || "Значение по умолчанию",
+      cadastralNumber: JSON.stringify(
+        data.cadastralNumber || ["Значение по умолчанию"]
+      ),
       addressObject: data.addressObject || "Значение по умолчанию",
       latitude: data.latitude || "Значение по умолчанию",
       longitude: data.longitude || "Значение по умолчанию",
