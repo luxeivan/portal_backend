@@ -75,6 +75,16 @@ const strapiObjects = {
       throw error;
     }
   },
+
+  // Функция для обновления объекта
+  updateObjectItem: async (id, data) => {
+    try {
+      return await strapi.update("objects", id, data).then((res) => res.data);
+    } catch (error) {
+      console.error("Ошибка обновления объекта", error);
+      throw error;
+    }
+  },
 };
 
 module.exports = strapiObjects;
