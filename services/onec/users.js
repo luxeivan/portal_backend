@@ -35,7 +35,7 @@ const usersonec = {
             if (!response.data) {
                 return false
             }
-            console.log(response.data[0])
+            //console.log(response.data[0])
             return response.data[0] ? response.data[0].objectid : false
 
         } catch (error) {
@@ -51,7 +51,7 @@ const usersonec = {
             if (!response.data) {
                 return false
             }
-            console.log(response.data)
+            //console.log(response.data)
             return response.data
 
         } catch (error) {
@@ -70,7 +70,7 @@ const usersonec = {
             }, {
                 headers
             })
-            console.log(response.data)
+            //console.log(response.data)
             return response.data
 
         } catch (error) {
@@ -88,7 +88,7 @@ const usersonec = {
             }, {
                 headers
             })
-            console.log(response.data)
+            //console.log(response.data)
             return response.data
 
         } catch (error) {
