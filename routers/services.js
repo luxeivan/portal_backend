@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { getUserById } = require('../services/onec/services')
+const { getServicesByKey } = require('../services/onec/services')
 
 router.get('/', async (req, res) => {
     try {
