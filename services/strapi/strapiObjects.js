@@ -10,37 +10,16 @@ const strapiObjects = {
   // Функция для создания структуры данных объекта
   createObjectData: (data, profileId) => {
     const objectData = {
-      // fullName: data.fullName || "Значение по умолчанию",
-      // cadastralNumber: data.cadastralNumber || "Значение по умолчанию",
-      // addressObject: data.addressObject || "Значение по умолчанию",
-      // latitude: data.latitude || "Значение по умолчанию",
-      // longitude: data.longitude || "Значение по умолчанию",
-      // profil: profileId,
-
       fullName: data.fullName || "Значение по умолчанию",
       cadastralNumber: data.cadastralNumber || ["Значение по умолчанию"],
       addressObject: data.addressObject || "Значение по умолчанию",
       coordinates: data.coordinates || "Значение по умолчанию",
-      // latitude: data.latitude || "Значение по умолчанию",
-      // longitude: data.longitude || "Значение по умолчанию",
       profil: profileId,
     };
     return objectData;
   },
 
   // Функция для добавления нового объекта в систему с использованием Strapi API.
-  // addObject: async (data, profileId) => {
-  //   const objectData = strapiObjects.createObjectData(data, profileId);
-  //   try {
-  //     const newObject = await strapi.create("objects", objectData, {
-  //       populate: ["counterparty"],
-  //     });
-  //     return newObject.data;
-  //   } catch (error) {
-  //     console.error("Ошибка создания объекта", error);
-  //     return error;
-  //   }
-  // },
   addObject: async (data, profileId) => {
     const objectData = strapiObjects.createObjectData(data, profileId);
     try {

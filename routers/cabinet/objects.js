@@ -12,7 +12,7 @@ const {
 // Маршрут для добавления нового объекта
 router.post("/", async (req, res) => {
   try {
-    const userId = req.userId; 
+    const userId = req.userId;
     const { body } = req;
     console.log("Received data:", body);
     const object = await addObject(body, userId);
@@ -62,7 +62,6 @@ router.delete("/:id", async (req, res) => {
     const userId = req.userId;
     const idObject = req.params.id;
     const object = await getObjectItem(idObject);
-    console.log(objectbject.attributes.profil.data.id);
     if (object.attributes.profil.data.id === userId) {
       const statusDel = await deleteObjectItem(idObject);
       res.json({
@@ -73,9 +72,30 @@ router.delete("/:id", async (req, res) => {
       res.status(400).json({ status: "error", message: "Неверный id объекта" });
     }
   } catch (error) {
-    //console.log(error.message)
+    console.error("Ошибка удаления объекта:", error);
     res.status(500).json({ message: "Internal server error" });
   }
 });
+
+// router.delete("/:id", async (req, res) => {
+//   try {
+//     const userId = req.userId;
+//     const idObject = req.params.id;
+//     const object = await getObjectItem(idObject);
+//     console.log(objectbject.attributes.profil.data.id);
+//     if (object.attributes.profil.data.id === userId) {
+//       const statusDel = await deleteObjectItem(idObject);
+//       res.json({
+//         status: "ok",
+//         message: `Объект ${statusDel.attributes.name} удален`,
+//       });
+//     } else {
+//       res.status(400).json({ status: "error", message: "Неверный id объекта" });
+//     }
+//   } catch (error) {
+//     //console.log(error.message)
+//     res.status(500).json({ message: "Internal server error" });
+//   }
+// });
 
 module.exports = router;
