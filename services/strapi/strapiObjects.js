@@ -67,7 +67,7 @@ const strapiObjects = {
   deleteObjectItem: async (id) => {
     try {
       return await strapi.delete("objects", id).then((res) => {
-        //console.log(res.data)
+        console.log("id'шник", id);
         return res.data;
       });
     } catch (error) {
