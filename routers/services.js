@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { getServicesByKey } = require('../services/onec/services')
+const { getServicesByKey, getServiceItemByKey } = require('../services/onec/services')
 
 router.get('/', async (req, res) => {
     try {
@@ -19,6 +19,18 @@ router.get('/:key', async (req, res) => {
         const key = req.params.key;
         //console.log(userData)
         const services = await getServicesByKey(key);
+        res.json(services);
+    } catch (error) {
+        console.log(error)
+        res.status(500).json({ message: 'Internal server error' });
+    }
+});
+router.get('/item/:key', async (req, res) => {
+    try {
+        // const userId = req.userId
+        const key = req.params.key;
+        //console.log(userData)
+        const services = await getServiceItemByKey(key);
         res.json(services);
     } catch (error) {
         console.log(error)
