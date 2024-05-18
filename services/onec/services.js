@@ -24,6 +24,22 @@ const servicesOneC = {
             return false
         }
     },
+    getServiceItemByKey: async (key) => {
+        try {
+            const response = await axios.get(`${server1c}/Catalog_Services?$format=json&$filter=Ref_Key eq guid'${key}'`, {
+                headers
+            })
+            if (!response.data) {
+                return false
+            }
+            console.log(response.data)
+            return response.data
+
+        } catch (error) {
+            console.log(error.message)
+            return false
+        }
+    },
 }
 
 module.exports = servicesOneC;
