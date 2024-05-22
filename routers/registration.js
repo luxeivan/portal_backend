@@ -4,7 +4,7 @@ const jwt = require("jsonwebtoken");
 const { check, validationResult } = require("express-validator");
 const sendCodeToMail = require('../services/sendCodeToMail')
 const sendCodeToPhone = require('../services/sendCodeToPhone')
-const { createNewUser, updateUser, checkUserByEmail } = require('../services/strapi')
+const { createNewUser, updateUser, checkUserByEmail } = require('../services/onec/users')
 
 const privateKey = process.env.JWT_SECRET;
 

@@ -8,18 +8,19 @@ const server1c_auth = process.env.SERVER_1C_AUTHORIZATION
 const headers = {
     "Authorization": server1c_auth
 }
+
 const saltRounds = Number(process.env.PASSWORD_SALT_ROUNDS)
 
 const usersonec = {
     getUserByEmail: async (email) => {
         try {
-            const response = await axios.get(`${server1c}/users?email=${email}`, {
+            const response = await axios.get(`${server1c}/Catalog_Profile?$format=json&$filter=Email eq '${email}'`, {
                 headers
             })
             if (!response.data) {
                 return false
             }
-            //console.log(response.data[0])
+            console.log(response.data)
             return { userid: response.data[0].objectid, ...response.data[0].elementjson }
 
         } catch (error) {
@@ -29,13 +30,13 @@ const usersonec = {
     },
     checkUserByEmail: async (email) => {
         try {
-            const response = await axios.get(`${server1c}/users?email=${email}`, {
+            const response = await axios.get(`${server1c}/Catalog_Profile?$format=json&$filter=Email eq '${email}'`, {
                 headers
             })
             if (!response.data) {
                 return false
             }
-            //console.log(response.data[0])
+            console.log(response.data)
             return response.data[0] ? response.data[0].objectid : false
 
         } catch (error) {
@@ -43,15 +44,15 @@ const usersonec = {
             return false
         }
     },
-    getUserById: async (id) => {
+    getUserById: async (key) => {
         try {
-            const response = await axios.get(`${server1c}/users/${id}`, {
+            const response = await axios.get(`${server1c}/Catalog_Profile(guid'${key}')?$format=json`, {
                 headers
             })
             if (!response.data) {
                 return false
             }
-            //console.log(response.data)
+            console.log(response.data)
             return response.data
 
         } catch (error) {
@@ -63,14 +64,15 @@ const usersonec = {
         //console.log({headers})
         try {
             const hashPassword = await bcrypt.hash(password, saltRounds)
-            const response = await axios.post(`${server1c}/users/${uuidv4()}`, {
-                email,
-                phone,
-                password: hashPassword
+            const response = await axios.post(`${server1c}/Catalog_Profile?$format=json`, {
+                Description: email,
+                Email: email,
+                Phone: phone,
+                Password: hashPassword
             }, {
                 headers
             })
-            //console.log(response.data)
+            console.log(response.data)
             return response.data
 
         } catch (error) {
@@ -78,13 +80,14 @@ const usersonec = {
             return error
         }
     },
-    updateUser: async (checkUser, email, phone, password) => {
+    updateUser: async (key, email, phone, password) => {
         try {
             const hashPassword = await bcrypt.hash(password, saltRounds)
-            const response = await axios.post(`${server1c}/users/${checkUser}`, {
-                email,
-                phone,
-                password: hashPassword
+            const response = await axios.patch(`${server1c}/Catalog_Profile(guid'${key}')?$format=json`, {
+                Description: email,
+                Email: email,
+                Phone: phone,
+                Password: hashPassword
             }, {
                 headers
             })
