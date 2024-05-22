@@ -33,11 +33,11 @@ const usersonec = {
             const response = await axios.get(`${server1c}/Catalog_Profile?$format=json&$filter=Email eq '${email}'`, {
                 headers
             })
-            if (!response.data) {
+            if (!response.data && !response.data.value[0]) {
                 return false
             }
-            console.log(response.data)
-            return response.value[0] ? response.value[0].Ref_Key : false
+            console.log('checkUserByEmail',response.data)
+            return response.data.value[0] ? response.data.value[0].Ref_Key : false
 
         } catch (error) {
             console.log(error.message)
