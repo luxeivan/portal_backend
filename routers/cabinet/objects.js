@@ -7,6 +7,7 @@ const {
   getObjects,
   getObjectItem,
   deleteObjectItem,
+  updateObjectItem,
 } = require("../../services/strapi/strapiObjects");
 
 // Маршрут для добавления нового объекта
