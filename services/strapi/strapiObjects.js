@@ -66,7 +66,6 @@ const strapiObjects = {
   // Функция для удаления объекта из системы по его ID.
   deleteObjectItem: async (id) => {
     try {
-      console.log("id'шник", id);
       return await strapi.delete("objects", id).then((res) => {
         return res.data;
       });
@@ -79,6 +78,7 @@ const strapiObjects = {
   // Функция для обновления объекта
   updateObjectItem: async (id, data) => {
     try {
+      console.log("id'шник", id);
       return await strapi.update("objects", id, data).then((res) => res.data);
     } catch (error) {
       console.error("Ошибка обновления объекта", error);
