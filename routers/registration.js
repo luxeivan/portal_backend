@@ -34,7 +34,7 @@ router.post('/phone', async (req, res) => {
     //Пытаемся отправить код на телефон
     try {
         const code = await sendCodeToPhone(req.body.phone)
-console.log('code',code)
+        console.log('code', code)
         //Блокируем на время
         req.session.phoneBlock = true
         setTimeout(() => {
@@ -67,7 +67,7 @@ router.post('/phonecode', async (req, res) => {
         return res.json({ status: 'error', message: "закончились попытки подтверждения телефона" })
     }
     //Сравниваем пришедший код и код из сессии если совпадает то подтверждаем проверку телефона
-    console.log('phoneCode',req.session.phoneCode)
+    console.log('phoneCode', req.session.phoneCode)
     if (req.body.phoneCode == req.session.phoneCode) {
         req.session.phoneCheck = true
         req.session.phoneCount = 0
@@ -177,17 +177,18 @@ router.post('/newuser', async (req, res) => {
             return res.status(500).json({ status: 'error', message: "ошибка обновления пользователя", error: error.message })
         }
 
-    }
-    //Создание нового пользователя
-    try {
-        const newuser = await createNewUser(req.session.email, req.session.phone, req.body.password)
-        req.session.destroy()
-        const userjwt = jwt.sign({ id: newuser.Ref_Key, email: newuser.Email, phone: newuser.Phone }, privateKey, { expiresIn: `${process.env.JWT_LIVE_HOURS}h` });
-        return res.json({ status: "ok", jwt: userjwt });
-        // return res.json({ status: 'ok', message: "пользователь создан", data: newuser.data })
-    } catch (error) {
-        console.log(error.message)
-        return res.status(500).json({ status: 'error', message: "ошибка создания пользователя", error: error.message })
+    } else {
+        //Создание нового пользователя
+        try {
+            const newuser = await createNewUser(req.session.email, req.session.phone, req.body.password)
+            req.session.destroy()
+            const userjwt = jwt.sign({ id: newuser.Ref_Key, email: newuser.Email, phone: newuser.Phone }, privateKey, { expiresIn: `${process.env.JWT_LIVE_HOURS}h` });
+            return res.json({ status: "ok", jwt: userjwt });
+            // return res.json({ status: 'ok', message: "пользователь создан", data: newuser.data })
+        } catch (error) {
+            console.log(error.message)
+            return res.status(500).json({ status: 'error', message: "ошибка создания пользователя", error: error.message })
+        }
     }
 
 })

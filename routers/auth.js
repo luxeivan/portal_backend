@@ -33,11 +33,11 @@ router.post(
     }
     const founduser = await getUserByEmail(req.body.email.toLowerCase());
     //console.log(founduser)
-    if (founduser && await bcrypt.compare(req.body.password, founduser.attributes.password)) {
+    if (founduser && await bcrypt.compare(req.body.password, founduser.Password)) {
       req.session.founduser = founduser;
       //console.log(req.session.founduser)
       try {
-        req.session.pincode = await sendCodeToPhone(founduser.attributes.phone);
+        req.session.pincode = await sendCodeToPhone(founduser.Phone);
         return res.json({ status: "ok", message: "Ожидается пин код" });
       } catch (error) {
       console.log(error)
@@ -74,7 +74,7 @@ router.post(
       return res.status(400).json({ status: "error", message: "Не найден пользователь" });
     }
     if (req.session.pincode == req.body.pincode) {
-      const userjwt = jwt.sign({ id: req.session.founduser.id, email: req.session.founduser.email, phone: req.session.founduser.phone }, privateKey, { expiresIn: `${process.env.JWT_LIVE_HOURS}h` });
+      const userjwt = jwt.sign({ id: req.session.founduser.Ref_key, email: req.session.founduser.Email, phone: req.session.founduser.Phone }, privateKey, { expiresIn: `${process.env.JWT_LIVE_HOURS}h` });
       return res.json({ status: "ok", jwt: userjwt, userid: req.session.founduser.userid, email: req.session.founduser.email, phone: req.session.founduser.phone });
     } else {
       return res.status(418).json({ status: "error", message: "Не верный пин код" });
