@@ -90,7 +90,7 @@ const usersonec = {
             }, {
                 headers
             })
-            //console.log(response.data)
+            console.log('updateUser',response.data)
             return response.data
 
         } catch (error) {
