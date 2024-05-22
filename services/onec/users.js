@@ -80,12 +80,11 @@ const usersonec = {
             return error
         }
     },
-    updateUser: async (key, email, phone, password) => {
+    updateUser: async (key, phone, password) => {
         try {
             const hashPassword = await bcrypt.hash(password, saltRounds)
             const response = await axios.patch(`${server1c}/Catalog_Profile(guid'${key}')?$format=json`, {
                 Description: email,
-                Email: email,
                 Phone: phone,
                 Password: hashPassword
             }, {
