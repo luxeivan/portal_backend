@@ -84,7 +84,6 @@ const usersonec = {
         try {
             const hashPassword = await bcrypt.hash(password, saltRounds)
             const response = await axios.patch(`${server1c}/Catalog_Profile(guid'${key}')?$format=json`, {
-                Description: email,
                 Phone: phone,
                 Password: hashPassword
             }, {
