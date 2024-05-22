@@ -21,7 +21,7 @@ const usersonec = {
                 return false
             }
             console.log(response.data)
-            return { userid: response.data[0].objectid, ...response.data[0].elementjson }
+            return response.data[0]
 
         } catch (error) {
             console.log(error.message)
