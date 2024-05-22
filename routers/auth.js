@@ -3,7 +3,7 @@ const router = express.Router();
 const { check, validationResult, checkSchema } = require("express-validator");
 const sendCodeToPhone = require("../services/sendCodeToPhone");
 const jwt = require("jsonwebtoken");
-const { getUserByEmail, getUserById } = require("../services/strapi");
+const { getUserByEmail, getUserById } = require("../services/onec/users");
 const bcrypt = require('bcrypt');
 
 const privateKey = process.env.JWT_SECRET;
