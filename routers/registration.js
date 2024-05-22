@@ -165,11 +165,11 @@ router.post('/newuser', async (req, res) => {
     if (checkUser) {
         //Обновление пароля и телефона пользователя с указанным email
         try {
-            const newuser = await updateUser(checkUser, req.session.phone, req.body.password)
-            console.log(newuser)
+            const user = await updateUser(checkUser, req.session.phone, req.body.password)
+            console.log('user',user)
             //const email = req.session.email
             req.session.destroy()
-            const userjwt = jwt.sign({ id: newuser.Ref_Key, email: newuser.Email, phone: newuser.Phone }, privateKey, { expiresIn: `${process.env.JWT_LIVE_HOURS}h` });
+            const userjwt = jwt.sign({ id: user.Ref_Key, email: user.Email, phone: user.Phone }, privateKey, { expiresIn: `${process.env.JWT_LIVE_HOURS}h` });
             return res.json({ status: "ok", jwt: userjwt });
             // return res.json({ status: 'ok', message: `Пароль и телефон обновлен у пользователя: ${email}` })
         } catch (error) {
