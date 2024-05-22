@@ -32,7 +32,7 @@ router.post(
       return res.status(400).json({ status: "error", message: "нет нужной информации" });
     }
     const founduser = await getUserByEmail(req.body.email.toLowerCase());
-    //console.log(founduser)
+    console.log('founduser',founduser)
     if (founduser && await bcrypt.compare(req.body.password, founduser.Password)) {
       req.session.founduser = founduser;
       //console.log(req.session.founduser)
