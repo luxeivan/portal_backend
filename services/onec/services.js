@@ -8,7 +8,7 @@ const headers = {
 }
 
 const servicesOneC = {
-    getServicesByKey: async (key="00000000-0000-0000-0000-000000000000") => {
+    getServicesByKey: async (key = "00000000-0000-0000-0000-000000000000") => {
         try {
             const response = await axios.get(`${server1c}/Catalog_Services?$format=json&$filter=Parent_Key eq guid'${key}'`, {
                 headers
@@ -16,7 +16,7 @@ const servicesOneC = {
             if (!response.data) {
                 return false
             }
-            console.log(response.data)
+            // console.log(response.data)
             return response.data
 
         } catch (error) {
@@ -32,7 +32,7 @@ const servicesOneC = {
             if (!response.data) {
                 return false
             }
-            console.log(response.data)
+            // console.log(response.data)
             return response.data
 
         } catch (error) {
