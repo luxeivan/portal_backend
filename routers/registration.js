@@ -169,7 +169,7 @@ router.post('/newuser', async (req, res) => {
             console.log(newuser)
             //const email = req.session.email
             req.session.destroy()
-            const userjwt = jwt.sign({ id: newuser.data.id, email: newuser.data.attributes.email, phone: newuser.data.attributes.phone }, privateKey, { expiresIn: `${process.env.JWT_LIVE_HOURS}h` });
+            const userjwt = jwt.sign({ id: newuser.Ref_Key, email: newuser.Email, phone: newuser.Phone }, privateKey, { expiresIn: `${process.env.JWT_LIVE_HOURS}h` });
             return res.json({ status: "ok", jwt: userjwt });
             // return res.json({ status: 'ok', message: `Пароль и телефон обновлен у пользователя: ${email}` })
         } catch (error) {
@@ -182,7 +182,7 @@ router.post('/newuser', async (req, res) => {
     try {
         const newuser = await createNewUser(req.session.email, req.session.phone, req.body.password)
         req.session.destroy()
-        const userjwt = jwt.sign({ id: newuser.data.id, email: newuser.data.attributes.email, phone: newuser.data.attributes.phone }, privateKey, { expiresIn: `${process.env.JWT_LIVE_HOURS}h` });
+        const userjwt = jwt.sign({ id: newuser.Ref_Key, email: newuser.Email, phone: newuser.Phone }, privateKey, { expiresIn: `${process.env.JWT_LIVE_HOURS}h` });
         return res.json({ status: "ok", jwt: userjwt });
         // return res.json({ status: 'ok', message: "пользователь создан", data: newuser.data })
     } catch (error) {
