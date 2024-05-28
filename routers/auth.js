@@ -74,7 +74,7 @@ router.post(
       return res.status(400).json({ status: "error", message: "Не найден пользователь" });
     }
     if (req.session.pincode == req.body.pincode) {
-      const userjwt = jwt.sign({ id: req.session.founduser.Ref_key, email: req.session.founduser.Email, phone: req.session.founduser.Phone }, privateKey, { expiresIn: `${process.env.JWT_LIVE_HOURS}h` });
+      const userjwt = jwt.sign({ id: req.session.founduser.Ref_Key, email: req.session.founduser.Email, phone: req.session.founduser.Phone }, privateKey, { expiresIn: `${process.env.JWT_LIVE_HOURS}h` });
       return res.json({ status: "ok", jwt: userjwt, userid: req.session.founduser.Ref_key, email: req.session.founduser.Email, phone: req.session.founduser.Phone });
     } else {
       return res.status(418).json({ status: "error", message: "Не верный пин код" });
