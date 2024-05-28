@@ -109,7 +109,7 @@ router.post('/checkjwt', async function (req, res) {
   if (!req.body.jwt) return res.json('не указан jwt в теле')
   try {
     const valid = await jwt.verify(req.body.jwt, privateKey);
-    console.log(valid)
+    console.log('valid',valid)
     const user = await getUserById(valid.id)
     if(!user) throw new Error('Пользователь не найден')
     //console.log(valid)
