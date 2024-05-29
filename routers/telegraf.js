@@ -5,7 +5,8 @@ const router = express.Router();
 const telegram = new Telegram("7221312469:AAHpG-K9hCN_U2hsgYPF8kM6387ajRnwRkY");
 
 router.post("/", async (req, res) => {
-  res.json(req.body);
+  console.log(req.body);
+  res.json("Ok");
 });
 
 router.post("/send", async (req, res) => {
