@@ -24,8 +24,8 @@ router.post("/", async (req, res) => {
             "http://5.35.9.42:1337/api/id-avarijnyh-soobshhenij-v-telegrams",
             {
               data: {
-                messageId: response.message_id,
-                avarijnoeID: entry.id,
+                messageID: response.message_id,
+                avariynoeID: entry.id,
               },
             }
           );
@@ -39,9 +39,9 @@ router.post("/", async (req, res) => {
       try {
         // Получаем сообщение из базы данных по avarijnoeID
         const response = await axios.get(
-          `http://5.35.9.42:1337/api/id-avarijnyh-soobshhenij-v-telegrams?filters[avarijnoeID][$eq]=${entry.id}`
+          `http://5.35.9.42:1337/api/id-avarijnyh-soobshhenij-v-telegrams?filters[avariynoeID][$eq]=${entry.id}`
         );
-        const messageId = response.data.data[0].attributes.messageId;
+        const messageId = response.data.data[0].attributes.messageID;
 
         // Удаляем сообщение в Telegram
         const telegramResponse = await telegram.deleteMessage(
