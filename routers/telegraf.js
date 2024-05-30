@@ -10,7 +10,47 @@ router.post("/", async (req, res) => {
   const model = req.body.model;
 
   if (model === "avarijnye-otklyucheniya") {
-    if (event === "entry.create") {
+    if (event === "entry.update") {
+      const entry = req.body.entry;
+      const date = new Date(entry.dateDisconnected);
+      const options = {
+        timeZone: "Europe/Moscow",
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+      };
+      const formattedDate = date.toLocaleString("ru-RU", options);
+
+      const message = `<b>Городской округ:</b> ${entry.go}
+  <b>Улицы:</b> ${entry.addressDisconnected}
+  <b>Дата:</b> ${formattedDate}
+  <b>Продолжительность:</b> ${entry.durationSolution} ч`;
+
+      try {
+        // Поиск существующего сообщения в базе данных
+        const response = await axios.get(
+          `http://5.35.9.42:1337/api/id-avarijnyh-soobshhenij-v-telegrams?filters[avariynoeID][$eq]=${entry.id}`
+        );
+        const messageId = response.data.data[0].attributes.messageID;
+
+        // Обновляем сообщение в Telegram
+        await telegram.editMessageText(
+          "-1002070621778",
+          messageId,
+          null,
+          message,
+          {
+            parse_mode: "HTML",
+          }
+        );
+
+        console.log("Message updated in Telegram:", messageId);
+      } catch (error) {
+        console.error("Error updating Telegram message:", error);
+      }
+    } else if (event === "entry.create") {
       const entry = req.body.entry;
       const date = new Date(entry.dateDisconnected);
       const options = {
@@ -97,14 +137,26 @@ module.exports = router;
 //   if (model === "avarijnye-otklyucheniya") {
 //     if (event === "entry.create") {
 //       const entry = req.body.entry;
-//       const message = `Аварийное отключение:
-//         Городской округ: ${entry.go}
-//         Улицы: ${entry.addressDisconnected}
-//         Дата: ${new Date(entry.dateDisconnected).toLocaleString()}
-//         Продолжительность: ${entry.durationSolution} ч`;
+//       const date = new Date(entry.dateDisconnected);
+//       const options = {
+//         timeZone: "Europe/Moscow",
+//         day: "2-digit",
+//         month: "2-digit",
+//         year: "numeric",
+//         hour: "2-digit",
+//         minute: "2-digit",
+//       };
+//       const formattedDate = date.toLocaleString("ru-RU", options);
+
+//       const message = `<b>Городской округ:</b> ${entry.go}
+// <b>Улицы:</b> ${entry.addressDisconnected}
+// <b>Дата:</b> ${formattedDate}
+// <b>Продолжительность:</b> ${entry.durationSolution} ч`;
+
 //       try {
 //         const response = await telegram.sendMessage("-1002070621778", message, {
 //           message_thread_id: 4,
+//           parse_mode: "HTML",
 //         });
 //         if (response.message_id) {
 //           await axios.post(
