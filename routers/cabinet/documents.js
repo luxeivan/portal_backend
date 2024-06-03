@@ -4,7 +4,6 @@ const router = express.Router();
 const path = require("path");
 const fs = require("fs");
 const { v4: uuidv4 } = require("uuid");
-const { pool } = require("./db"); // Подключение к базе данных
 
 const pathFileStorage = process.env.PATH_FILESTORAGE;
 const maxSizeFile = 10; // Максимальный размер файла в мегабайтах
@@ -58,7 +57,10 @@ router.post("/", async function (req, res) {
         console.log(error);
         return res
           .status(500)
-          .json({ status: "error", message: "Ошибка при записи файлов" });
+          .json({
+            status: "error",
+            message: "Ошибка при создании директории для файлов",
+          });
       }
     }
   }
@@ -81,29 +83,8 @@ router.post("/", async function (req, res) {
   });
 
   Promise.all(arrayWriteFile)
-    .then(async (responses) => {
-      try {
-        // Сохраняем информацию о документах в базе данных
-        const insertQuery =
-          "INSERT INTO documents (user_id, document_name, file_path) VALUES ($1, $2, $3)";
-        const promises = responses.map((file) => {
-          const documentName = req.body.documentName || "Неизвестно";
-          const filePath = `${dirName}/${file}`;
-          return pool.query(insertQuery, [userId, documentName, filePath]);
-        });
-
-        await Promise.all(promises);
-        return res.json({ status: "ok", files: responses });
-      } catch (error) {
-        console.error(error);
-        return res
-          .status(500)
-          .json({
-            status: "error",
-            message:
-              "Ошибка при сохранении информации о документах в базе данных",
-          });
-      }
+    .then((responses) => {
+      return res.json({ status: "ok", files: responses });
     })
     .catch((error) => {
       console.error(error);
