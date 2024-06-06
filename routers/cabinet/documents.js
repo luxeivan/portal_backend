@@ -177,12 +177,12 @@ router.post("/", async function (req, res) {
     const response = await axios.post(
       "http://45.89.189.5/InfoBase/odata/standard.odata/Catalog_DocumentsOfProfiles?$format=json",
       payload,
-      // {
-      //   headers: {
-      //     "Content-Type": "application/json",
-      //     Authorization: `Bearer ${token}`,
-      //   },
-      // }
+      {
+        headers: {
+          "Content-Type": "application/json",
+          // Authorization: `Bearer ${token}`,
+        },
+      }
     );
     console.log(response)
     res.json({ status: "ok", message: "Документ успешно сохранен",response });
