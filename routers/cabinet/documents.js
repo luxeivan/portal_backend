@@ -139,20 +139,26 @@ router.post("/upload", async function (req, res) {
 //   }
 // });
 
-router.post("/documents", async function (req, res) {
+router.post("/", async function (req, res) {
   const { documentName, files } = req.body;
-  const token = req.headers["authorization"].split(" ")[1];
-  let userId;
 
-  try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    userId = decoded.id; 
-  } catch (error) {
-    return res
-      .status(401)
-      .json({ status: "error", message: "Невалидный токен" });
+  if(!documentName && !files){
+    res.status(400).json({
+      status: "error",
+      message: "Нет нужных полей",
+    });
   }
+  // const token = req.headers["authorization"].split(" ")[1];
+  // let userId;
 
+  // try {
+  //   const decoded = jwt.verify(token, process.env.JWT_SECRET);
+  //   userId = decoded.id; 
+  // } catch (error) {
+  //   return res
+  //     .status(401)
+  //     .json({ status: "error", message: "Невалидный токен" });
+  // }
   const filesData = files.map((file, index) => ({
     LineNumber: index + 1,
     fileName: file.name,
