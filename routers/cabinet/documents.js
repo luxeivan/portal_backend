@@ -140,6 +140,7 @@ router.post("/upload", async function (req, res) {
 // });
 
 router.post("/", async function (req, res) {
+  const userId = req.userId;
   const { documentName, files } = req.body;
 
   if(!documentName && !files){
