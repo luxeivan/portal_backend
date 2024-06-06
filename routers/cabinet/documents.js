@@ -1,7 +1,7 @@
 const express = require("express");
 const jwt = require("jsonwebtoken");
-const axios = require("axios");
 const router = express.Router();
+const axios = require("axios");
 const path = require("path");
 const fs = require("fs");
 const { v4: uuidv4 } = require("uuid");
@@ -54,12 +54,10 @@ router.post("/upload", async function (req, res) {
         await fs.promises.mkdir(dirName);
       } catch (error) {
         console.log(error);
-        return res
-          .status(500)
-          .json({
-            status: "error",
-            message: "Ошибка при создании директории для файлов",
-          });
+        return res.status(500).json({
+          status: "error",
+          message: "Ошибка при создании директории для файлов",
+        });
       }
     }
   }
@@ -93,6 +91,54 @@ router.post("/upload", async function (req, res) {
     });
 });
 
+// router.post("/documents", async function (req, res) {
+//   const { documentName, files } = req.body;
+//   const token = req.headers["authorization"].split(" ")[1];
+//   let userId;
+
+//   try {
+//     const decoded = jwt.verify(token, process.env.JWT_SECRET);
+//     userId = decoded.id; // Извлекаем ID пользователя из токена
+//   } catch (error) {
+//     return res
+//       .status(401)
+//       .json({ status: "error", message: "Невалидный токен" });
+//   }
+
+//   const filesData = files.map((file, index) => ({
+//     LineNumber: index + 1,
+//     fileName: file.name,
+//     fileType: file.name.split(".").pop(),
+//     fileSize: "1000", // Пример размера файла, используйте фактический размер
+//   }));
+
+//   const payload = {
+//     Description: documentName,
+//     profile: userId,
+//     files: filesData,
+//   };
+
+//   try {
+//     await axios.post(
+//       "http://45.89.189.5/InfoBase/odata/standard.odata/Catalog_DocumentsOfProfiles?$format=json",
+//       payload,
+//       {
+//         headers: {
+//           "Content-Type": "application/json",
+//           Authorization: `Bearer ${token}`,
+//         },
+//       }
+//     );
+//     res.json({ status: "ok", message: "Документ успешно сохранен" });
+//   } catch (error) {
+//     console.error("Ошибка при отправке данных в 1С", error);
+//     res.status(500).json({
+//       status: "error",
+//       message: "Ошибка при отправке данных в 1С",
+//     });
+//   }
+// });
+
 router.post("/documents", async function (req, res) {
   const { documentName, files } = req.body;
   const token = req.headers["authorization"].split(" ")[1];
@@ -100,7 +146,7 @@ router.post("/documents", async function (req, res) {
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    userId = decoded.id; // Извлекаем ID пользователя из токена
+    userId = decoded.id; 
   } catch (error) {
     return res
       .status(401)
@@ -111,7 +157,7 @@ router.post("/documents", async function (req, res) {
     LineNumber: index + 1,
     fileName: file.name,
     fileType: file.name.split(".").pop(),
-    fileSize: "1000", // Пример размера файла, используйте фактический размер
+    fileSize: "1000", 
   }));
 
   const payload = {
