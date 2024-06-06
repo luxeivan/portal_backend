@@ -143,7 +143,7 @@ router.post("/", async function (req, res) {
   const userId = req.userId;
   const { documentName, files } = req.body;
 
-  if(!documentName && !files){
+  if (!documentName && !files) {
     res.status(400).json({
       status: "error",
       message: "Нет нужных полей",
@@ -164,7 +164,7 @@ router.post("/", async function (req, res) {
     LineNumber: index + 1,
     fileName: file.name,
     fileType: file.name.split(".").pop(),
-    fileSize: "1000", 
+    fileSize: "1000",
   }));
 
   const payload = {
@@ -174,7 +174,7 @@ router.post("/", async function (req, res) {
   };
 
   try {
-    await axios.post(
+    const response = await axios.post(
       "http://45.89.189.5/InfoBase/odata/standard.odata/Catalog_DocumentsOfProfiles?$format=json",
       payload,
       // {
@@ -184,7 +184,8 @@ router.post("/", async function (req, res) {
       //   },
       // }
     );
-    res.json({ status: "ok", message: "Документ успешно сохранен" });
+    console.log(response)
+    res.json({ status: "ok", message: "Документ успешно сохранен",response });
   } catch (error) {
     console.error("Ошибка при отправке данных в 1С", error);
     res.status(500).json({
