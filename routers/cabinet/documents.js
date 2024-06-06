@@ -185,7 +185,7 @@ router.post("/", async function (req, res) {
       }
     );
     console.log(response)
-    res.json({ status: "ok", message: "Документ успешно сохранен",response });
+    res.json({ status: "ok", message: "Документ успешно сохранен" });
   } catch (error) {
     console.error("Ошибка при отправке данных в 1С", error);
     res.status(500).json({
