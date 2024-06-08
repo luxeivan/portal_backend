@@ -9,87 +9,89 @@ const { v4: uuidv4 } = require("uuid");
 const pathFileStorage = process.env.PATH_FILESTORAGE;
 const maxSizeFile = 10;
 
-router.post("/upload", async function (req, res) {
-  const uuid = uuidv4();
-  const token = req.headers["authorization"].split(" ")[1];
-  let userId;
+const server1C = 'http://45.89.189.5/InfoBase/odata/standard.odata'
 
-  try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    userId = decoded.id; // Извлекаем ID пользователя из токена
-  } catch (error) {
-    return res
-      .status(401)
-      .json({ status: "error", message: "Невалидный токен" });
-  }
+// router.post("/upload", async function (req, res) {
+//   const uuid = uuidv4();
+//   const token = req.headers["authorization"].split(" ")[1];
+//   let userId;
 
-  const dirName = `${pathFileStorage}/${userId}`;
+//   try {
+//     const decoded = jwt.verify(token, process.env.JWT_SECRET);
+//     userId = decoded.id; // Извлекаем ID пользователя из токена
+//   } catch (error) {
+//     return res
+//       .status(401)
+//       .json({ status: "error", message: "Невалидный токен" });
+//   }
 
-  if (!req.files || Object.keys(req.files).length === 0) {
-    return res.status(400).json({
-      status: "error",
-      message: "Нет файлов для загрузки",
-      files: req.files,
-    });
-  }
+//   const dirName = `${pathFileStorage}/${userId}`;
 
-  let bigFile = false;
-  Object.keys(req.files).map((item) => {
-    if (req.files[item].size > maxSizeFile * 1024 * 1024) {
-      bigFile = true;
-    }
-  });
+//   if (!req.files || Object.keys(req.files).length === 0) {
+//     return res.status(400).json({
+//       status: "error",
+//       message: "Нет файлов для загрузки",
+//       files: req.files,
+//     });
+//   }
 
-  if (bigFile) {
-    return res
-      .status(400)
-      .json({ status: "error", message: "Файлы больше 10МБ не принимаются" });
-  }
+//   let bigFile = false;
+//   Object.keys(req.files).map((item) => {
+//     if (req.files[item].size > maxSizeFile * 1024 * 1024) {
+//       bigFile = true;
+//     }
+//   });
 
-  try {
-    await fs.promises.access(dirName);
-  } catch (err) {
-    if (err && err.code === "ENOENT") {
-      try {
-        await fs.promises.mkdir(dirName);
-      } catch (error) {
-        console.log(error);
-        return res.status(500).json({
-          status: "error",
-          message: "Ошибка при создании директории для файлов",
-        });
-      }
-    }
-  }
+//   if (bigFile) {
+//     return res
+//       .status(400)
+//       .json({ status: "error", message: "Файлы больше 10МБ не принимаются" });
+//   }
 
-  const arrayWriteFile = Object.keys(req.files).map((item) => {
-    return new Promise(function (resolve, reject) {
-      const filename = `${item}_${uuid}.${req.files[item].name.slice(
-        req.files[item].name.lastIndexOf(".") + 1
-      )}`;
-      req.files[item].mv(`${dirName}/${filename}`, function (err) {
-        if (err)
-          reject({
-            status: "error",
-            message: "Ошибка при записи файлов",
-            error,
-          });
-        resolve({ filename, path: `${dirName}/${filename}` });
-      });
-    });
-  });
+//   try {
+//     await fs.promises.access(dirName);
+//   } catch (err) {
+//     if (err && err.code === "ENOENT") {
+//       try {
+//         await fs.promises.mkdir(dirName);
+//       } catch (error) {
+//         console.log(error);
+//         return res.status(500).json({
+//           status: "error",
+//           message: "Ошибка при создании директории для файлов",
+//         });
+//       }
+//     }
+//   }
 
-  Promise.all(arrayWriteFile)
-    .then(async (responses) => {
-      res.json({ status: "ok", files: responses });
-    })
-    .catch((error) => {
-      console.error(error);
-      return res
-        .status(500)
-        .json({ status: "error", message: "Ошибка при записи файлов" });
-    });
-});
+//   const arrayWriteFile = Object.keys(req.files).map((item) => {
+//     return new Promise(function (resolve, reject) {
+//       const filename = `${item}_${uuid}.${req.files[item].name.slice(
+//         req.files[item].name.lastIndexOf(".") + 1
+//       )}`;
+//       req.files[item].mv(`${dirName}/${filename}`, function (err) {
+//         if (err)
+//           reject({
+//             status: "error",
+//             message: "Ошибка при записи файлов",
+//             error,
+//           });
+//         resolve({ filename, path: `${dirName}/${filename}` });
+//       });
+//     });
+//   });
+
+//   Promise.all(arrayWriteFile)
+//     .then(async (responses) => {
+//       res.json({ status: "ok", files: responses });
+//     })
+//     .catch((error) => {
+//       console.error(error);
+//       return res
+//         .status(500)
+//         .json({ status: "error", message: "Ошибка при записи файлов" });
+//     });
+//  });
 
 router.post("/", async function (req, res) {
   const userId = req.userId;
@@ -116,7 +118,7 @@ router.post("/", async function (req, res) {
 
   try {
     const response = await axios.post(
-      "http://45.89.189.5/InfoBase/odata/standard.odata/Catalog_DocumentsOfProfiles?$format=json",
+      `${server1C}/Catalog_DocumentsOfProfiles?$format=json`,
       payload,
       {
         headers: {
@@ -141,28 +143,46 @@ router.post("/", async function (req, res) {
 });
 
 router.get("/", async function (req, res) {
-  const token = req.headers["authorization"].split(" ")[1];
-  let userId;
-
-  try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    userId = decoded.id; // Извлекаем ID пользователя из токена
-  } catch (error) {
-    return res
-      .status(401)
-      .json({ status: "error", message: "Невалидный токен" });
-  }
+  const userId = req.userId;
 
   try {
     const response = await axios.get(
-      `http://45.89.189.5/InfoBase/odata/standard.odata/Catalog_DocumentsOfProfiles?$format=json&$filter=profile eq '${userId}'`,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
+      `${server1C}/Catalog_DocumentsOfProfiles?$format=json&$filter=profile eq '${userId}'`
+      // {
+      //   headers: {
+      //     Authorization: `Bearer ${token}`,
+      //   },
+      // }
     );
 
+    if (response.data) {
+      res.json({
+        status: "ok",
+        documents: response.data.value,
+      });
+    }
+  } catch (error) {
+    console.error("Ошибка при получении данных из 1С", error);
+    res.status(500).json({
+      status: "error",
+      message: "Ошибка при получении данных из 1С",
+    });
+  }
+});
+
+router.get("/:id", async function (req, res) {
+  const userId = req.userId;
+
+  try {
+    const response = await axios.get(
+      `${server1C}/Catalog_DocumentsOfProfiles(guid'${idDocument}')?$format=json'`
+      // {
+      //   headers: {
+      //     Authorization: `Bearer ${token}`,
+      //   },
+      // }
+    );
+    console.log(response.data)
     if (response.data) {
       res.json({
         status: "ok",
