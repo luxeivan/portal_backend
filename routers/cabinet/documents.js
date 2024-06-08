@@ -170,6 +170,26 @@ router.get("/", async function (req, res) {
   }
 });
 
+router.get("/getNameDocs", async function (req, res) {
+  try {
+    const response = await axios.get(
+      `${server1C}/ChartOfCharacteristicTypes_НаименованиеДокументовПрофиля?$format=json`
+    );
+    console.log(response.data)
+    if (response.data) {      
+        res.json({
+          status: "ok",
+          nameDocs: response.data.value,
+        });      
+    }
+  } catch (error) {
+    console.error("Ошибка при получении данных из 1С", error);
+    res.status(500).json({
+      status: "error",
+      message: "Ошибка при получении данных из 1С",
+    });
+  }
+})
 router.get("/:id", async function (req, res) {
   const userId = req.userId;
   const idDocument = req.params.id;
@@ -200,25 +220,5 @@ router.get("/:id", async function (req, res) {
   }
 });
 
-router.get("/getNameDocs", async function (req, res) {
-  try {
-    const response = await axios.get(
-      `${server1C}/ChartOfCharacteristicTypes_НаименованиеДокументовПрофиля?$format=json`
-    );
-    console.log(response.data)
-    if (response.data) {      
-        res.json({
-          status: "ok",
-          nameDocs: response.data.value,
-        });      
-    }
-  } catch (error) {
-    console.error("Ошибка при получении данных из 1С", error);
-    res.status(500).json({
-      status: "error",
-      message: "Ошибка при получении данных из 1С",
-    });
-  }
-})
 
 module.exports = router;
