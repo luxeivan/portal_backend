@@ -172,7 +172,7 @@ router.get("/", async function (req, res) {
 
 router.get("/:id", async function (req, res) {
   const userId = req.userId;
-
+  const idDocument = req.params.id;
   try {
     const response = await axios.get(
       `${server1C}/Catalog_DocumentsOfProfiles(guid'${idDocument}')?$format=json'`
