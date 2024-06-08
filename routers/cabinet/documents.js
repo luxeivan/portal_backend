@@ -186,7 +186,7 @@ router.get("/:id", async function (req, res) {
     if (response.data) {
       res.json({
         status: "ok",
-        documents: response.data.value,
+        document: response.data,
       });
     }
   } catch (error) {
