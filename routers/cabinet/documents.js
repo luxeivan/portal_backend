@@ -157,6 +157,7 @@ router.get("/", async function (req, res) {
     );
 
     if (response.data) {
+      response.data.value.filter(item => !item.DeletionMark)
       res.json({
         status: "ok",
         documents: response.data.value,
