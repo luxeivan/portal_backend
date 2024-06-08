@@ -175,7 +175,7 @@ router.get("/:id", async function (req, res) {
   const idDocument = req.params.id;
   try {
     const response = await axios.get(
-      `${server1C}/Catalog_DocumentsOfProfiles(guid'${idDocument}')?$format=json'`
+      `${server1C}/Catalog_DocumentsOfProfiles(guid'${idDocument}')?$format=json`
       // {
       //   headers: {
       //     Authorization: `Bearer ${token}`,
