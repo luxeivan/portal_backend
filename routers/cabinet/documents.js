@@ -95,7 +95,7 @@ const server1C = 'http://45.89.189.5/InfoBase/odata/standard.odata'
 
 router.post("/", async function (req, res) {
   const userId = req.userId;
-  const { documentName, files } = req.body;
+  const { documentName, files, nameDoc_Key } = req.body;
 
   if (!documentName && !files) {
     res.status(400).json({
@@ -114,6 +114,7 @@ router.post("/", async function (req, res) {
     Description: documentName,
     profile: userId,
     files: filesData,
+    nameDoc_Key
   };
 
   try {
@@ -176,11 +177,11 @@ router.get("/getNameDocs", async function (req, res) {
       `${server1C}/ChartOfCharacteristicTypes_НаименованиеДокументовПрофиля?$format=json`
     );
     console.log(response.data)
-    if (response.data) {      
-        res.json({
-          status: "ok",
-          nameDocs: response.data.value,
-        });      
+    if (response.data) {
+      res.json({
+        status: "ok",
+        nameDocs: response.data.value,
+      });
     }
   } catch (error) {
     console.error("Ошибка при получении данных из 1С", error);
