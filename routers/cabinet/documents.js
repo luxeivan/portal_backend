@@ -148,7 +148,7 @@ router.get("/", async function (req, res) {
 
   try {
     const response = await axios.get(
-      `${server1C}/Catalog_DocumentsOfProfiles?$format=json&$filter=profile eq '${userId}'`
+      `${server1C}/Catalog_DocumentsOfProfiles?$format=json&$filter=(profile eq '${userId}') and (DeletionMark eq false)`
       // {
       //   headers: {
       //     Authorization: `Bearer ${token}`,
@@ -157,7 +157,6 @@ router.get("/", async function (req, res) {
     );
 
     if (response.data) {
-      response.data.value.filter(item => !item.DeletionMark)
       res.json({
         status: "ok",
         documents: response.data.value,
