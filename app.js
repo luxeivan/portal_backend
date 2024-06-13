@@ -19,13 +19,18 @@ const FileStore = require("session-file-store")(session);
 
 const checkAuth = require("./middleware/checkAuth");
 
-const options = {
-  cert: fs.readFileSync("./ssl/luxeivan.ru_cert.pem"),
-  key: fs.readFileSync("./ssl/luxeivan.ru_private_key.pem"),
-};
+
 const secretSession = process.env.SECRET_SESSION;
 const port = process.env.PORT;
 const portSSL = process.env.PORT_SSL;
+const cert = process.env.CERT;
+const certKey = process.env.CERT_KEY;
+
+const options = {
+  cert: fs.readFileSync(cert),
+  key: fs.readFileSync(certKey),
+};
+
 
 const app = express();
 app.use(cors({ credentials: true, origin: true }));
