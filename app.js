@@ -23,14 +23,14 @@ const checkAuth = require("./middleware/checkAuth");
 
 const secretSession = process.env.SECRET_SESSION;
 const port = process.env.PORT;
-const portSSL = process.env.PORT_SSL;
-const cert = process.env.CERT;
-const certKey = process.env.CERT_KEY;
+// const portSSL = process.env.PORT_SSL;
+// const cert = process.env.CERT;
+// const certKey = process.env.CERT_KEY;
 
-const options = {
-  cert: fs.readFileSync(cert),
-  key: fs.readFileSync(certKey),
-};
+// const options = {
+//   cert: fs.readFileSync(cert),
+//   key: fs.readFileSync(certKey),
+// };
 
 
 const app = express();
@@ -75,8 +75,8 @@ app.use("/api/services", services);
 app.use("/api/formonec", formonec);
 
 const httpServer = http.createServer(app);
-const httpsServer = https.createServer(options, app);
+// const httpsServer = https.createServer(options, app);
 httpServer.listen(port, () => {
   console.log(`Зашли и вышли, приключения на ${port} порту`);
 });
-httpsServer.listen(portSSL);
+// httpsServer.listen(portSSL);
