@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { getGetFields } = require('../services/onec/formonec')
+ const { getGetFields } = require('../services/onec/formonec')
 
 router.get('/', async (req, res) => {
     try {
@@ -13,3 +13,4 @@ router.get('/', async (req, res) => {
         res.status(500).json({ message: 'Internal server error' });
     }
 });
+module.exports = router;
