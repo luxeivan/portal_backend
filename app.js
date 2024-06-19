@@ -10,6 +10,7 @@ const registration = require("./routers/registration");
 const sendMail = require("./routers/sendmail");
 const cabinet = require("./routers/cabinet");
 const services = require("./routers/services");
+const formonec = require("./routers/formonec");
 
 const session = require("express-session");
 
@@ -71,6 +72,7 @@ app.use("/api/registration", registration);
 // app.use('/api/sendmail', sendMail)
 app.use("/api/cabinet", checkAuth, cabinet);
 app.use("/api/services", services);
+app.use("/api/formonec", formonec);
 
 const httpServer = http.createServer(app);
 const httpsServer = https.createServer(options, app);
