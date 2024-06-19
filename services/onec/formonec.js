@@ -10,7 +10,7 @@ const headers = {
 const formOneC = {
     getGetFields: async (key = "00000000-0000-0000-0000-000000000000") => {
         try {
-            const response = await axios.get(`${server1c}/Catalog_Services_Fields/?$format=json&$filter=Ref_Key eq guid'ea7c57cb-16ab-11ef-8681-c8d9d20cde1f' and Usage eq true&$select=*&$expand=Name,NameTable,ValueTemplate,ValueVariants`, {
+            const response = await axios.get(`${server1c}/Catalog_Services_Fields/?$format=json&$filter=Ref_Key eq guid'${key}' and Usage eq true&$select=*&$expand=Name,NameTable,ValueTemplate,ValueVariants`, {
                 headers
             })
             if (!response.data) {
