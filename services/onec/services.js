@@ -28,13 +28,13 @@ const servicesOneC = {
         try {
             const resp = await Promise.all([
                 axios.get(`${server1c}/Catalog_Services?$format=json&$filter=DeletionMark eq false and Usage eq true and Ref_Key eq guid'${key}'`, {
-                headers
-            }), 
-            axios.get(`${server1c}/Catalog_Services_Fields/?$format=json&$filter=Ref_Key eq guid'${key}'&$select=*&$expand=Name`, {
-                headers
-            })
-        ]
-        )
+                    headers
+                }),
+                axios.get(`${server1c}/Catalog_Services_Fields/?$format=json&$filter=Ref_Key eq guid'${key}'&$select=*&$expand=Name`, {
+                    headers
+                })
+            ]
+            )
             // const response = await axios.get(`${server1c}/Catalog_Services?$format=json&$filter=DeletionMark eq false and Usage eq true and Ref_Key eq guid'${key}'`, {
             //     headers
             // })
@@ -45,11 +45,11 @@ const servicesOneC = {
             // console.log(resp)
             // console.log(resp[0].data.value)
             // console.log(resp[1].data)
-            return resp[0].data.value
+            return resp[0].data.value[0]
 
         } catch (error) {
             console.log(error.data)
-            return {status:"error"}
+            return { status: "error" }
         }
     },
 }
