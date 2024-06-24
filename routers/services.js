@@ -18,8 +18,8 @@ router.get('/:key', async (req, res) => {
         // const userId = req.userId
         const key = req.params.key;
         //console.log(userData)
-        const services = await getServicesByKey(key);
-        res.json(services);
+        const service = await getServicesByKey(key);
+        res.json(service);
     } catch (error) {
         console.log(error)
         res.status(500).json({ message: 'Internal server error' });
