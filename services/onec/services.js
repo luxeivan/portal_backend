@@ -10,7 +10,7 @@ const headers = {
 const servicesOneC = {
     getServicesByKey: async (key = "00000000-0000-0000-0000-000000000000") => {
         try {
-            const response = await axios.get(`${server1c}/Catalog_Services?$format=json&$filter=Parent_Key eq guid'${key}'`, {
+            const response = await axios.get(`${server1c}/Catalog_Services?$format=json&$filter=Used eq true and Parent_Key eq guid'${key}'`, {
                 headers
             })
             if (!response.data) {
@@ -26,7 +26,7 @@ const servicesOneC = {
     },
     getServiceItemByKey: async (key) => {
         try {
-            const response = await axios.get(`${server1c}/Catalog_Services?$format=json&$filter=Ref_Key eq guid'${key}'`, {
+            const response = await axios.get(`${server1c}/Catalog_Services?$format=json&$filter=Used eq true and Ref_Key eq guid'${key}'`, {
                 headers
             })
             if (!response.data) {
