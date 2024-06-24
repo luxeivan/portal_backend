@@ -26,18 +26,30 @@ const servicesOneC = {
     },
     getServiceItemByKey: async (key) => {
         try {
-            const response = await axios.get(`${server1c}/Catalog_Services?$format=json&$filter=DeletionMark eq false and Usage eq true and Ref_Key eq guid'${key}'`, {
+            const resp = await Promise.all([
+                axios.get(`${server1c}/Catalog_Services?$format=json&$filter=DeletionMark eq false and Usage eq true and Ref_Key eq guid'${key}'`, {
+                headers
+            }), 
+            axios.get(`${server1c}/Catalog_Services_Fields/?$format=json&$filter=Ref_Key eq guid'${key}'&$select=*&$expand=Name`, {
                 headers
             })
-            if (!response.data) {
-                return false
-            }
-            // console.log(response.data)
-            return response.data
+        ]
+        )
+            // const response = await axios.get(`${server1c}/Catalog_Services?$format=json&$filter=DeletionMark eq false and Usage eq true and Ref_Key eq guid'${key}'`, {
+            //     headers
+            // })
+            // if (!response.data) {
+            //     return false
+            // }
+            resp[0].data.value[0].Fields = resp[1].data.value
+            // console.log(resp)
+            // console.log(resp[0].data.value)
+            // console.log(resp[1].data)
+            return resp[0].data.value
 
         } catch (error) {
-            console.log(error.message)
-            return false
+            console.log(error.data)
+            return {status:"error"}
         }
     },
 }
