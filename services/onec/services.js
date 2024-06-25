@@ -30,7 +30,7 @@ const servicesOneC = {
                 axios.get(`${server1c}/Catalog_Services?$format=json&$filter=DeletionMark eq false and Usage eq true and Ref_Key eq guid'${key}'`, {
                     headers
                 }),
-                axios.get(`${server1c}/Catalog_Services_Fields/?$format=json&$filter=Ref_Key eq guid'${key}'&$select=*&$expand=Name`, {
+                axios.get(`${server1c}/Catalog_Services_Fields/?$format=json&$filter=Ref_Key eq guid'${key}'&$expand=name`, {
                     headers
                 })
             ]
@@ -44,7 +44,7 @@ const servicesOneC = {
             resp[0].data.value[0].Fields = resp[1].data.value
             // console.log(resp)
             // console.log(resp[0].data.value)
-            // console.log(resp[1].data)
+            console.log(resp[1].data)
             return resp[0].data.value[0]
 
         } catch (error) {
