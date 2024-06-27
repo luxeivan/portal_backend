@@ -10,13 +10,13 @@ router.post('/', async (req, res) => {
         res.json(newClaim);
     } catch (error) {
         console.log(error)
-        res.status(500).json({ message: 'Internal server error' });
+        res.status(500).json({ message: 'Internal server error',error });
     }
 });
 router.get('/', async (req, res) => {
     try {
         const userId = req.userId
-        console.log(userId)
+        // console.log(userId)
         const services = await getClaims(userId);
         res.json(services);
     } catch (error) {
