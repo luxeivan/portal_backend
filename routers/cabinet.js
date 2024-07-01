@@ -13,6 +13,7 @@ const getCadastral = require("./cabinet/getCadastral");
 const getFmsUnit = require("./cabinet/getFmsUnit");
 const sendSms = require("./cabinet/sendSms");
 const documentsRouter = require("./cabinet/documents");
+const claimstest = require("./cabinet/claimstest");
 // ... и так далее для всех остальных файлов в папке cabinet ...
 
 router.use("/subjects", subjectsRouter);
@@ -27,6 +28,7 @@ router.use("/get-cadastral", getCadastral);
 router.use("/get-fms", getFmsUnit);
 router.use("/send-sms", sendSms);
 router.use("/documents", documentsRouter);
+router.use("/claimstest", claimstest);
 // ... и так далее для всех остальных импортированных роутеров ...
 
 module.exports = router;
