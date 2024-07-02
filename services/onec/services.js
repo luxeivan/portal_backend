@@ -30,7 +30,7 @@ const servicesOneC = {
                 axios.get(`${server1c}/Catalog_Services?$format=json&$filter=DeletionMark eq false and Usage eq true and Ref_Key eq guid'${key}'`, {
                     headers
                 }),
-                axios.get(`${server1c}/Catalog_Services_Fields/?$format=json&$filter=Ref_Key eq guid'${key}'&$select=*&$expand=name,component,depend`, {
+                axios.get(`${server1c}/InformationRegister_portalFields?$format=json&$select=*&$expand=name,component,dependName,dependСondition&$filter=cast(object,'Catalog_Services') eq guid'${key}'`, {
                     headers
                 })
             ]
