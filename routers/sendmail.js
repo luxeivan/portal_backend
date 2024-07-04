@@ -1,14 +1,23 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
-const sendCodeToMail = require('../services/sendCodeToMail')
+const sendCodeToMail = require("../services/sendCodeToMail");
+const logger = require("../logger");
 
-router.get('/', async (req, res) => {
-    try {
-       await sendCodeToMail('luxeivan@gmail.com', 5289)
-       res.json({status:"ok"})
-    } catch (error) {
-        res.json(error)
-    }
-    
-})
+router.get("/", async (req, res) => {
+  logger.info("Получен запрос на отправку кода на email");
+
+  try {
+    await sendCodeToMail("luxeivan@gmail.com", 5289);
+    logger.info("Код успешно отправлен на email luxeivan@gmail.com");
+    res.json({ status: "ok" });
+  } catch (error) {
+    logger.error(`Ошибка при отправке кода на email: ${error.message}`);
+    res.status(500).json({
+      status: "error",
+      message: "Ошибка при отправке кода на email",
+      error: error.message,
+    });
+  }
+});
+
 module.exports = router;
