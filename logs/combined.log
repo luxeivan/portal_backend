@@ -20,3 +20,5 @@
     at next (/Users/yanutstas/Desktop/Project/portal_backend/node_modules/express/lib/router/index.js:280:10)
     at Function.handle (/Users/yanutstas/Desktop/Project/portal_backend/node_modules/express/lib/router/index.js:175:3)
     at router (/Users/yanutstas/Desktop/Project/portal_backend/node_modules/express/lib/router/index.js:47:12)
+11:31 05.07.2024 info: Получен запрос на получение сервисов
+11:31 05.07.2024 info: Сервисы успешно получены
