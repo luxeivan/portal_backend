@@ -1,0 +1,22 @@
+14:35 04.07.2024 error: Ошибка: Это тестовая ошибка для логирования. Стек вызова: Error: Это тестовая ошибка для логирования
+    at /Users/yanutstas/Desktop/Project/portal_backend/routers/auth.js:14:11
+    at Layer.handle [as handle_request] (/Users/yanutstas/Desktop/Project/portal_backend/node_modules/express/lib/router/layer.js:95:5)
+    at next (/Users/yanutstas/Desktop/Project/portal_backend/node_modules/express/lib/router/route.js:149:13)
+    at Route.dispatch (/Users/yanutstas/Desktop/Project/portal_backend/node_modules/express/lib/router/route.js:119:3)
+    at Layer.handle [as handle_request] (/Users/yanutstas/Desktop/Project/portal_backend/node_modules/express/lib/router/layer.js:95:5)
+    at /Users/yanutstas/Desktop/Project/portal_backend/node_modules/express/lib/router/index.js:284:15
+    at Function.process_params (/Users/yanutstas/Desktop/Project/portal_backend/node_modules/express/lib/router/index.js:346:12)
+    at next (/Users/yanutstas/Desktop/Project/portal_backend/node_modules/express/lib/router/index.js:280:10)
+    at Function.handle (/Users/yanutstas/Desktop/Project/portal_backend/node_modules/express/lib/router/index.js:175:3)
+    at router (/Users/yanutstas/Desktop/Project/portal_backend/node_modules/express/lib/router/index.js:47:12)
+14:35 04.07.2024 error: Ошибка: Это тестовая ошибка для логирования. Стек вызова: Error: Это тестовая ошибка для логирования
+    at /Users/yanutstas/Desktop/Project/portal_backend/routers/auth.js:14:11
+    at Layer.handle [as handle_request] (/Users/yanutstas/Desktop/Project/portal_backend/node_modules/express/lib/router/layer.js:95:5)
+    at next (/Users/yanutstas/Desktop/Project/portal_backend/node_modules/express/lib/router/route.js:149:13)
+    at Route.dispatch (/Users/yanutstas/Desktop/Project/portal_backend/node_modules/express/lib/router/route.js:119:3)
+    at Layer.handle [as handle_request] (/Users/yanutstas/Desktop/Project/portal_backend/node_modules/express/lib/router/layer.js:95:5)
+    at /Users/yanutstas/Desktop/Project/portal_backend/node_modules/express/lib/router/index.js:284:15
+    at Function.process_params (/Users/yanutstas/Desktop/Project/portal_backend/node_modules/express/lib/router/index.js:346:12)
+    at next (/Users/yanutstas/Desktop/Project/portal_backend/node_modules/express/lib/router/index.js:280:10)
+    at Function.handle (/Users/yanutstas/Desktop/Project/portal_backend/node_modules/express/lib/router/index.js:175:3)
+    at router (/Users/yanutstas/Desktop/Project/portal_backend/node_modules/express/lib/router/index.js:47:12)

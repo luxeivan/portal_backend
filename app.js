@@ -4,6 +4,7 @@ const fs = require("fs");
 const http = require("http");
 const https = require("https");
 require("dotenv").config();
+const logger = require("./logger");
 
 const auth = require("./routers/auth");
 const registration = require("./routers/registration");
@@ -21,7 +22,6 @@ const FileStore = require("session-file-store")(session);
 
 const checkAuth = require("./middleware/checkAuth");
 
-
 const secretSession = process.env.SECRET_SESSION;
 const port = process.env.PORT;
 const portSSL = process.env.PORT_SSL;
@@ -32,7 +32,6 @@ const options = {
   cert: fs.readFileSync(cert),
   key: fs.readFileSync(certKey),
 };
-
 
 const app = express();
 app.use(cors({ credentials: true, origin: true }));
@@ -65,6 +64,12 @@ app.use(
     tempFileDir: "/tmp/",
   })
 );
+
+// Middleware для логирования ошибок
+app.use((err, req, res, next) => {
+  logger.error(err.stack);
+  res.status(500).send("Морти, у нас что-то сломалось!");
+});
 
 //app.use(express.urlencoded({ extended: true }));
 
