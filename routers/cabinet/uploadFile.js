@@ -4,6 +4,7 @@ const router = express.Router();
 const path = require('path');
 const fs = require('fs');
 const { v4: uuidv4 } = require('uuid');
+const logger = require("../../logger");
 // const multer = require('multer')
 // const upload = multer({ dest: 'uploads/' })
 
@@ -12,33 +13,38 @@ const maxSizeFile = 10 //Максимальный размер файла в м�
 
 router.post('/',
     async function (req, res) {
-        const uuid = uuidv4()
-        const userId = req.userId
-        const dirName = `${pathFileStorage}/${userId}`
-        //console.log(req.files)
+        const uuid = uuidv4();
+        const userId = req.userId;
+        const dirName = `${pathFileStorage}/${userId}`;
+        logger.info(`Получен запрос на загрузку файлов для пользователя: ${userId}, UUID: ${uuid}`);
+
         if (!req.files || Object.keys(req.files).length === 0) {
+            logger.warn(`Запрос на загрузку файлов не содержит файлов. UUID: ${uuid}`);
             return res.status(400).json({ status: "error", message: 'Нет файлов для загрузки', files: req.files });
         }
-        let bigFile = false
+
+        let bigFile = false;
         Object.keys(req.files).map(item => {
-            console.log(req.files[item].size)
+            logger.info(`Размер файла ${item}: ${req.files[item].size} байт. UUID: ${uuid}`);
             if (req.files[item].size > maxSizeFile * 1024 * 1024) {
-                bigFile = true
+                bigFile = true;
             }
+        });
 
-        })
         if (bigFile) {
+            logger.warn(`Один или несколько файлов превышают допустимый размер. UUID: ${uuid}`);
             return res.status(400).json({ status: "error", message: 'Файлы больше 10МБ не принимаются' });
-
         }
+
         try {
-            await fs.promises.access(dirName)
+            await fs.promises.access(dirName);
         } catch (err) {
             if (err && err.code === 'ENOENT') {
                 try {
-                    await fs.promises.mkdir(dirName)
+                    await fs.promises.mkdir(dirName);
+                    logger.info(`Создана директория: ${dirName}. UUID: ${uuid}`);
                 } catch (error) {
-                    console.log(error)
+                    logger.error(`Ошибка при создании директории: ${dirName}. UUID: ${uuid}. Ошибка: ${error.message}`);
                     return res.status(500).json({ status: "error", message: 'Ошибка при записи файлов' });
                 }
             }
@@ -46,32 +52,30 @@ router.post('/',
 
         const arrayWriteFile = Object.keys(req.files).map(item => {
             return new Promise(function (resolve, reject) {
-                const filename = `${item}_${uuid}.${req.files[item].name.slice(req.files[item].name.lastIndexOf('.') + 1)}`
-                //console.log(req.files[item])
+                const filename = `${item}_${uuid}.${req.files[item].name.slice(req.files[item].name.lastIndexOf('.') + 1)}`;
                 req.files[item].mv(`${dirName}/${filename}`, function (err) {
-                    if (err) reject({ status: "error", message: 'Ошибка при записи файлов', error })
-                    resolve(`${filename}`)
-                })
-                // fs.promises.writeFile(`${dirName}/${filename}`, req.files[item].data).then(() => {
-                //     resolve(`/${userId}/${filename}`)
-                // }).catch((error) => {
-                //     reject({ status: "error", message: 'Ошибка при записи файлов', error })
-                // })
-            })
-        })
+                    if (err) {
+                        logger.error(`Ошибка при записи файла: ${filename}. UUID: ${uuid}. Ошибка: ${err.message}`);
+                        reject({ status: "error", message: 'Ошибка при записи файлов', error: err });
+                    } else {
+                        logger.info(`Файл успешно записан: ${filename}. UUID: ${uuid}`);
+                        resolve(`${filename}`);
+                    }
+                });
+            });
+        });
 
         Promise.all(arrayWriteFile)
             .then((responses) => {
-                // console.log(responses)
+                logger.info(`Все файлы успешно загружены для пользователя: ${userId}, UUID: ${uuid}`);
                 return res.json({ status: "ok", files: responses });
             })
             .catch(error => {
-                console.error(error)
+                logger.error(`Ошибка при записи файлов. UUID: ${uuid}. Ошибка: ${error.message}`);
                 return res.status(500).json({ status: "error", message: 'Ошибка при записи файлов' });
-            })
-
-
+            });
     }
-)
+);
+
 
 module.exports = router;

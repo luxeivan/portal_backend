@@ -1,13 +1,11 @@
 const { default: axios } = require("axios");
 const express = require("express");
-const {
-  validationResult,
-  query,
-} = require("express-validator");
+const { validationResult, query } = require("express-validator");
 const getCadastral = express.Router();
 const url = "https://cleaner.dadata.ru/api/v1/clean/address";
 
 const token = process.env.DADATA_TOKEN;
+
 getCadastral.get("/", query("addressObject").notEmpty(), async (req, res) => {
   // Проверка-------------------------
   const result = validationResult(req);
