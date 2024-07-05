@@ -1,5 +1,6 @@
 const axios = require('axios')
 const moment = require('moment')
+const services = require('./services')
 require('dotenv').config()
 
 const server1c = process.env.SERVER_1C
@@ -11,7 +12,9 @@ const headers = {
 const claimsOneC = {
     getClaims: async (userId) => {
         try {
-            const response = await axios.get(`${server1c}/Document_Claims?$format=json&$filter=profile eq '${userId}'`)
+            const response = await axios.get(`${server1c}/Document_Claims?$format=json&$filter=profile eq '${userId}'`, {
+                headers
+            })
             if (!response.data) {
                 return false
             }
@@ -24,23 +27,42 @@ const claimsOneC = {
         }
     },
     createClaim: async (data, userId) => {
-        
-        
-            const response = await axios.post(`${server1c}/Document_Claims?$format=json`, {
-                ...data,
-                Date:moment().format(),
-                service_Key: data.Ref_Key,
-                Ref_Key:undefined,
-                Parent_Key: undefined,
-                profile: userId
-            })
-            if (!response.data) {
-                return false
+        // console.log(data)
+        const service = await services.getServiceItemByKey(data.service)
+        // console.log(service)
+        const values = []
+        for (const [key, value] of Object.entries(data.values)) {
+            // console.log(`${key}: ${value}`);
+            values.push({ key, value })
+        }
+        const Fields = values.map((item, index) => {
+            const field = service.Fields.find(field => field.name_Key === item.key)
+            return {
+                LineNumber: index + 1,
+                Name_Key: item.key,
+                Value: item.value,
+                Value_Type: field.component_Expanded.typeOData,
+                Component: field.component,
+                Component_Type: field.component_Type,
+                LinkValueRepresentation: null
             }
-            // console.log(response.data)
-            return response.data
+        })
 
-        
+        const response = await axios.post(`${server1c}/Document_Claims?$format=json`, {
+            Fields,
+            Date: moment().format(),
+            Template_Key: data.service,
+            profile: userId
+        }, {
+            headers
+        })
+        if (!response.data) {
+            return false
+        }
+        // console.log(response.data)
+        return response.data
+
+
     },
 
 }
