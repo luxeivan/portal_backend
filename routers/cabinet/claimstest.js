@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { createClaim, getClaims } = require('../../services/onec/claimtest')
+const logger = require("../../logger");
 
 router.post('/', async (req, res) => {
     try {
@@ -13,6 +14,7 @@ router.post('/', async (req, res) => {
         res.status(500).json({ message: 'Internal server error',error });
     }
 });
+
 router.get('/', async (req, res) => {
     try {
         const userId = req.userId
@@ -24,6 +26,7 @@ router.get('/', async (req, res) => {
         res.status(500).json({ message: 'Internal server error' });
     }
 });
+
 router.get('/:key', async (req, res) => {
     try {
         // const userId = req.userId
@@ -36,6 +39,7 @@ router.get('/:key', async (req, res) => {
         res.status(500).json({ message: 'Internal server error' });
     }
 });
+
 router.get('/item/:key', async (req, res) => {
     try {
         // const userId = req.userId
