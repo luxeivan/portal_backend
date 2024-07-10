@@ -1,24 +1,14 @@
 const express = require("express");
 const router = express.Router();
 
+//НИЧЕГО НЕ ЛОГИРОВАЛ, ПОТОМУ ЧТО ОТКАЗАЛИСЬ
+const logger = require("../../logger");
+
 const {
   getRelations,
   getRelationItem,
   deleteRelationItem,
 } = require("../../services/strapi/strapiRelations");
-
-// Маршрут для добавления нового субъекта
-// router.post("/", async (req, res) => {
-//   try {
-//     const userId = req.userId;
-//     const { body } = req;
-//     const relation = await addRelation(body, userId); // Вызывает функцию для добавления доверенности
-//     res.status(201).json(relation);
-//   } catch (error) {
-//     console.log(error.message);
-//     res.status(500).json({ message: "Internal server error" });
-//   }
-// });
 
 // Маршрут для получения списка субъектов пользователя
 router.get("/", async (req, res) => {
