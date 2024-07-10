@@ -36,14 +36,15 @@ const claimsOneC = {
             values.push({ key, value })
         }
         const Fields = values.map((item, index) => {
-            const field = service.Fields.find(field => field.name_Key === item.key)
+            const field = service.Fields.find(field => field.idLine === item.key)
             return {
                 LineNumber: index + 1,
-                Name_Key: item.key,
+                Name_Key: field.name_Key,
                 Value: item.value,
                 Value_Type: field.component_Expanded.typeOData,
-                Component: field.component,
-                Component_Type: field.component_Type,
+                idLine: field.idLine,
+                // Component: field.component,
+                // Component_Type: field.component_Type,
                 LinkValueRepresentation: null
             }
         })
