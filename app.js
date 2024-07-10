@@ -71,29 +71,6 @@ app.use((err, req, res, next) => {
   res.status(500).send("Морти, у нас что-то сломалось!");
 });
 
-// Использование всех модулей Helmet
-app.use(helmet());
-
-// Настройка Content Security Policy
-app.use(
-  helmet.contentSecurityPolicy({
-    directives: {
-      defaultSrc: ["'self'"],
-      scriptSrc: ["'self'", "trusted-scripts.com"],
-      styleSrc: ["'self'", "'unsafe-inline'"],
-      imgSrc: ["'self'", "data:"],
-      connectSrc: ["'self'", "api.trusted.com"],
-      fontSrc: ["'self'", "fonts.googleapis.com"],
-      objectSrc: ["'none'"],
-      mediaSrc: ["'self'"],
-      frameSrc: ["'none'"],
-    },
-  })
-);
-
-// Настройка Referrer Policy
-app.use(helmet.referrerPolicy({ policy: "same-origin" }));
-
 // Маршруты вашего приложения
 app.get("/", (req, res) => {
   res.send("Hello, World!");
