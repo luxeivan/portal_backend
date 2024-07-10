@@ -14,35 +14,38 @@ const maxSizeFile = 10;
 const server1C = "http://45.89.189.5/InfoBase/odata/standard.odata";
 
 router.post("/", async function (req, res) {
-  const userId = req.userId;
-  const { documentName, files, nameDoc_Key } = req.body;
-
-  if (!documentName && !files) {
-    return res.status(400).json({
-      status: "error",
-      message: "Нет нужных полей",
-    });
-  }
-
-  const filesData = files.map((file, index) => ({
-    LineNumber: index + 1,
-    fileName: file.name,
-    fileType: file.name.split(".").pop(),
-    fileSize: "1000",
-  }));
-
-  const payload = {
-    Description: documentName,
-    profile: userId,
-    files: filesData,
-    nameDoc_Key,
-  };
-
-  logger.info(
-    `Получен запрос на сохранение документа от пользователя с id: ${userId}`
-  );
-
   try {
+    const userId = req.userId;
+    const { documentName, files, nameDoc_Key } = req.body;
+
+    if (!documentName && !files) {
+      logger.error(
+        `Отсутствуют необходимые поля в запросе от пользователя с id: ${userId}`
+      );
+      return res.status(400).json({
+        status: "error",
+        message: "Нет нужных полей",
+      });
+    }
+
+    const filesData = files.map((file, index) => ({
+      LineNumber: index + 1,
+      fileName: file.name,
+      fileType: file.name.split(".").pop(),
+      fileSize: "1000",
+    }));
+
+    const payload = {
+      Description: documentName,
+      profile: userId,
+      files: filesData,
+      nameDoc_Key,
+    };
+
+    logger.info(
+      `Получен запрос на сохранение документа от пользователя с id: ${userId}`
+    );
+
     const response = await axios.post(
       `${server1C}/Catalog_DocumentsOfProfiles?$format=json`,
       payload,
@@ -52,6 +55,7 @@ router.post("/", async function (req, res) {
         },
       }
     );
+
     if (response.data) {
       logger.info(`Документ успешно сохранен для пользователя с id: ${userId}`);
       res.json({
@@ -87,16 +91,22 @@ router.get("/", async function (req, res) {
       logger.info(
         `Документы успешно получены для пользователя с id: ${userId}`
       );
-      res.json({
+      return res.json({
         status: "ok",
         documents: response.data.value,
+      });
+    } else {
+      logger.warn(`Нет данных для пользователя с id: ${userId}`);
+      return res.status(404).json({
+        status: "error",
+        message: "Нет данных",
       });
     }
   } catch (error) {
     logger.error(
       `Ошибка при получении данных из 1С для пользователя с id: ${userId}. Ошибка: ${error.message}`
     );
-    res.status(500).json({
+    return res.status(500).json({
       status: "error",
       message: "Ошибка при получении данных из 1С",
     });
@@ -110,19 +120,25 @@ router.get("/getNameDocs", async function (req, res) {
     const response = await axios.get(
       `${server1C}/ChartOfCharacteristicTypes_НаименованиеДокументовПрофиля?$format=json`
     );
-    console.log(response.data);
+
     if (response.data) {
       logger.info("Наименования документов профиля успешно получены");
-      res.json({
+      return res.json({
         status: "ok",
         nameDocs: response.data.value,
+      });
+    } else {
+      logger.warn("Нет данных по наименованиям документов профиля");
+      return res.status(404).json({
+        status: "error",
+        message: "Нет данных по наименованиям документов профиля",
       });
     }
   } catch (error) {
     logger.error(
       `Ошибка при получении наименований документов из 1С. Ошибка: ${error.message}`
     );
-    res.status(500).json({
+    return res.status(500).json({
       status: "error",
       message: "Ошибка при получении данных из 1С",
     });
@@ -139,13 +155,13 @@ router.get("/:id", async function (req, res) {
     const response = await axios.get(
       `${server1C}/Catalog_DocumentsOfProfiles(guid'${idDocument}')?$format=json`
     );
-    console.log(response.data);
+
     if (response.data) {
       if (response.data.profile === userId) {
         logger.info(
           `Документ с id: ${idDocument} успешно получен для пользователя: ${userId}`
         );
-        res.json({
+        return res.json({
           status: "ok",
           document: response.data,
         });
@@ -153,17 +169,23 @@ router.get("/:id", async function (req, res) {
         logger.warn(
           `Документ с id: ${idDocument} не принадлежит пользователю: ${userId}`
         );
-        res.status(400).json({
+        return res.status(400).json({
           status: "error",
           message: "Не верный id документа",
         });
       }
+    } else {
+      logger.warn(`Документ с id: ${idDocument} не найден`);
+      return res.status(404).json({
+        status: "error",
+        message: "Документ не найден",
+      });
     }
   } catch (error) {
     logger.error(
       `Ошибка при получении данных из 1С для документа с id: ${idDocument}. Ошибка: ${error.message}`
     );
-    res.status(500).json({
+    return res.status(500).json({
       status: "error",
       message: "Ошибка при получении данных из 1С",
     });
@@ -204,6 +226,17 @@ router.put("/:id", async function (req, res) {
   };
 
   try {
+    const object = await getObjectItem(idDocument);
+    if (object.attributes.profil.data.id !== userId) {
+      logger.warn(
+        `Документ с id: ${idDocument} не принадлежит пользователю: ${userId}`
+      );
+      return res.status(400).json({
+        status: "error",
+        message: "Неверный id объекта",
+      });
+    }
+
     const response = await axios.patch(
       `${server1C}/Catalog_DocumentsOfProfiles(guid'${idDocument}')?$format=json`,
       payload,
