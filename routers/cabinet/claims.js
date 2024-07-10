@@ -7,21 +7,21 @@ router.post("/", async (req, res) => {
   const userId = req.userId;
   const data = req.body;
   logger.info(
-    `Получен запрос на создание претензии от пользователя с ID: ${userId}`
+    `Получен запрос на создание заявки от пользователя с ID: ${userId}`
   );
 
   try {
     const newClaim = await createClaim(data, userId);
-    logger.info(`Претензия успешно создана для пользователя с ID: ${userId}`);
+    logger.info(`Заявка успешно создана для пользователя с ID: ${userId}`);
     res.json(newClaim);
   } catch (error) {
     logger.error(
-      `Ошибка при создании претензии для пользователя с ID ${userId}: ${error.message}`
+      `Ошибка при создании заявки для пользователя с ID ${userId}: ${error.message}`
     );
     res.status(500).json({
       status: "error",
-      message: "Ошибка при создании претензии",
-      error: error.message,
+      message: "Ошибка при создании заявки",
+      error: error,
     });
   }
 });
@@ -29,20 +29,20 @@ router.post("/", async (req, res) => {
 router.get("/", async (req, res) => {
   const userId = req.userId;
   logger.info(
-    `Получен запрос на получение претензий пользователя с ID: ${userId}`
+    `Получен запрос на получение заявки пользователя с ID: ${userId}`
   );
 
   try {
     const services = await getClaims(userId);
-    logger.info(`Претензии успешно получены для пользователя с ID: ${userId}`);
+    logger.info(`Заявки успешно получены для пользователя с ID: ${userId}`);
     res.json(services);
   } catch (error) {
     logger.error(
-      `Ошибка при получении претензий для пользователя с ID ${userId}: ${error.message}`
+      `Ошибка при получении заявки для пользователя с ID ${userId}: ${error.message}`
     );
     res.status(500).json({
       status: "error",
-      message: "Ошибка при получении претензий",
+      message: "Ошибка при получении заявки",
       error: error.message,
     });
   }
@@ -50,19 +50,19 @@ router.get("/", async (req, res) => {
 
 router.get("/:key", async (req, res) => {
   const key = req.params.key;
-  logger.info(`Получен запрос на получение услуги с ключом: ${key}`);
+  logger.info(`Получен запрос на получение заявки с ключом: ${key}`);
 
   try {
     const service = await getServicesByKey(key);
-    logger.info(`Услуга с ключом ${key} успешно получена`);
+    logger.info(`Заявка с ключом ${key} успешно получена`);
     res.json(service);
   } catch (error) {
     logger.error(
-      `Ошибка при получении услуги с ключом ${key}: ${error.message}`
+      `Ошибка при получении заявки с ключом ${key}: ${error.message}`
     );
     res.status(500).json({
       status: "error",
-      message: "Ошибка при получении услуги",
+      message: "Ошибка при получении заявки",
       error: error.message,
     });
   }
@@ -70,19 +70,19 @@ router.get("/:key", async (req, res) => {
 
 router.get("/item/:key", async (req, res) => {
   const key = req.params.key;
-  logger.info(`Получен запрос на получение элемента услуги с ключом: ${key}`);
+  logger.info(`Получен запрос на получение элемента заявки с ключом: ${key}`);
 
   try {
     const services = await getServiceItemByKey(key);
-    logger.info(`Элемент услуги с ключом ${key} успешно получен`);
+    logger.info(`Элемент заявки с ключом ${key} успешно получен`);
     res.json(services);
   } catch (error) {
     logger.error(
-      `Ошибка при получении элемента услуги с ключом ${key}: ${error.message}`
+      `Ошибка при получении элемента заявки с ключом ${key}: ${error.message}`
     );
     res.status(500).json({
       status: "error",
-      message: "Ошибка при получении элемента услуги",
+      message: "Ошибка при получении элемента заявки",
       error: error.message,
     });
   }
