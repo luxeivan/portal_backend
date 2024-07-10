@@ -5,6 +5,7 @@ const getInn = express.Router();
 const url = "http://suggestions.dadata.ru/suggestions/api/4_1/rs/findById/party";
 
 const token = process.env.DADATA_TOKEN
+
 getInn.get('/:type',
     query('inn').notEmpty(),
     async (req, res) => {

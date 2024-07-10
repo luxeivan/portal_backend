@@ -71,6 +71,11 @@ app.use((err, req, res, next) => {
   res.status(500).send("Морти, у нас что-то сломалось!");
 });
 
+// Маршруты вашего приложения
+app.get("/", (req, res) => {
+  res.send("Hello, World!");
+});
+
 //app.use(express.urlencoded({ extended: true }));
 
 app.use("/api/auth", auth);
