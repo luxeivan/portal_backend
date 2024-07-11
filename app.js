@@ -6,6 +6,7 @@ const http = require("http");
 const https = require("https");
 require("dotenv").config();
 const logger = require("./logger");
+const rateLimit = require("express-rate-limit");
 
 const auth = require("./routers/auth");
 const registration = require("./routers/registration");
@@ -60,6 +61,17 @@ app.use(
     tempFileDir: "/tmp/",
   })
 );
+
+
+// Настраиваем rate limiter
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 минут
+  max: 100, // лимит каждого IP до 100 запросов
+  message: "Слишком много запросов с этого IP, пожалуйста, попробуйте позже.",
+});
+
+// Применяем rate limiter ко всем запросам
+app.use(limiter);
 
 // Использование всех модулей Helmet
 app.use(helmet());
