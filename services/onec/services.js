@@ -31,7 +31,7 @@ const servicesOneC = {
                 axios.get(`${server1c}/Catalog_Services?$format=json&$filter=DeletionMark eq false and Usage eq true and Ref_Key eq guid'${key}'`, {
                     headers
                 }),
-                axios.get(`${server1c}/InformationRegister_portalFields?$format=json&$select=*&$expand=name,component,dependName,dependСondition&$filter=cast(object,'Catalog_Services') eq guid'${key}'`, {
+                axios.get(`${server1c}/InformationRegister_portalFields?$format=json&$select=*&$expand=name,component,dependName,dependСondition,nameTable,componentTable&$filter=cast(object,'Catalog_Services') eq guid'${key}'`, {
                     headers
                 })
             ]
@@ -42,19 +42,40 @@ const servicesOneC = {
             // if (!response.data) {
             //     return false
             // }
-            resp[0].data.value[0].Fields = await Promise.all(resp[1].data.value.map((item, index) => {
-                return new Promise(async (resolve, reject) => {
-                    if (item.component_Type.includes("ComponentsTableInput")) {
-                        const tableFields = await axios.get(`${server1c}/Catalog_ComponentsTableInput_Fields?$format=json&$filter=Ref_Key eq guid'${item.component}'&$expand=component`, {
-                            headers
-                        })
-                        item.component_Expanded.Fields = tableFields.data.value
-                    }
-                    resolve(item)
-                })
+            console.log(resp[1].data.value)
+            const Fields = []
+            let IdLineTable = false
+            let tempArr = []
+            resp[1].data.value.sort((a, b) => a.lineNum - b.lineNum).forEach(element => {
+                if (element.nameTable) {
+                    IdLineTable = element.IdLineTable
+                    tempArr.push(element)
+                    // if (!Object.hasOwn(temp, element.nameTable_Key)) temp[element.nameTable_Key] = []
+                    // temp[element.nameTable_Key].pu
+                } else if (!element.nameTable && IdLineTable) {
+                    Fields.push({component_Type:'ComponentsTableInput', idLine: IdLineTable, Fields: tempArr })
+                    IdLineTable = false
+                    tempArr = []
+                } else {
+                    Fields.push(element)
+                }
+            });
+            resp[0].data.value[0].Fields = Fields
+            // resp[0].data.value[0].Fields = await Promise.all(resp[1].data.value.map((item, index) => {
+            //     return new Promise(async (resolve, reject) => {
+            //         if (item.component_Type.includes("ComponentsTableInput")) {
+            //             const tableFields = await axios.get(`${server1c}/Catalog_ComponentsTableInput_Fields?$format=json&$filter=Ref_Key eq guid'${item.component}'&$expand=component,nameTable,componentTable`, {
+            //                 headers
+            //             })
+            //             item.component_Expanded.Fields = tableFields.data.value
+            //         }
+            //         resolve(item)
+            //     })
 
-            })
-            )
+            // })
+            // )
+
+
             // resp[0].data.value[0].Fields = resp[1].data.value
             // console.log(resp)
             // console.log(resp[0].data.value)
