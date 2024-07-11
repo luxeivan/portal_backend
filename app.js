@@ -68,15 +68,15 @@ app.use(helmet());
 app.use(
   helmet.contentSecurityPolicy({
     directives: {
-      defaultSrc: ["'self'"],
-      scriptSrc: ["'self'", "trusted-scripts.com"],
-      styleSrc: ["'self'", "'unsafe-inline'"],
-      imgSrc: ["'self'", "data:"],
-      connectSrc: ["'self'", "api.trusted.com"],
-      fontSrc: ["'self'", "fonts.googleapis.com"],
-      objectSrc: ["'none'"],
-      mediaSrc: ["'self'"],
-      frameSrc: ["'none'"],
+      defaultSrc: ["'self'"], // Разрешает загрузку контента только с текущего домена.
+      scriptSrc: ["'self'", "trusted-scripts.com"], // Разрешает выполнение скриптов только с текущего домена и trusted-scripts.com.
+      styleSrc: ["'self'", "'unsafe-inline'"], // Разрешает стили только с текущего домена и использование inline-стилей (не рекомендуется, но может быть необходимо).
+      imgSrc: ["'self'", "data:"], // Разрешает загрузку изображений только с текущего домена и data URI (для встраивания изображений в HTML).
+      connectSrc: ["'self'", "api.trusted.com"], // Разрешает соединения (например, AJAX-запросы) только с текущего домена и api.trusted.com.
+      fontSrc: ["'self'", "fonts.googleapis.com"], // Разрешает загрузку шрифтов только с текущего домена и fonts.googleapis.com.
+      objectSrc: ["'none'"], // Запрещает загрузку плагинов (например, Flash).
+      mediaSrc: ["'self'"], // Разрешает загрузку медиа-контента только с текущего домена.
+      frameSrc: ["'none'"], // Запрещает встраивание вашего сайта в iframe на других сайтах (предотвращает clickjacking).
     },
   })
 );
@@ -103,7 +103,6 @@ httpServer.listen(port, () => {
   console.log(`Зашли и вышли, приключения на ${port} порту`);
 });
 httpsServer.listen(portSSL);
-
 
 // const express = require("express");
 // const cors = require("cors");
