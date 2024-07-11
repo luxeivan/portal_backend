@@ -2,4 +2,4 @@
 .env
 /sessions
 /files
-/logs
+logs/
