@@ -35,6 +35,7 @@ const claimsOneC = {
             // console.log(`${key}: ${value}`);
             values.push({ key, value })
         }
+        // ------------------------------------------------------------------------
         const Fields = values.filter(item => {
             const field = service.Fields.find(field => field.idLine === item.key)
             if (field.component_Type.includes("ComponentsTableInput")) return false
@@ -42,17 +43,19 @@ const claimsOneC = {
         })
             .map((item, index) => {
                 const field = service.Fields.find(field => field.idLine === item.key)
+                // console.log('field',field)
                 return {
                     LineNumber: index + 1,
                     Name_Key: field.name_Key,
-                    Value: item.value,
-                    Value_Type: field.component_Expanded.typeOData,
+                    Value: item.value ? item.value : undefined,
+                    Value_Type: item.value ? field.component_Expanded.typeOData : undefined,
                     idLine: field.idLine,
                     // Component: field.component,
                     // Component_Type: field.component_Type,
                     LinkValueRepresentation: null
                 }
             })
+        // ------------------------------------------------------------------------
         const TableFields = []
         let LineNumber = 1
         values.filter(item => {
@@ -62,7 +65,7 @@ const claimsOneC = {
         })
             .forEach((item, index) => {
                 const table = service.Fields.find(field => field.idLine === item.key)
-                // console.log(table.component_Expanded)
+                console.log(table.label)
                 item.value.forEach((valuesTable, indexRow) => {
                     const arr = []
                     for (const [key, value] of Object.entries(valuesTable)) {
@@ -73,10 +76,10 @@ const claimsOneC = {
                             LineNumber,
                             LineNum: indexRow + 1,
                             NameTable_Key: table.component_Expanded.nameTable_Key,
-                            Name_Key: tableRow.key,
-                            Value: tableRow.value,
-                            Value_Type: table.component_Expanded.Fields.find(item => item.name_Key === tableRow.key).component_Expanded.typeOData,
-                            idLine: table.component_Expanded.Fields.find(item => item.name_Key === tableRow.key).Ref_Key,
+                            Name_Key: table.component_Expanded.Fields.find(item => item.idLine === tableRow.key).name_Key,
+                            Value: tableRow.value ? tableRow.value : undefined,
+                            Value_Type: tableRow.value ? table.component_Expanded.Fields.find(item => item.idLine === tableRow.key).component_Expanded.typeOData : undefined,
+                            idLine: table.component_Expanded.Fields.find(item => item.idLine === tableRow.key).idLine,
                         })
                         LineNumber = LineNumber + 1
                     })
@@ -96,7 +99,7 @@ const claimsOneC = {
         if (!response.data) {
             return false
         }
-        console.log(response.data)
+        // console.log(response.data)
         return response.data
 
 
