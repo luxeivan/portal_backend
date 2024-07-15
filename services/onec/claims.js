@@ -56,6 +56,18 @@ const claimsOneC = {
                 }
             })
         // ------------------------------------------------------------------------
+        service.Fields.filter(field => field.component_Type.includes('ComponentsHiddenInput'))
+            .forEach((field, index) => {
+                console.log(index, field)
+                Fields.push({
+                    LineNumber: Fields.length + 1 + index,
+                    Name_Key: field.name_Key,
+                    Value: field.component_Expanded.value,
+                    Value_Type: field.component_Expanded.value_Type,
+                    LinkValueRepresentation: null
+                })
+            })
+        // ------------------------------------------------------------------------
         const TableFields = []
         let LineNumber = 1
         values.filter(item => {
@@ -65,7 +77,7 @@ const claimsOneC = {
         })
             .forEach((item, index) => {
                 const table = service.Fields.find(field => field.idLine === item.key)
-                console.log(table.label)
+                // console.log(table.label)
                 item.value.forEach((valuesTable, indexRow) => {
                     const arr = []
                     for (const [key, value] of Object.entries(valuesTable)) {
