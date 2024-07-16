@@ -12,7 +12,7 @@ const headers = {
 const claimsOneC = {
     getClaims: async (userId) => {
         try {
-            const response = await axios.get(`${server1c}/InformationRegister_ConnectionsOfElements?$format=json&$select=*&$expand=Element2/Document_ClaimsProject/Template&$filter=cast(Element1,'Catalog_Profile') eq guid'${userId}' and Element2_Type eq 'StandardODATA.Document_ClaimsProject'`, {
+            const response = await axios.get(`${server1c}/InformationRegister_connectionsOfElements?$format=json&$select=*&$expand=element2/Document_claimsProject/template&$filter=cast(element1,'Catalog_profile') eq guid'${userId}' and element2_Type eq 'StandardODATA.Document_claimsProject'`, {
                 headers
             })
             if (!response.data) {
@@ -28,14 +28,14 @@ const claimsOneC = {
     },
     getClaimItem: async (userId, Ref_key) => {
         try {
-            const response = await axios.get(`${server1c}/InformationRegister_ConnectionsOfElements?$format=json&$select=*&$expand=Element2/Document_ClaimsProject/Template&$filter=cast(Element1,'Catalog_Profile') eq guid'${userId}' and cast(Element2,'Document_ClaimsProject') eq guid'${Ref_key}'`, {
+            const response = await axios.get(`${server1c}/InformationRegister_connectionsOfElements?$format=json&$select=*&$expand=element2/Document_claimsProject/template&$filter=cast(element1,'Catalog_profile') eq guid'${userId}' and cast(element2,'Document_claimsProject') eq guid'${Ref_key}'`, {
                 headers
             })
             if (!response.data) {
                 return false
             }
             // console.log(response.data)
-            return response.data.value[0].Element2_Expanded
+            return response.data.value[0].element2_Expanded
 
         } catch (error) {
             console.log(error)
@@ -52,47 +52,43 @@ const claimsOneC = {
             values.push({ key, value })
         }
         // ------------------------------------------------------------------------
-        const Fields = values.filter(item => {
-            const field = service.Fields.find(field => field.idLine === item.key)
-            if (field.component_Type.includes("ComponentsTableInput")) return false
+        const fields = values.filter(item => {
+            const field = service.fields.find(field => field.idLine === item.key)
+            if (field.component_Type.includes("TableInput")) return false
             return true
         })
             .map((item, index) => {
-                const field = service.Fields.find(field => field.idLine === item.key)
+                const field = service.fields.find(field => field.idLine === item.key)
                 // console.log('field',field)
                 return {
                     LineNumber: index + 1,
-                    Name_Key: field.name_Key,
-                    Value: item.value ? item.value : undefined,
-                    Value_Type: item.value ? field.component_Expanded.typeOData : undefined,
+                    name_Key: field.name_Key,
+                    value: item.value ? item.value : undefined,
+                    value_Type: item.value ? field.component_Expanded.typeOData : undefined,
                     idLine: field.idLine,
-                    // Component: field.component,
-                    // Component_Type: field.component_Type,
-                    LinkValueRepresentation: null
                 }
             })
         // ------------------------------------------------------------------------
-        service.Fields.filter(field => field.component_Type.includes('ComponentsHiddenInput'))
+        service.fields.filter(field => field.component_Type.includes('HiddenInput'))
             .forEach((field, index) => {
                 console.log(index, field)
-                Fields.push({
-                    LineNumber: Fields.length + 1 + index,
-                    Name_Key: field.name_Key,
-                    Value: field.component_Expanded.value,
-                    Value_Type: field.component_Expanded.value_Type,
-                    LinkValueRepresentation: null
+                fields.push({
+                    LineNumber: fields.length + 1 + index,
+                    name_Key: field.name_Key,
+                    value: field.component_Expanded.value,
+                    value_Type: field.component_Expanded.value_Type,
                 })
             })
         // ------------------------------------------------------------------------
-        const TableFields = []
+        const tableFields = []
         let LineNumber = 1
         values.filter(item => {
-            const field = service.Fields.find(field => field.idLine === item.key)
-            if (field.component_Type.includes("ComponentsTableInput")) return true
+            const field = service.fields.find(field => field.idLine === item.key)
+            if (field.component_Type.includes("TableInput")) return true
             return false
         })
             .forEach((item, index) => {
-                const table = service.Fields.find(field => field.idLine === item.key)
+                const table = service.fields.find(field => field.idLine === item.key)
                 // console.log(table.label)
                 item.value.forEach((valuesTable, indexRow) => {
                     const arr = []
@@ -100,14 +96,14 @@ const claimsOneC = {
                         arr.push({ key, value })
                     }
                     arr.forEach(tableRow => {
-                        TableFields.push({
+                        tableFields.push({
                             LineNumber,
-                            LineNum: indexRow + 1,
-                            NameTable_Key: table.component_Expanded.nameTable_Key,
-                            Name_Key: table.component_Expanded.Fields.find(item => item.idLine === tableRow.key).name_Key,
-                            Value: tableRow.value ? tableRow.value : undefined,
-                            Value_Type: tableRow.value ? table.component_Expanded.Fields.find(item => item.idLine === tableRow.key).component_Expanded.typeOData : undefined,
-                            idLine: table.component_Expanded.Fields.find(item => item.idLine === tableRow.key).idLine,
+                            lineNum: indexRow + 1,
+                            nameTable_Key: table.component_Expanded.nameTable_Key,
+                            name_Key: table.component_Expanded.fields.find(item => item.idLine === tableRow.key).name_Key,
+                            value: tableRow.value ? tableRow.value : undefined,
+                            value_Type: tableRow.value ? table.component_Expanded.fields.find(item => item.idLine === tableRow.key).component_Expanded.typeOData : undefined,
+                            idLine: table.component_Expanded.fields.find(item => item.idLine === tableRow.key).idLine,
                         })
                         LineNumber = LineNumber + 1
                     })
@@ -115,26 +111,26 @@ const claimsOneC = {
 
             })
 
-        const newClaim = await axios.post(`${server1c}/Document_ClaimsProject?$format=json`, {
-            Fields,
-            TableFields,
+        const newClaim = await axios.post(`${server1c}/Document_claimsProject?$format=json`, {
+            fields,
+            tableFields,
             Date: moment().format(),
-            Template_Key: data.service,
-            profile: userId
+            template_Key: data.service,
+            // profile: userId
         }, {
             headers
         })
         if (!newClaim.data) {
             return false
         }
-        const connectionsOfElements = await axios.post(`${server1c}/InformationRegister_ConnectionsOfElements?$format=json`, {
+        const connectionsOfElements = await axios.post(`${server1c}/InformationRegister_connectionsOfElements?$format=json`, {
             "Period": moment().format(),
-            "Usage": true,
-            "Element1": userId,
-            "Element1_Type": "StandardODATA.Catalog_Profile",
-            "Element2": newClaim.data.Ref_Key,
-            "Element2_Type": "StandardODATA.Document_ClaimsProject",
-            "Reason": "Установка соединения с профилем при создании заявки"
+            "usage": true,
+            "element1": userId,
+            "element1_Type": "StandardODATA.Catalog_profile",
+            "element2": newClaim.data.Ref_Key,
+            "element2_Type": "StandardODATA.Document_claimsProject",
+            "reason": "Установка соединения с профилем при создании заявки"
         }, {
             headers
         })
