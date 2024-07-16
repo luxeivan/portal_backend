@@ -57,12 +57,12 @@ router.post(
 
       if (
         founduser &&
-        (await bcrypt.compare(req.body.password, founduser.Password))
+        (await bcrypt.compare(req.body.password, founduser.password))
       ) {
         req.session.founduser = founduser;
         //console.log(req.session.founduser)
         try {
-          req.session.pincode = await sendCodeToPhone(founduser.Phone);
+          req.session.pincode = await sendCodeToPhone(founduser.phone);
           return res.json({ status: "ok", message: "Ожидается пин код" });
         } catch (error) {
           logger.error(
@@ -136,8 +136,8 @@ router.post(
         const userjwt = jwt.sign(
           {
             id: req.session.founduser.Ref_Key,
-            email: req.session.founduser.Email,
-            phone: req.session.founduser.Phone,
+            email: req.session.founduser.email,
+            phone: req.session.founduser.phone,
           },
           privateKey,
           { expiresIn: `${process.env.JWT_LIVE_HOURS}h` }
@@ -146,8 +146,8 @@ router.post(
           status: "ok",
           jwt: userjwt,
           userid: req.session.founduser.Ref_key,
-          email: req.session.founduser.Email,
-          phone: req.session.founduser.Phone,
+          email: req.session.founduser.email,
+          phone: req.session.founduser.phone,
         });
       } else {
         logger.error("Ошибка: Не верный пин код"); // Логируем ошибку неверного пинкода
@@ -205,7 +205,7 @@ router.post("/checkjwt", async function (req, res) {
     const user = await getUserById(valid.id);
     if (!user) throw new Error("Пользователь не найден");
     //console.log(valid)
-    res.json({ id: user.Ref_key, email: user.Email, phone: user.Phone });
+    res.json({ id: user.Ref_key, email: user.email, phone: user.phone });
   } catch (error) {
     logger.error("Ошибка проверки JWT", { error: error.message }); // Логируем ошибку проверки JWT
     res.status(401).json({ status: "unauthorized" });
