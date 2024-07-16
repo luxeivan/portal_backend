@@ -26,12 +26,13 @@ const servicesOneC = {
         }
     },
     getServiceItemByKey: async (key) => {
+        console.log(key)
         try {
             const resp = await Promise.all([
                 axios.get(`${server1c}/Catalog_Services?$format=json&$filter=DeletionMark eq false and Usage eq true and Ref_Key eq guid'${key}'`, {
                     headers
                 }),
-                axios.get(`${server1c}/InformationRegister_portalFields?$format=json&$select=*&$expand=name,component,dependName,dependСondition,nameTable,componentTable&$filter=cast(object,'Catalog_Services') eq guid'${key}'`, {
+                axios.get(`${server1c}/InformationRegister_portalFields?$format=json&$select=*&$expand=name,component,dependName,dependСondition&$filter=cast(object,'Catalog_Services') eq guid'${key}'`, {
                     headers
                 })
             ]
@@ -64,7 +65,7 @@ const servicesOneC = {
             resp[0].data.value[0].Fields = await Promise.all(resp[1].data.value.map((item, index) => {
                 return new Promise(async (resolve, reject) => {
                     if (item.component_Type.includes("ComponentsTableInput")) {
-                        const tableFields = await axios.get(`${server1c}/InformationRegister_portalFields?$format=json&$select=*&$expand=name,component,dependName,dependСondition,nameTable,componentTable&$filter=cast(object,'Catalog_ComponentsTableInput') eq guid'${item.component}'`, {
+                        const tableFields = await axios.get(`${server1c}/InformationRegister_portalFields?$format=json&$select=*&$expand=name,component,dependName,dependСondition&$filter=cast(object,'Catalog_ComponentsTableInput') eq guid'${item.component}'`, {
                             headers
                         })
                         // console.log(tableFields.data.value)
@@ -84,7 +85,7 @@ const servicesOneC = {
             return resp[0].data.value[0]
 
         } catch (error) {
-            console.log(error.data)
+            console.log(error.response.data)
             return { status: "error" }
         }
     },

@@ -12,14 +12,14 @@ const headers = {
 const claimsOneC = {
     getClaims: async (userId) => {
         try {
-            const response = await axios.get(`${server1c}/Document_Claims?$format=json&$filter=profile eq '${userId}'`, {
+            const response = await axios.get(`${server1c}/InformationRegister_ConnectionsOfElements?$format=json&$expand=Element2&$filter=cast(Element1,'Catalog_Profile') eq guid'${userId}' and Element2_Type eq 'StandardODATA.Document_ClaimsProject'`, {
                 headers
             })
             if (!response.data) {
                 return false
             }
             // console.log(response.data)
-            return response.data
+            return response.data.value
 
         } catch (error) {
             console.log(error)
@@ -99,7 +99,7 @@ const claimsOneC = {
 
             })
 
-        const response = await axios.post(`${server1c}/Document_Claims?$format=json`, {
+        const newClaim = await axios.post(`${server1c}/Document_ClaimsProject?$format=json`, {
             Fields,
             TableFields,
             Date: moment().format(),
@@ -108,11 +108,22 @@ const claimsOneC = {
         }, {
             headers
         })
-        if (!response.data) {
+        if (!newClaim.data) {
             return false
         }
+        const connectionsOfElements = await axios.post(`${server1c}/InformationRegister_ConnectionsOfElements?$format=json`, {
+            "Period": moment().format(),
+            "Usage": true,
+            "Element1": userId,
+            "Element1_Type": "StandardODATA.Catalog_Profile",
+            "Element2": newClaim.data.Ref_Key,
+            "Element2_Type": "StandardODATA.Document_ClaimsProject",
+            "Reason": "Установка соединения с профилем при создании заявки"
+        }, {
+            headers
+        })
         // console.log(response.data)
-        return response.data
+        return newClaim.data
 
 
     },
