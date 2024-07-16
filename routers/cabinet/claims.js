@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const { createClaim, getClaims } = require("../../services/onec/claims");
+const { createClaim, getClaims, getClaimItem } = require("../../services/onec/claims");
 const logger = require("../../logger");
 
 router.post("/", async (req, res) => {
@@ -32,7 +32,7 @@ router.get("/", async (req, res) => {
   logger.info(
     `Получен запрос на получение заявок пользователя с ID: ${userId}`
   );
-
+  
   try {
     const claims = await getClaims(userId);
     logger.info(`Заявки успешно получены для пользователя с ID: ${userId}`);
@@ -50,11 +50,12 @@ router.get("/", async (req, res) => {
 });
 
 router.get("/:key", async (req, res) => {
+  const userId = req.userId;
   const key = req.params.key;
   logger.info(`Получен запрос на получение заявки с ключом: ${key}`);
 
   try {
-    const claim = await getServicesByKey(key);
+    const claim = await getClaimItem(userId,key);
     logger.info(`Заявка с ключом ${key} успешно получена`);
     res.json(claim);
   } catch (error) {
