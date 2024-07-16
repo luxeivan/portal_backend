@@ -79,13 +79,13 @@ const servicesOneC = {
 
 
             // resp[0].data.value[0].Fields = resp[1].data.value
-            // console.log(resp)
+             console.log(resp)
             // console.log(resp[0].data.value)
             // console.log(resp[1].data)
             return resp[0].data.value[0]
 
         } catch (error) {
-            console.log(error.response.data)
+            console.log(error)
             return { status: "error" }
         }
     },
