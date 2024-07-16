@@ -12,7 +12,7 @@ const headers = {
 const claimsOneC = {
     getClaims: async (userId) => {
         try {
-            const response = await axios.get(`${server1c}/InformationRegister_ConnectionsOfElements?$format=json&$expand=Element2&$filter=cast(Element1,'Catalog_Profile') eq guid'${userId}' and Element2_Type eq 'StandardODATA.Document_ClaimsProject'`, {
+            const response = await axios.get(`${server1c}/InformationRegister_ConnectionsOfElements?$format=json&$select=*&$expand=Element2/Document_ClaimsProject/Template&$filter=cast(Element1,'Catalog_Profile') eq guid'${userId}' and Element2_Type eq 'StandardODATA.Document_ClaimsProject'`, {
                 headers
             })
             if (!response.data) {
@@ -20,6 +20,22 @@ const claimsOneC = {
             }
             // console.log(response.data)
             return response.data.value
+
+        } catch (error) {
+            console.log(error)
+            return error
+        }
+    },
+    getClaimItem: async (userId, Ref_key) => {
+        try {
+            const response = await axios.get(`${server1c}/InformationRegister_ConnectionsOfElements?$format=json&$select=*&$expand=Element2/Document_ClaimsProject/Template&$filter=cast(Element1,'Catalog_Profile') eq guid'${userId}' and cast(Element2,'Document_ClaimsProject') eq guid'${Ref_key}'`, {
+                headers
+            })
+            if (!response.data) {
+                return false
+            }
+            // console.log(response.data)
+            return response.data.value[0].Element2_Expanded
 
         } catch (error) {
             console.log(error)
