@@ -11,7 +11,7 @@ const headers = {
 const servicesOneC = {
     getServicesByKey: async (key = "00000000-0000-0000-0000-000000000000") => {
         try {
-            const response = await axios.get(`${server1c}/Catalog_Services?$format=json&$filter=DeletionMark eq false and Usage eq true and Parent_Key eq guid'${key}' and (( year(BeginDate) eq 0001 or (year(BeginDate) le ${moment().year()} and month(BeginDate) le ${moment().month() + 1} and day(BeginDate) le ${moment().date()})) and ( year(EndDate) eq 0001 or (year(EndDate) ne 0001 and year(EndDate) ge ${moment().year()} and month(EndDate) ge ${moment().month()} and day(EndDate) ge ${moment().date()})))`, {
+            const response = await axios.get(`${server1c}/Catalog_services?$format=json&$filter=DeletionMark eq false and usage eq true and Parent_Key eq guid'${key}' and (( year(beginDate) eq 0001 or (year(beginDate) le ${moment().year()} and month(beginDate) le ${moment().month() + 1} and day(beginDate) le ${moment().date()})) and ( year(endDate) eq 0001 or (year(endDate) ne 0001 and year(endDate) ge ${moment().year()} and month(endDate) ge ${moment().month()} and day(endDate) ge ${moment().date()})))`, {
                 headers
             })
             if (!response.data) {
@@ -29,10 +29,10 @@ const servicesOneC = {
         console.log(key)
         try {
             const resp = await Promise.all([
-                axios.get(`${server1c}/Catalog_Services?$format=json&$filter=DeletionMark eq false and Usage eq true and Ref_Key eq guid'${key}'`, {
+                axios.get(`${server1c}/Catalog_services?$format=json&$filter=DeletionMark eq false and usage eq true and Ref_Key eq guid'${key}'`, {
                     headers
                 }),
-                axios.get(`${server1c}/InformationRegister_portalFields?$format=json&$select=*&$expand=name,component,dependName,dependСondition&$filter=cast(object,'Catalog_Services') eq guid'${key}'`, {
+                axios.get(`${server1c}/InformationRegister_portalFields?$format=json&$select=*&$expand=name,component,dependName,dependСondition&$filter=cast(object,'Catalog_services') eq guid'${key}'`, {
                     headers
                 })
             ]
@@ -62,26 +62,28 @@ const servicesOneC = {
             //     }
             // });
             // resp[0].data.value[0].Fields = Fields
-            resp[0].data.value[0].Fields = await Promise.all(resp[1].data.value.map((item, index) => {
-                return new Promise(async (resolve, reject) => {
-                    if (item.component_Type.includes("ComponentsTableInput")) {
-                        const tableFields = await axios.get(`${server1c}/InformationRegister_portalFields?$format=json&$select=*&$expand=name,component,dependName,dependСondition&$filter=cast(object,'Catalog_ComponentsTableInput') eq guid'${item.component}'`, {
-                            headers
-                        })
-                        // console.log(tableFields.data.value)
-                        item.component_Expanded.Fields = tableFields.data.value.sort((a, b) => a.lineNum - b.lineNum)
-                    }
-                    resolve(item)
+                
+                resp[0].data.value[0].fields = await Promise.all(resp[1].data.value.map((item, index) => {
+                    return new Promise(async (resolve, reject) => {
+                        if (item.component_Type.includes("TableInput")) {
+                            const tableFields = await axios.get(`${server1c}/InformationRegister_portalFields?$format=json&$select=*&$expand=name,component,dependName,dependСondition&$filter=cast(object,'Catalog_componentsTableInput') eq guid'${item.component}'`, {
+                                headers
+                            })
+                            // console.log(tableFields.data.value)
+                            item.component_Expanded.fields = tableFields.data.value.sort((a, b) => a.lineNum - b.lineNum)
+                        }
+                        resolve(item)
+                    })
+                    
                 })
-
-            })
             )
-
-
-            // resp[0].data.value[0].Fields = resp[1].data.value
-             console.log(resp)
-            // console.log(resp[0].data.value)
-            // console.log(resp[1].data)
+        
+        
+        
+        // resp[0].data.value[0].Fields = resp[1].data.value
+        // console.log(resp[0].data.value)
+        // console.log(resp[1].data)
+        console.log('resp', resp[0].data.value[0])
             return resp[0].data.value[0]
 
         } catch (error) {

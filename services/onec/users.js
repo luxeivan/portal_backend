@@ -14,7 +14,7 @@ const saltRounds = Number(process.env.PASSWORD_SALT_ROUNDS)
 const usersonec = {
     getUserByEmail: async (email) => {
         try {
-            const response = await axios.get(`${server1c}/Catalog_Profile?$format=json&$filter=Email eq '${email}'`, {
+            const response = await axios.get(`${server1c}/Catalog_profile?$format=json&$filter=email eq '${email}'`, {
                 headers
             })
             if (!response.data) {
@@ -30,7 +30,7 @@ const usersonec = {
     },
     checkUserByEmail: async (email) => {
         try {
-            const response = await axios.get(`${server1c}/Catalog_Profile?$format=json&$filter=Email eq '${email}'`, {
+            const response = await axios.get(`${server1c}/Catalog_profile?$format=json&$filter=email eq '${email}'`, {
                 headers
             })
             if (!response.data && !response.data.value[0]) {
@@ -46,7 +46,7 @@ const usersonec = {
     },
     getUserById: async (key) => {
         try {
-            const response = await axios.get(`${server1c}/Catalog_Profile(guid'${key}')?$format=json`, {
+            const response = await axios.get(`${server1c}/Catalog_profile(guid'${key}')?$format=json`, {
                 headers
             })
             if (!response.data) {
@@ -64,7 +64,7 @@ const usersonec = {
         //console.log({headers})
         try {
             const hashPassword = await bcrypt.hash(password, saltRounds)
-            const response = await axios.post(`${server1c}/Catalog_Profile?$format=json`, {
+            const response = await axios.post(`${server1c}/Catalog_profile?$format=json`, {
                 Description: email,
                 Email: email,
                 Phone: phone,
