@@ -62,7 +62,8 @@ const servicesOneC = {
             //     }
             // });
             // resp[0].data.value[0].Fields = Fields
-                
+            try {
+
                 resp[0].data.value[0].fields = await Promise.all(resp[1].data.value.map((item, index) => {
                     return new Promise(async (resolve, reject) => {
                         if (item.component_Type.includes("TableInput")) {
@@ -74,16 +75,20 @@ const servicesOneC = {
                         }
                         resolve(item)
                     })
-                    
+
                 })
-            )
-        
-        
-        
-        // resp[0].data.value[0].Fields = resp[1].data.value
-        // console.log(resp[0].data.value)
-        // console.log(resp[1].data)
-        console.log('resp', resp[0].data.value[0])
+                )
+            } catch (error) {
+                console.log(error)
+                return false
+            }
+
+
+
+            // resp[0].data.value[0].Fields = resp[1].data.value
+            // console.log(resp[0].data.value)
+            // console.log(resp[1].data)
+            console.log('resp', resp[0].data.value[0])
             return resp[0].data.value[0]
 
         } catch (error) {
