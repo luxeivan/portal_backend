@@ -108,7 +108,7 @@ const servicesOneC = {
   getServicesByKey: async (key = "00000000-0000-0000-0000-000000000000") => {
     try {
       const response = await axios.get(
-        `${server1c}/Catalog_servicess_broken?$format=json&$filter=DeletionMark eq false and usage eq true and Parent_Key eq guid'${key}' and (( year(beginDate) eq 0001 or (year(beginDate) le ${moment().year()} and month(beginDate) le ${
+        `${server1c}/Catalog_services?$format=json&$filter=DeletionMark eq false and usage eq true and Parent_Key eq guid'${key}' and (( year(beginDate) eq 0001 or (year(beginDate) le ${moment().year()} and month(beginDate) le ${
           moment().month() + 1
         } and day(beginDate) le ${moment().date()})) and ( year(endDate) eq 0001 or (year(endDate) ne 0001 and year(endDate) ge ${moment().year()} and month(endDate) ge ${moment().month()} and day(endDate) ge ${moment().date()})))`,
         {
@@ -130,7 +130,7 @@ const servicesOneC = {
     try {
       const resp = await Promise.all([
         axios.get(
-          `${server1c}/Catalog_servicess_broken?$format=json&$filter=DeletionMark eq false and usage eq true and Ref_Key eq guid'${key}'`,
+          `${server1c}/Catalog_services?$format=json&$filter=DeletionMark eq false and usage eq true and Ref_Key eq guid'${key}'`,
           {
             headers,
           }
