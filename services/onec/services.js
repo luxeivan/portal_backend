@@ -108,8 +108,7 @@ const servicesOneC = {
   getServicesByKey: async (key = "00000000-0000-0000-0000-000000000000") => {
     try {
       const response = await axios.get(
-        `${server1c}/Catalog_services?$format=json&$filter=DeletionMark eq false and usage eq true and Parent_Key eq guid'${key}' and (( year(beginDate) eq 0001 or (year(beginDate) le ${moment().year()} and month(beginDate) le ${
-          moment().month() + 1
+        `${server1c}/Catalog_services?$format=json&$filter=DeletionMark eq false and usage eq true and Parent_Key eq guid'${key}' and (( year(beginDate) eq 0001 or (year(beginDate) le ${moment().year()} and month(beginDate) le ${moment().month() + 1
         } and day(beginDate) le ${moment().date()})) and ( year(endDate) eq 0001 or (year(endDate) ne 0001 and year(endDate) ge ${moment().year()} and month(endDate) ge ${moment().month()} and day(endDate) ge ${moment().date()})))`,
         {
           headers,
@@ -126,7 +125,7 @@ const servicesOneC = {
     }
   },
   getServiceItemByKey: async (key) => {
-    console.log(key);
+    // console.log(key);
     try {
       const resp = await Promise.all([
         axios.get(
@@ -186,16 +185,23 @@ const servicesOneC = {
               }
               // -------------Если LinkInput (ссылка на справочник и установлен флаг allValues)
               if (item.component_Type.includes("LinkInput") && item.component_Expanded.allValues) {
+                console.log(item.component_Expanded.linkUrl)
                 const allValues = await axios.get(
                   `${server1c}${item.component_Expanded.linkUrl}`,
                   {
                     headers,
                   }
                 );
-                console.log(allValues.data.value)
-                item.component_Expanded.fields = allValues.data.value.sort(
-                  (a, b) => a.lineNum - b.lineNum
-                );
+                console.log('allValues', allValues.data.value)
+                item.component_Expanded.options = allValues.data.value.sort((a, b) => {
+                  if (a.Description.toLowerCase() < b.Description.toLowerCase()) {
+                    return -1;
+                  }
+                  if (a.Description.toLowerCase() > b.Description.toLowerCase()) {
+                    return 1;
+                  }
+                  return 0;
+                }).map(item => ({ value: item.Ref_Key, label: item.Description }))
               }
               resolve(item);
             });
@@ -209,7 +215,7 @@ const servicesOneC = {
       // resp[0].data.value[0].Fields = resp[1].data.value
       // console.log(resp[0].data.value)
       // console.log(resp[1].data)
-      console.log("resp", resp[0].data.value[0]);
+      // console.log("resp", resp[0].data.value[0]);
       return resp[0].data.value[0];
     } catch (error) {
       console.log(error);
