@@ -171,6 +171,7 @@ const servicesOneC = {
         resp[0].data.value[0].fields = await Promise.all(
           resp[1].data.value.map((item, index) => {
             return new Promise(async (resolve, reject) => {
+              // -------------Если таблица
               if (item.component_Type.includes("TableInput")) {
                 const tableFields = await axios.get(
                   `${server1c}/InformationRegister_portalFields?$format=json&$select=*&$expand=name,component,dependName,dependСondition&$filter=cast(object,'Catalog_componentsTableInput') eq guid'${item.component}'`,
@@ -180,6 +181,19 @@ const servicesOneC = {
                 );
                 // console.log(tableFields.data.value)
                 item.component_Expanded.fields = tableFields.data.value.sort(
+                  (a, b) => a.lineNum - b.lineNum
+                );
+              }
+              // -------------Если LinkInput (ссылка на справочник и установлен флаг allValues)
+              if (item.component_Type.includes("LinkInput") && item.component_Expanded.allValues) {
+                const allValues = await axios.get(
+                  `${server1c}${item.component_Expanded.linkUrl}`,
+                  {
+                    headers,
+                  }
+                );
+                console.log(allValues.data.value)
+                item.component_Expanded.fields = allValues.data.value.sort(
                   (a, b) => a.lineNum - b.lineNum
                 );
               }
