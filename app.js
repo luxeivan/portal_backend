@@ -15,6 +15,7 @@ const cabinet = require("./routers/cabinet");
 const services = require("./routers/services");
 const servicestest = require("./routers/servicestest");
 const formonec = require("./routers/formonec");
+const getDaData = require('./routers/getDaData/getDaData');
 
 const session = require("express-session");
 
@@ -107,6 +108,7 @@ app.use("/api/cabinet", checkAuth, cabinet);
 app.use("/api/services", services);
 app.use("/api/servicestest", servicestest);
 app.use("/api/formonec", formonec);
+app.use('/getDaData', getDaData);
 
 const httpServer = http.createServer(app);
 const httpsServer = https.createServer(options, app);
