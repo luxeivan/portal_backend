@@ -203,6 +203,18 @@ const servicesOneC = {
                   return 0;
                 }).map(item => ({ value: item.Ref_Key, label: item.Description }))
               }
+              if (item.component_Type.includes("GroupFieldsInput")) {
+                const tableFields = await axios.get(
+                  `${server1c}/InformationRegister_portalFields?$format=json&$select=*&$expand=name,component,dependName,dependСondition&$filter=cast(object,'Catalog_componentsGroupFieldsInput') eq guid'${item.component}'`,
+                  {
+                    headers,
+                  }
+                );
+                // console.log(tableFields.data.value)
+                item.component_Expanded.fields = tableFields.data.value.sort(
+                  (a, b) => a.lineNum - b.lineNum
+                );
+              }
               resolve(item);
             });
           })
