@@ -21,12 +21,12 @@ const sendCodeToPhone = async (phone) => {
             "Authorization": authMegafon
         },
     })
+    console.log(response.data)
     if (response.data.result.status.code === 0) {
         return pincode
     } else {
         throw new Error('Не удалось отправить код')
     }
-    // console.log(response.data)
 }
 
 module.exports = sendCodeToPhone;
