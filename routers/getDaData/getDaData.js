@@ -1,3 +1,5 @@
+// getDaData.js
+
 const axios = require("axios");
 const express = require("express");
 const { validationResult, query } = require("express-validator");
@@ -16,8 +18,9 @@ const getDaDataUrl = (type) => {
     case "ИНН":
       return `${DADATA_BASE_URL}/findById/party`;
     case "Страна":
-    case "Город":
     case "Регион":
+    case "Город":
+    case "Район":
     case "Улица":
       return `${DADATA_BASE_URL}/suggest/address`;
     default:
@@ -25,24 +28,27 @@ const getDaDataUrl = (type) => {
   }
 };
 
-const getParts = (type) => {
+// Функция для определения частей адреса и ФИО
+const getBoundsAndParts = (type) => {
   switch (type) {
     case "Фамилия":
-      return ["SURNAME"];
+      return { parts: ["SURNAME"] };
     case "Имя":
-      return ["NAME"];
+      return { parts: ["NAME"] };
     case "Отчество":
-      return ["PATRONYMIC"];
-    case "Город":
-      return ["CITY"];
-    case "Район":
-      return ["SETTLEMENT"];
-    case "Улица":
-      return ["STREET"];
+      return { parts: ["PATRONYMIC"] };
     case "Страна":
-      return ["COUNTRY"];
+      return { from: "country", to: "country" };
+    case "Регион":
+      return { from: "region", to: "region" };
+    case "Город":
+      return { from: "city", to: "city" };
+    case "Район":
+      return { from: "area", to: "area" };
+    case "Улица":
+      return { from: "street", to: "street" };
     default:
-      return [];
+      return {};
   }
 };
 
@@ -60,7 +66,7 @@ getDaData.get(
 
     const { type, query: searchQuery } = req.query;
     const url = getDaDataUrl(type);
-    const parts = getParts(type);
+    const { from, to, parts } = getBoundsAndParts(type);
 
     if (!url) {
       return res
@@ -76,12 +82,17 @@ getDaData.get(
       },
     };
 
+    const body = {
+      query: searchQuery,
+      ...(parts && { parts }),
+      ...(from && to && {
+        from_bound: { value: from },
+        to_bound: { value: to },
+      }),
+    };
+
     try {
-      const result = await axios.post(
-        url,
-        { query: searchQuery, parts },
-        options
-      );
+      const result = await axios.post(url, body, options);
       res.json({ status: "ok", data: result.data.suggestions });
     } catch (error) {
       console.error("Ошибка запроса к DaData:", error);
@@ -93,3 +104,100 @@ getDaData.get(
 );
 
 module.exports = getDaData;
+
+
+// const axios = require("axios");
+// const express = require("express");
+// const { validationResult, query } = require("express-validator");
+// const getDaData = express.Router();
+
+// const DADATA_TOKEN = process.env.DADATA_TOKEN;
+// const DADATA_BASE_URL = "http://suggestions.dadata.ru/suggestions/api/4_1/rs";
+
+// // Функция для определения URL в зависимости от типа данных
+// const getDaDataUrl = (type) => {
+//   switch (type) {
+//     case "Фамилия":
+//     case "Имя":
+//     case "Отчество":
+//       return `${DADATA_BASE_URL}/suggest/fio`;
+//     case "ИНН":
+//       return `${DADATA_BASE_URL}/findById/party`;
+//     case "Страна":
+//     case "Город":
+//     case "Регион":
+//     case "Улица":
+//       return `${DADATA_BASE_URL}/suggest/address`;
+//     default:
+//       return null;
+//   }
+// };
+
+// const getParts = (type) => {
+//   switch (type) {
+//     case "Фамилия":
+//       return ["SURNAME"];
+//     case "Имя":
+//       return ["NAME"];
+//     case "Отчество":
+//       return ["PATRONYMIC"];
+//     case "Город":
+//       return ["CITY"];
+//     case "Район":
+//       return ["SETTLEMENT"];
+//     case "Улица":
+//       return ["STREET"];
+//     case "Страна":
+//       return ["COUNTRY"];
+//     default:
+//       return [];
+//   }
+// };
+
+// getDaData.get(
+//   "/",
+//   query("type").notEmpty(),
+//   query("query").notEmpty(),
+//   async (req, res) => {
+//     const errors = validationResult(req);
+//     if (!errors.isEmpty()) {
+//       return res
+//         .status(400)
+//         .json({ status: "error", message: "Пустое поле поиска или тип" });
+//     }
+
+//     const { type, query: searchQuery } = req.query;
+//     const url = getDaDataUrl(type);
+//     const parts = getParts(type);
+
+//     if (!url) {
+//       return res
+//         .status(400)
+//         .json({ status: "error", message: "Неподдерживаемый тип данных" });
+//     }
+
+//     const options = {
+//       headers: {
+//         "Content-Type": "application/json",
+//         Accept: "application/json",
+//         Authorization: `Token ${DADATA_TOKEN}`,
+//       },
+//     };
+
+//     try {
+//       const result = await axios.post(
+//         url,
+//         { query: searchQuery, parts },
+//         options
+//       );
+//       res.json({ status: "ok", data: result.data.suggestions });
+//     } catch (error) {
+//       console.error("Ошибка запроса к DaData:", error);
+//       res
+//         .status(500)
+//         .json({ status: "error", message: "Ошибка запроса к DaData" });
+//     }
+//   }
+// );
+
+// module.exports = getDaData;
