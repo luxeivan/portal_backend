@@ -17,7 +17,7 @@ const getDaDataUrl = (type) => {
       return `${DADATA_BASE_URL}/findById/party`;
     case "Страна":
     case "Город":
-    case "Район":
+    case "Регион":
     case "Улица":
       return `${DADATA_BASE_URL}/suggest/address`;
     default:
@@ -37,8 +37,8 @@ const getParts = (type) => {
       return ["country"];
     case "Город":
       return ["CITY"];
-    case "Район":
-      return ["SETTLEMENT"];
+    case "Регион":
+      return ["REGION"];
     case "Улица":
       return ["STREET"];
     default:
