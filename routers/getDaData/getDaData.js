@@ -33,14 +33,14 @@ const getParts = (type) => {
       return ["NAME"];
     case "Отчество":
       return ["PATRONYMIC"];
-    case "Страна":
-      return ["country"];
     case "Город":
       return ["CITY"];
-    case "Регион":
-      return ["REGION"];
+    case "Район":
+      return ["SETTLEMENT"];
     case "Улица":
       return ["STREET"];
+    case "Страна":
+      return ["COUNTRY"];
     default:
       return [];
   }
