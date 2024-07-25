@@ -54,7 +54,7 @@ const claimsOneC = {
         // ------------------------------------------------------------------------
         const fields = values.filter(item => {
             const field = service.fields.find(field => field.idLine === item.key)
-            if (field.component_Type.includes("TableInput")) return false
+            if (field.component_Type.includes("TableInput") || field.component_Type.includes("GroupFieldsInput")) return false
             return true
         })
             .map((item, index) => {
@@ -69,9 +69,34 @@ const claimsOneC = {
                 }
             })
         // ------------------------------------------------------------------------
+        values.filter(item => {
+            const field = service.fields.find(field => field.idLine === item.key)
+            if (field.component_Type.includes("GroupFieldsInput")) return true
+            return false
+        }).forEach((item, index1) => {
+            const field = service.fields.find(field => field.idLine === item.key)
+            // console.log('item',item)
+            const arr = []
+            for (const [key, value] of Object.entries(item.value)) {
+                arr.push({ key, value })
+            }
+            // console.log('arr',arr)
+            arr.forEach((element, index2) => {
+                fields.push({
+                    LineNumber: fields.length + 1,
+                    name_Key: field.component_Expanded.fields.find(el => el.idLine === element.key).name_Key,
+                    nameOwner_Key: field.name_Key,
+                    value: element.value,
+                    value_Type: field.component_Expanded.fields.find(el => el.idLine === element.key).component_Expanded.typeOData,
+                    idLine: field.component_Expanded.fields.find(el => el.idLine === element.key).idLine,
+                })
+
+            })
+        })
+        // ------------------------------------------------------------------------
         service.fields.filter(field => field.component_Type.includes('HiddenInput'))
             .forEach((field, index) => {
-                console.log(index, field)
+                //console.log(index, field)
                 fields.push({
                     LineNumber: fields.length + 1 + index,
                     name_Key: field.name_Key,
