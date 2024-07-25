@@ -15,6 +15,7 @@ const getDaDataUrl = (type) => {
       return `${DADATA_BASE_URL}/suggest/fio`;
     case "ИНН":
       return `${DADATA_BASE_URL}/findById/party`;
+    case "Страна":
     case "Город":
     case "Район":
     case "Улица":
@@ -32,6 +33,8 @@ const getParts = (type) => {
       return ["NAME"];
     case "Отчество":
       return ["PATRONYMIC"];
+    case "Страна":
+      return ["country"];
     case "Город":
       return ["CITY"];
     case "Район":
