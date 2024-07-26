@@ -1,5 +1,3 @@
-// getDaData.js
-
 const axios = require("axios");
 const express = require("express");
 const { validationResult, query } = require("express-validator");
@@ -38,7 +36,11 @@ const getBoundsAndParts = (type) => {
     case "Отчество":
       return { parts: ["PATRONYMIC"] };
     case "Страна":
-      return { from: "country", to: "country" };
+      return {
+        from: "country",
+        to: "country",
+        locations: [{ country_iso_code: "*" }],
+      };
     case "Регион":
       return { from: "region", to: "region" };
     case "Город":
@@ -66,7 +68,7 @@ getDaData.get(
 
     const { type, query: searchQuery } = req.query;
     const url = getDaDataUrl(type);
-    const { from, to, parts } = getBoundsAndParts(type);
+    const { from, to, parts, locations } = getBoundsAndParts(type);
 
     if (!url) {
       return res
@@ -85,10 +87,12 @@ getDaData.get(
     const body = {
       query: searchQuery,
       ...(parts && { parts }),
-      ...(from && to && {
-        from_bound: { value: from },
-        to_bound: { value: to },
-      }),
+      ...(from &&
+        to && {
+          from_bound: { value: from },
+          to_bound: { value: to },
+        }),
+      ...(locations && { locations }),
     };
 
     try {
@@ -104,7 +108,6 @@ getDaData.get(
 );
 
 module.exports = getDaData;
-
 
 // const axios = require("axios");
 // const express = require("express");
@@ -124,8 +127,9 @@ module.exports = getDaData;
 //     case "ИНН":
 //       return `${DADATA_BASE_URL}/findById/party`;
 //     case "Страна":
-//     case "Город":
 //     case "Регион":
+//     case "Город":
+//     case "Район":
 //     case "Улица":
 //       return `${DADATA_BASE_URL}/suggest/address`;
 //     default:
@@ -133,24 +137,27 @@ module.exports = getDaData;
 //   }
 // };
 
-// const getParts = (type) => {
+// // Функция для определения частей адреса и ФИО
+// const getBoundsAndParts = (type) => {
 //   switch (type) {
 //     case "Фамилия":
-//       return ["SURNAME"];
+//       return { parts: ["SURNAME"] };
 //     case "Имя":
-//       return ["NAME"];
+//       return { parts: ["NAME"] };
 //     case "Отчество":
-//       return ["PATRONYMIC"];
-//     case "Город":
-//       return ["CITY"];
-//     case "Район":
-//       return ["SETTLEMENT"];
-//     case "Улица":
-//       return ["STREET"];
+//       return { parts: ["PATRONYMIC"] };
 //     case "Страна":
-//       return ["COUNTRY"];
+//       return { from: "country", to: "country" };
+//     case "Регион":
+//       return { from: "region", to: "region" };
+//     case "Город":
+//       return { from: "city", to: "city" };
+//     case "Район":
+//       return { from: "area", to: "area" };
+//     case "Улица":
+//       return { from: "street", to: "street" };
 //     default:
-//       return [];
+//       return {};
 //   }
 // };
 
@@ -168,7 +175,7 @@ module.exports = getDaData;
 
 //     const { type, query: searchQuery } = req.query;
 //     const url = getDaDataUrl(type);
-//     const parts = getParts(type);
+//     const { from, to, parts } = getBoundsAndParts(type);
 
 //     if (!url) {
 //       return res
@@ -184,12 +191,17 @@ module.exports = getDaData;
 //       },
 //     };
 
+//     const body = {
+//       query: searchQuery,
+//       ...(parts && { parts }),
+//       ...(from && to && {
+//         from_bound: { value: from },
+//         to_bound: { value: to },
+//       }),
+//     };
+
 //     try {
-//       const result = await axios.post(
-//         url,
-//         { query: searchQuery, parts },
-//         options
-//       );
+//       const result = await axios.post(url, body, options);
 //       res.json({ status: "ok", data: result.data.suggestions });
 //     } catch (error) {
 //       console.error("Ошибка запроса к DaData:", error);
