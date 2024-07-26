@@ -41,9 +41,7 @@ router.get("/", async (req, res) => {
     logger.info(`Субъекты успешно получены для пользователя: ${userData.id}`);
   } catch (error) {
     logger.error(
-      `Ошибка при получении субъектов для пользователя: ${
-        userData?.id || "неизвестного"
-      }. Ошибка: ${error.message}`
+      `Ошибка при получении субъектов для пользователя: ${userData?.id || "неизвестного"}. Ошибка: ${error.message}`
     );
     res.status(500).json({ message: "Internal server error" });
   }
