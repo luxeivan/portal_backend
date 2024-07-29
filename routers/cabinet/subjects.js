@@ -29,10 +29,10 @@ router.post("/", async (req, res) => {
 
 // Маршрут для получения списка субъектов пользователя
 router.get("/", async (req, res) => {
+  const authHeader = req.headers.authorization;
+  const accessToken = authHeader.split(" ")[1];
+  const userData = jwt.verify(accessToken, process.env.JWT_SECRET);
   try {
-    const authHeader = req.headers.authorization;
-    const accessToken = authHeader.split(" ")[1];
-    const userData = jwt.verify(accessToken, process.env.JWT_SECRET);
     logger.info(
       `Запрос на получение субъектов для пользователя: ${userData.id}`
     );
@@ -41,9 +41,7 @@ router.get("/", async (req, res) => {
     logger.info(`Субъекты успешно получены для пользователя: ${userData.id}`);
   } catch (error) {
     logger.error(
-      `Ошибка при получении субъектов для пользователя: ${
-        userData?.id || "неизвестного"
-      }. Ошибка: ${error.message}`
+      `Ошибка при получении субъектов для пользователя: ${userData?.id || "неизвестного"}. Ошибка: ${error.message}`
     );
     res.status(500).json({ message: "Internal server error" });
   }
