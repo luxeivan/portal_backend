@@ -178,6 +178,31 @@ const servicesOneC = {
                     headers,
                   }
                 );
+                console.log('tableFields.data.value', tableFields.data.value)
+                tableFields.data.value = await Promise.all(tableFields.data.value.map(tableField => {
+                  return new Promise(async (resolve, reject) => {
+                    if (tableField.component_Type.includes("LinkInput") && tableField.component_Expanded.allValues) {
+                      // console.log(item.component_Expanded.linkUrl)
+                      const allValues = await axios.get(
+                        `${server1c}${tableField.component_Expanded.linkUrl}`,
+                        {
+                          headers,
+                        }
+                      );
+                      // console.log('allValues', allValues.data.value)
+                      tableField.component_Expanded.options = allValues.data.value.sort((a, b) => {
+                        if (a.Description.toLowerCase() < b.Description.toLowerCase()) {
+                          return -1;
+                        }
+                        if (a.Description.toLowerCase() > b.Description.toLowerCase()) {
+                          return 1;
+                        }
+                        return 0;
+                      }).map(item => ({ value: item.Ref_Key, label: item.Description }))
+                    }
+                    resolve(tableField)
+                  })
+                }))
                 // console.log(tableFields.data.value)
                 item.component_Expanded.fields = tableFields.data.value.sort(
                   (a, b) => a.lineNum - b.lineNum
@@ -192,7 +217,7 @@ const servicesOneC = {
                     headers,
                   }
                 );
-                console.log('allValues', allValues.data.value)
+                // console.log('allValues', allValues.data.value)
                 item.component_Expanded.options = allValues.data.value.sort((a, b) => {
                   if (a.Description.toLowerCase() < b.Description.toLowerCase()) {
                     return -1;
@@ -203,6 +228,7 @@ const servicesOneC = {
                   return 0;
                 }).map(item => ({ value: item.Ref_Key, label: item.Description }))
               }
+              // -------------Если GroupFieldsInput
               if (item.component_Type.includes("GroupFieldsInput")) {
                 const tableFields = await axios.get(
                   `${server1c}/InformationRegister_portalFields?$format=json&$select=*&$expand=name,component,dependName,dependСondition&$filter=cast(object,'Catalog_componentsGroupFieldsInput') eq guid'${item.component}'`,
