@@ -49,7 +49,7 @@ const getBoundsAndParts = (type) => {
       return { from: "area", to: "area" };
     case "Улица":
       return { from: "street", to: "street" };
-    case "Адрес":
+    case "АдресПолный":
       return [];
     default:
       return {};
