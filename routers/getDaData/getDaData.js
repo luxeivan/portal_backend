@@ -128,11 +128,6 @@ module.exports = getDaData;
 //       return `${DADATA_BASE_URL}/suggest/fio`;
 //     case "ИНН":
 //       return `${DADATA_BASE_URL}/findById/party`;
-<<<<<<< HEAD
-=======
-//     case "Страна":
-//     case "Регион":
->>>>>>> origin/main
 //     case "Город":
 //     case "Район":
 //     case "Улица":
@@ -142,7 +137,6 @@ module.exports = getDaData;
 //   }
 // };
 
-<<<<<<< HEAD
 // const getParts = (type) => {
 //   switch (type) {
 //     case "Фамилия":
@@ -159,29 +153,6 @@ module.exports = getDaData;
 //       return ["STREET"];
 //     default:
 //       return [];
-=======
-// // Функция для определения частей адреса и ФИО
-// const getBoundsAndParts = (type) => {
-//   switch (type) {
-//     case "Фамилия":
-//       return { parts: ["SURNAME"] };
-//     case "Имя":
-//       return { parts: ["NAME"] };
-//     case "Отчество":
-//       return { parts: ["PATRONYMIC"] };
-//     case "Страна":
-//       return { from: "country", to: "country" };
-//     case "Регион":
-//       return { from: "region", to: "region" };
-//     case "Город":
-//       return { from: "city", to: "city" };
-//     case "Район":
-//       return { from: "area", to: "area" };
-//     case "Улица":
-//       return { from: "street", to: "street" };
-//     default:
-//       return {};
->>>>>>> origin/main
 //   }
 // };
 
@@ -199,11 +170,7 @@ module.exports = getDaData;
 
 //     const { type, query: searchQuery } = req.query;
 //     const url = getDaDataUrl(type);
-<<<<<<< HEAD
 //     const parts = getParts(type);
-=======
-//     const { from, to, parts } = getBoundsAndParts(type);
->>>>>>> origin/main
 
 //     if (!url) {
 //       return res
@@ -219,26 +186,12 @@ module.exports = getDaData;
 //       },
 //     };
 
-<<<<<<< HEAD
 //     try {
 //       const result = await axios.post(
 //         url,
 //         { query: searchQuery, parts },
 //         options
 //       );
-=======
-//     const body = {
-//       query: searchQuery,
-//       ...(parts && { parts }),
-//       ...(from && to && {
-//         from_bound: { value: from },
-//         to_bound: { value: to },
-//       }),
-//     };
-
-//     try {
-//       const result = await axios.post(url, body, options);
->>>>>>> origin/main
 //       res.json({ status: "ok", data: result.data.suggestions });
 //     } catch (error) {
 //       console.error("Ошибка запроса к DaData:", error);
