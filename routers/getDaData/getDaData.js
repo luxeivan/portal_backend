@@ -20,6 +20,7 @@ const getDaDataUrl = (type) => {
     case "Город":
     case "Район":
     case "Улица":
+    case "АдресПолный":
       return `${DADATA_BASE_URL}/suggest/address`;
     default:
       return null;
