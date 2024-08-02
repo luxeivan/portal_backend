@@ -157,12 +157,14 @@ const servicesOneC = {
                 }
                 // -------------Если GroupFieldsInput
                 if (item.component_Type.includes("GroupFieldsInput")) {
+                  // console.log(`${server1c}/InformationRegister_portalFields?$format=json&$select=*&$expand=name,component,dependName,dependСondition&$filter=cast(object,'Catalog_componentsGroupFieldsInput') eq guid'${item.component}'`)
                   const tableFields = await axios.get(
                     `${server1c}/InformationRegister_portalFields?$format=json&$select=*&$expand=name,component,dependName,dependСondition&$filter=cast(object,'Catalog_componentsGroupFieldsInput') eq guid'${item.component}'`,
                     {
                       headers,
                     }
                   );
+                  // console.log(item)
                   if (tableFields.data && tableFields.data.value) {
                     item.component_Expanded.fields =
                       tableFields.data.value.sort(
