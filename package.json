@@ -29,6 +29,8 @@
     "react-yandex-maps": "^4.6.0",
     "session-file-store": "^1.5.0",
     "strapi-sdk-js": "^2.3.3",
+    "swagger-jsdoc": "^6.2.8",
+    "swagger-ui-express": "^5.0.1",
     "telegraf": "^4.16.3",
     "uuid": "^9.0.1",
     "winston": "^3.13.0",
