@@ -111,7 +111,7 @@ app.use("/api/cabinet", checkAuth, cabinet);
 app.use("/api/services", services);
 app.use("/api/servicestest", servicestest);
 app.use("/api/formonec", formonec);
-app.use('/getDaData', getDaData);
+app.use('/api/getDaData', getDaData);
 
 swaggerSetup(app);
 
