@@ -7,6 +7,7 @@ const https = require("https");
 require("dotenv").config();
 const logger = require("./logger");
 const rateLimit = require("express-rate-limit");
+const swaggerSetup = require('./swagger');
 
 const auth = require("./routers/auth");
 const registration = require("./routers/registration");
@@ -30,6 +31,8 @@ const port = process.env.PORT;
 const portSSL = process.env.PORT_SSL;
 const cert = process.env.CERT;
 const certKey = process.env.CERT_KEY;
+
+
 
 const options = {
   cert: fs.readFileSync(cert),
@@ -109,6 +112,8 @@ app.use("/api/services", services);
 app.use("/api/servicestest", servicestest);
 app.use("/api/formonec", formonec);
 app.use('/getDaData', getDaData);
+
+swaggerSetup(app);
 
 const httpServer = http.createServer(app);
 const httpsServer = https.createServer(options, app);
