@@ -45,9 +45,17 @@ const options = {
         name: "SendMail",
         description: "Маршруты для отправки кода на email",
       },
+      {
+        name: "Services",
+        description: "Маршруты для получения информации об услугах и их элементах",
+      },
+      {
+        name: "DaData",
+        description: "Маршруты для работы с API DaData",
+      }
     ],
   },
-  apis: ["./routers/*.js"], // путь к файлам с описанием API
+  apis: ["./routers/*.js", "./routers/getDaData/*.js"], // путь к файлам с описанием API
 };
 
 const specs = swaggerJsdoc(options);
