@@ -4,6 +4,42 @@ const { getUserById } = require("../../services/strapi");
 
 const logger = require("../../logger");
 
+/**
+ * @swagger
+ * tags:
+ *   - name: Profile
+ *     description: Маршруты для управления профилем пользователя
+ */
+
+/**
+ * @swagger
+ * /api/cabinet/profile:
+ *   get:
+ *     summary: Получение профиля пользователя
+ *     description: Возвращает данные профиля пользователя по его ID.
+ *     tags:
+ *       - Profile
+ *     responses:
+ *       200:
+ *         description: Профиль пользователя успешно получен
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 firstname:
+ *                   type: string
+ *                 lastname:
+ *                   type: string
+ *                 email:
+ *                   type: string
+ *                   format: email
+ *                 phone:
+ *                   type: string
+ *       500:
+ *         description: Внутренняя ошибка сервера
+ */
+
 router.get("/", async (req, res) => {
   try {
     const userId = req.userId;

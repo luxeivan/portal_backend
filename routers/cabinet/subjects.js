@@ -10,7 +10,43 @@ const {
 
 const logger = require("../../logger");
 
+/**
+ * @swagger
+ * tags:
+ *   - name: Subjects (ПОКА НЕ ИСПОЛЬЗУЕМ)
+ *     description: Маршруты для управления субъектами
+ */
+
 // Маршрут для добавления нового субъекта
+/**
+ * @swagger
+ * /api/cabinet/subjects:
+ *   post:
+ *     summary: Добавление нового субъекта
+ *     description: Добавляет нового субъекта для пользователя.
+ *     tags:
+ *       - Subjects (ПОКА НЕ ИСПОЛЬЗУЕМ)
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               name:
+ *                 type: string
+ *               description:
+ *                 type: string
+ *     responses:
+ *       201:
+ *         description: Субъект успешно добавлен
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *       500:
+ *         description: Внутренняя ошибка сервера
+ */
 router.post("/", async (req, res) => {
   try {
     const userId = req.userId;
@@ -27,6 +63,26 @@ router.post("/", async (req, res) => {
   }
 });
 
+/**
+ * @swagger
+ * /api/cabinet/subjects:
+ *   get:
+ *     summary: Получение списка субъектов пользователя
+ *     description: Возвращает список всех субъектов, связанных с пользователем.
+ *     tags:
+ *       - Subjects (ПОКА НЕ ИСПОЛЬЗУЕМ)
+ *     responses:
+ *       200:
+ *         description: Список субъектов успешно получен
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *       500:
+ *         description: Внутренняя ошибка сервера
+ */
 // Маршрут для получения списка субъектов пользователя
 router.get("/", async (req, res) => {
   const authHeader = req.headers.authorization;
@@ -41,13 +97,42 @@ router.get("/", async (req, res) => {
     logger.info(`Субъекты успешно получены для пользователя: ${userData.id}`);
   } catch (error) {
     logger.error(
-      `Ошибка при получении субъектов для пользователя: ${userData?.id || "неизвестного"}. Ошибка: ${error.message}`
+      `Ошибка при получении субъектов для пользователя: ${
+        userData?.id || "неизвестного"
+      }. Ошибка: ${error.message}`
     );
     res.status(500).json({ message: "Internal server error" });
   }
 });
 
 // Маршрут для получения одного субъекта
+/**
+ * @swagger
+ * /api/cabinet/subjects/{id}:
+ *   get:
+ *     summary: Получение одного субъекта
+ *     description: Возвращает данные одного субъекта по его ID.
+ *     tags:
+ *       - Subjects (ПОКА НЕ ИСПОЛЬЗУЕМ)
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: ID субъекта
+ *     responses:
+ *       200:
+ *         description: Субъект успешно получен
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *       404:
+ *         description: Субъект с данным ID не найден
+ *       500:
+ *         description: Внутренняя ошибка сервера
+ */
 router.get("/:id", async (req, res) => {
   try {
     const userId = req.userId;
@@ -78,6 +163,29 @@ router.get("/:id", async (req, res) => {
   }
 });
 
+/**
+ * @swagger
+ * /api/cabinet/subjects/{id}:
+ *   delete:
+ *     summary: Удаление субъекта
+ *     description: Удаляет субъект по его ID.
+ *     tags:
+ *       - Subjects (ПОКА НЕ ИСПОЛЬЗУЕМ)
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: ID субъекта
+ *     responses:
+ *       200:
+ *         description: Субъект успешно удален
+ *       404:
+ *         description: Субъект с данным ID не найден
+ *       500:
+ *         description: Внутренняя ошибка сервера
+ */
 router.delete("/:id", async (req, res) => {
   try {
     const userId = req.userId;
