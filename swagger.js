@@ -61,7 +61,19 @@ const options = {
       {
         name: "UploadFile",
         description: "Маршруты для загрузки файлов",
-      },      
+      },
+      {
+        name: "Objects (ПОКА НЕ ИСПОЛЬЗУЕМ)",
+        description: "Маршруты для управления объектами пользователей",
+      },
+      {
+        name: "Subjects (ПОКА НЕ ИСПОЛЬЗУЕМ)",
+        description: "Маршруты для управления субъектами",
+      },  
+      {
+        name: "Profile",
+        description: "Маршруты для управления профилем пользователя",
+      }, 
       {
         name: "DaData",
         description: "Маршруты для работы с API DaData",
@@ -80,23 +92,3 @@ const specs = swaggerJsdoc(options);
 module.exports = (app) => {
   app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(specs));
 };
-
-// const swaggerJsdoc = require('swagger-jsdoc');
-// const swaggerUi = require('swagger-ui-express');
-
-// const options = {
-//   definition: {
-//     openapi: '3.0.0',
-//     info: {
-//       title: 'API МосОблЭнерго',
-//       version: '1.0.0',
-//     },
-//   },
-//   apis: ['./routers/*.js'], // путь к файлам с описанием API
-// };
-
-// const specs = swaggerJsdoc(options);
-
-// module.exports = (app) => {
-//   app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));
-// };

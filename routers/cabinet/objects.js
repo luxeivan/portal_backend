@@ -12,7 +12,39 @@ const {
   updateObjectItem,
 } = require("../../services/strapi/strapiObjects");
 
+/**
+ * @swagger
+ * tags:
+ *   - name: Objects (ПОКА НЕ ИСПОЛЬЗУЕМ)
+ *     description: Маршруты для управления объектами пользователей
+ */
+
 // Маршрут для добавления нового объекта
+/**
+ * @swagger
+ * /api/cabinet/objects:
+ *   post:
+ *     summary: Добавление нового объекта
+ *     description: Добавляет новый объект для пользователя.
+ *     tags:
+ *       - Objects (ПОКА НЕ ИСПОЛЬЗУЕМ)
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               name:
+ *                 type: string
+ *               description:
+ *                 type: string
+ *     responses:
+ *       201:
+ *         description: Объект успешно добавлен
+ *       500:
+ *         description: Внутренняя ошибка сервера
+ */
 router.post("/", async (req, res) => {
   try {
     const userId = req.userId;
@@ -34,6 +66,20 @@ router.post("/", async (req, res) => {
 });
 
 // Маршрут для получения списка объектов пользователя
+/**
+ * @swagger
+ * /api/cabinet/objects:
+ *   get:
+ *     summary: Получение списка объектов пользователя
+ *     description: Возвращает список всех объектов, принадлежащих пользователю.
+ *     tags:
+ *       - Objects (ПОКА НЕ ИСПОЛЬЗУЕМ)
+ *     responses:
+ *       200:
+ *         description: Список объектов успешно получен
+ *       500:
+ *         description: Внутренняя ошибка сервера
+ */
 router.get("/", async (req, res) => {
   try {
     const authHeader = req.headers.authorization;
@@ -56,6 +102,29 @@ router.get("/", async (req, res) => {
 });
 
 // Маршрут для получения одного объекта
+/**
+ * @swagger
+ * /api/cabinet/objects/{id}:
+ *   get:
+ *     summary: Получение одного объекта по ID
+ *     description: Возвращает информацию об объекте по его ID.
+ *     tags:
+ *       - Objects (ПОКА НЕ ИСПОЛЬЗУЕМ)
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Идентификатор объекта
+ *     responses:
+ *       200:
+ *         description: Объект успешно получен
+ *       404:
+ *         description: Объект не найден
+ *       500:
+ *         description: Внутренняя ошибка сервера
+ */
 router.get("/:id", async (req, res) => {
   try {
     const userId = req.userId;
@@ -86,6 +155,29 @@ router.get("/:id", async (req, res) => {
   }
 });
 
+/**
+ * @swagger
+ * /api/cabinet/objects/{id}:
+ *   delete:
+ *     summary: Удаление объекта по ID
+ *     description: Удаляет объект по его ID.
+ *     tags:
+ *       - Objects (ПОКА НЕ ИСПОЛЬЗУЕМ)
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Идентификатор объекта
+ *     responses:
+ *       200:
+ *         description: Объект успешно удален
+ *       400:
+ *         description: Неверный ID объекта
+ *       500:
+ *         description: Внутренняя ошибка сервера
+ */
 router.delete("/:id", async (req, res) => {
   try {
     const userId = req.userId;
@@ -117,6 +209,40 @@ router.delete("/:id", async (req, res) => {
   }
 });
 
+/**
+ * @swagger
+ * /api/cabinet/objects/{id}:
+ *   put:
+ *     summary: Обновление объекта по ID
+ *     description: Обновляет информацию об объекте по его ID.
+ *     tags:
+ *       - Objects (ПОКА НЕ ИСПОЛЬЗУЕМ)
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Идентификатор объекта
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               name:
+ *                 type: string
+ *               description:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Объект успешно обновлен
+ *       400:
+ *         description: Неверный ID объекта
+ *       500:
+ *         description: Внутренняя ошибка сервера
+ */
 router.put("/:id", async (req, res) => {
   try {
     const userId = req.userId;
