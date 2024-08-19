@@ -100,9 +100,9 @@ const getBoundsAndParts = (type) => {
  *                   type: array
  *                   items:
  *                     oneOf:
- *                       - $ref: '#/components/schemas/ПодсказкаФИО'
+ *                       - $ref: '#/components/schemas/ПодсказкаПоФИО'
  *                       - $ref: '#/components/schemas/ПоискИНН'
- *                       - $ref: '#/components/schemas/ПодсказкаАдрес'
+ *                       - $ref: '#/components/schemas/ПодсказкаПоАдресу'
  *       400:
  *         description: Пустое поле поиска или тип
  *       500:
@@ -113,7 +113,7 @@ const getBoundsAndParts = (type) => {
  * @swagger
  * components:
  *   schemas:
- *     ПодсказкаФИО:
+ *     ПодсказкаПоФИО:
  *       type: object
  *       properties:
  *         value:
@@ -149,7 +149,7 @@ const getBoundsAndParts = (type) => {
  *             ogrn:
  *               type: string
  *               example: 1234567890123
- *     ПодсказкаАдрес:
+ *     ПодсказкаПоАдресу:
  *       type: object
  *       properties:
  *         value:
