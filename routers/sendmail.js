@@ -16,7 +16,7 @@ const logger = require("../logger");
  *   get:
  *     summary: Отправка кода на email
  *     description: Отправляет код на указанный email. Код и email жестко закодированы в этом маршруте.
-  *     tags:
+ *     tags:
  *       - SendMail
  *     responses:
  *       200:
