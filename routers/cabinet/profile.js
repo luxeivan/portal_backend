@@ -42,7 +42,7 @@ const logger = require("../../logger");
 
 router.get("/", async (req, res) => {
   try {
-    const userId = req.userId;
+    const userId = req.userId || false;
     logger.info(`Запрос на получение профиля пользователя с id: ${userId}`);
     const profile = await getUserById(userId);
     res.json({
