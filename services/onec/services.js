@@ -12,23 +12,24 @@ const servicesOneC = {
   getServicesByKey: async (key = "00000000-0000-0000-0000-000000000000") => {
     try {
       const response = await axios.get(
-        `${server1c}/Catalog_services?$format=json&$filter=DeletionMark eq false and usage eq true and Parent_Key eq guid'${key}' and (( year(beginDate) eq 0001 or (year(beginDate) le ${moment().year()} and month(beginDate) le ${
-          moment().month() + 1
+        `${server1c}/Catalog_services?$format=json&$filter=DeletionMark eq false and usage eq true and Parent_Key eq guid'${key}' and (( year(beginDate) eq 0001 or (year(beginDate) le ${moment().year()} and month(beginDate) le ${moment().month() + 1
         } and day(beginDate) le ${moment().date()})) and ( year(endDate) eq 0001 or (year(endDate) ne 0001 and year(endDate) ge ${moment().year()} and month(endDate) ge ${moment().month()} and day(endDate) ge ${moment().date()})))`,
         {
           headers,
         }
       );
+      console.log('response.data: ', response.data);
       if (!response.data) {
         return false;
       }
       return response.data;
     } catch (error) {
-      console.log(error.message);
+      console.log('getServicesByKey: ', error.message);
       return false;
     }
   },
   getServiceItemByKey: async (key) => {
+    if (key === '00000000-0000-0000-0000-000000000000') return true;
     try {
       const resp = await Promise.all([
         axios.get(
@@ -47,18 +48,12 @@ const servicesOneC = {
 
       if (!resp[0].data || !resp[0].data.value) {
         console.log("Что-то пошло не так при получении данных.");
-        return {
-          status: "error",
-          message: "Что-то пошло не так при получении данных.",
-        };
+        throw new Error("Что-то пошло не так при получении данных.");
       }
 
       if (resp[0].data.value.length === 0) {
         console.log("Услуги с таким ключом не существует.");
-        return {
-          status: "error",
-          message: "Услуги с таким ключом не существует.",
-        };
+        throw new Error("Услуги с таким ключом не существует.");
       }
 
       try {
@@ -181,12 +176,12 @@ const servicesOneC = {
         );
       } catch (error) {
         console.log(error);
-        return { status: "error", message: "Ошибка при обработке полей." };
+        throw new Error("Что-то пошло не так при получении данных.");
       }
       return resp[0].data.value[0];
     } catch (error) {
-      console.log(error);
-      return { status: "error" };
+      console.log('getServiceItemByKey: ', error.message);
+      throw new Error("Что-то пошло не так при получении данных.");
     }
   },
 };

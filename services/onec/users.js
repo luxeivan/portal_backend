@@ -18,14 +18,14 @@ const usersonec = {
                 headers
             })
             if (!response.data) {
-                return false
+                throw new Error("Что-то пошло не так при получении данных профиля.");
             }
-            console.log(response.data)
+            // console.log(response.data)
             return response.data.value[0]
 
         } catch (error) {
             console.log(error.message)
-            return false
+            throw new Error("Что-то пошло не так при получении данных профиля.");
         }
     },
     checkUserByEmail: async (email) => {
@@ -34,14 +34,14 @@ const usersonec = {
                 headers
             })
             if (!response.data && !response.data.value[0]) {
-                return false
+                throw new Error("Что-то пошло не так при получении данных профиля.");
             }
-            console.log('checkUserByEmail',response.data)
+            // console.log('checkUserByEmail',response.data)
             return response.data.value[0] ? response.data.value[0].Ref_Key : false
 
         } catch (error) {
             console.log(error.message)
-            return false
+            throw new Error("Что-то пошло не так при получении данных профиля.");
         }
     },
     getUserById: async (key) => {
@@ -50,14 +50,14 @@ const usersonec = {
                 headers
             })
             if (!response.data) {
-                return false
+                throw new Error("Что-то пошло не так при получении данных профиля.");
             }
-            console.log(response.data)
+            // console.log(response.data)
             return response.data
 
         } catch (error) {
             console.log(error.message)
-            return false
+            throw new Error("Что-то пошло не так при получении данных профиля.");
         }
     },
     createNewUser: async (email, phone, password) => {
@@ -72,12 +72,12 @@ const usersonec = {
             }, {
                 headers
             })
-            console.log(response.data)
+            // console.log(response.data)
             return response.data
 
         } catch (error) {
-            console.log(error)
-            return error
+            console.log(error.message)
+            throw new Error("Что-то пошло не так при получении данных профиля.");
         }
     },
     updateUser: async (key, phone, password) => {
@@ -93,7 +93,8 @@ const usersonec = {
             return response.data
 
         } catch (error) {
-
+            console.log(error.message)
+            throw new Error("Что-то пошло не так при получении данных профиля.");
         }
     }
 }

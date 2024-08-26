@@ -54,7 +54,12 @@ router.get("/", async (req, res) => {
   try {
     const services = await getServicesByKey();
     logger.info("Услуги успешно получены");
-    res.json(services);
+    console.log('services', services)
+    if (services) {
+      res.json(services);
+    } else {
+      throw new Error("Ошибка получения данных с БД");
+    }
   } catch (error) {
     logger.error(`Ошибка при получении услуг: ${error.message}`);
     res.status(500).json({
@@ -110,18 +115,22 @@ router.get("/:key", async (req, res) => {
 
   try {
     const key = req.params.key;
-    const service = await getServicesByKey(key);
+    const services = await getServicesByKey(key);
     logger.info(`Услуга с ключом ${key} успешно получена`);
-    res.json(service);
+    if (services) {
+      res.json(services);
+    } else {
+      throw new Error("Ошибка получения данных с БД");
+    }
   } catch (error) {
-    logger.error(
-      `Ошибка при получении услуги с ключом ${req.params.key}: ${error.message}`
-    );
     res.status(500).json({
       status: "error",
       message: "Ошибка при получении услуги",
       error: error.message,
     });
+    logger.error(
+      `Ошибка при получении услуги с ключом ${req.params.key}: ${error.message}`
+    );
   }
 });
 
