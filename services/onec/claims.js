@@ -270,15 +270,19 @@ const claimsOneC = {
             // console.log(`${key}: ${value}`);
             values.push({ key, value })
         }
-        // ------------------------------------------------------------------------
+        // -Field-----------------------------------------------------------------------
+        //console.log(service.fields)
         const fields = values.filter(item => {
             const field = service.fields.find(field => field.idLine === item.key)
-            if (field.component_Type.includes("TableInput") || field.component_Type.includes("GroupFieldsInput")) return false
+            if (field.component_Type.includes("TableInput") || field.component_Type.includes("GroupFieldsInput") || field.component_Type.includes("AddressInput")) return false
             return true
         })
             .map((item, index) => {
                 const field = service.fields.find(field => field.idLine === item.key)
-                // console.log('field',field)
+                //console.log(index)
+                if (index == 20) {
+                    console.log('field', field)
+                }
                 return {
                     LineNumber: index + 1,
                     name_Key: field.name_Key,
@@ -287,7 +291,7 @@ const claimsOneC = {
                     idLine: field.idLine,
                 }
             })
-        // ------------------------------------------------------------------------
+        // --GroupFieldsInput----------------------------------------------------------------------
         values.filter(item => {
             const field = service.fields.find(field => field.idLine === item.key)
             if (field.component_Type.includes("GroupFieldsInput")) return true
@@ -299,7 +303,7 @@ const claimsOneC = {
             for (const [key, value] of Object.entries(item.value)) {
                 arr.push({ key, value })
             }
-            // console.log('arr',arr)
+            //console.log('arr',arr)
             arr.forEach((element, index2) => {
                 fields.push({
                     LineNumber: fields.length + 1,
@@ -312,18 +316,18 @@ const claimsOneC = {
 
             })
         })
-        // ------------------------------------------------------------------------
+        // -HiddenInput-----------------------------------------------------------------------
         service.fields.filter(field => field.component_Type.includes('HiddenInput'))
             .forEach((field, index) => {
-                //console.log(index, field)
+                console.log(index, field)
                 fields.push({
-                    LineNumber: fields.length + 1 + index,
+                    LineNumber: fields.length + 1,
                     name_Key: field.name_Key,
-                    value: field.component_Expanded.value,
-                    value_Type: field.component_Expanded.value_Type,
+                    value: field.defaultValue,
+                    value_Type: field.defaultValue_Type,
                 })
             })
-        // ------------------------------------------------------------------------
+        // -TableInput-----------------------------------------------------------------------
         const tableFields = []
         let LineNumber = 1
         values.filter(item => {
