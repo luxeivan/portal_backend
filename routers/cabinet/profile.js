@@ -6,8 +6,8 @@ const logger = require("../../logger");
 router.get("/", async (req, res) => {
   try {
     // Предполагается, что userId получен из сессии или токена
-    const userId = req.session.founduser ? req.session.founduser.Ref_Key : null;
-
+    // const userId = req.session.founduser ? req.session.founduser.Ref_Key : null;
+    const userId = req.userId;
     if (!userId) {
       logger.error("User ID is not defined");
       return res.status(400).json({ message: "User ID is required" });
@@ -15,15 +15,18 @@ router.get("/", async (req, res) => {
 
     logger.info(`Запрос на получение профиля пользователя с id: ${userId}`);
     const profile = await getUserById(userId); // Используем метод из 1С
-
+    console.log('profile',profile)
+    
     res.json({
-      firstname: profile.attributes.firstname,
-      lastname: profile.attributes.lastname,
-      email: profile.attributes.email,
-      phone: profile.attributes.phone,
+      firstname: profile.firstName,
+      lastname: profile.lastName,
+      email: profile.email,
+      phone: profile.phone,
     });
     logger.info(`Профиль пользователя с id: ${userId} успешно получен`);
   } catch (error) {
+    console.log('error',error.message)
+
     logger.error(
       `Ошибка при получении профиля пользователя с id: ${userId}. Ошибка: ${error.message}`
     );
