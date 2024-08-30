@@ -81,15 +81,15 @@ const usersonec = {
         }
     },
     updateUser: async (key, phone, password) => {
+        const data = {}
+        if (phone) data.phone = phone;
+        if (password) data.password = await bcrypt.hash(password, saltRounds);
         try {
-            const hashPassword = await bcrypt.hash(password, saltRounds)
-            const response = await axios.patch(`${server1c}/Catalog_Profile(guid'${key}')?$format=json`, {
-                phone: phone,
-                password: hashPassword
-            }, {
+            // const hashPassword = await bcrypt.hash(password, saltRounds)
+            const response = await axios.patch(`${server1c}/Catalog_Profile(guid'${key}')?$format=json`, data, {
                 headers
             })
-            console.log('updateUser',response.data)
+            console.log('updateUser', response.data)
             return response.data
 
         } catch (error) {
