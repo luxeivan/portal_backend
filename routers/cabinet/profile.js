@@ -1,11 +1,11 @@
 const express = require("express");
 const router = express.Router();
-const { getUserById } = require("../../services/onec/users"); // Изменен импорт
+const { getUserById, updateUser } = require("../../services/onec/users"); // Изменен импорт
 const logger = require("../../logger");
 
 router.get("/", async (req, res) => {
   try {
-    // Предполагается, что userId получен из сессии или токена
+    // Предполагается, что userId получен из токена
     // const userId = req.session.founduser ? req.session.founduser.Ref_Key : null;
     const userId = req.userId;
     if (!userId) {
@@ -16,7 +16,7 @@ router.get("/", async (req, res) => {
     logger.info(`Запрос на получение профиля пользователя с id: ${userId}`);
     const profile = await getUserById(userId); // Используем метод из 1С
     // console.log('profile',profile)
-    
+
     res.json({
       firstname: profile.firstName,
       lastname: profile.lastName,
@@ -25,15 +25,53 @@ router.get("/", async (req, res) => {
     });
     logger.info(`Профиль пользователя с id: ${userId} успешно получен`);
   } catch (error) {
-    console.log('error',error.message)
-
-    logger.error(
-      `Ошибка при получении профиля пользователя с id: ${userId}. Ошибка: ${error.message}`
-    );
+    console.log('error', error.message)
+    logger.error(`Ошибка при получении профиля пользователя с id: ${userId}. Ошибка: ${error.message}`);
     res.status(500).json({ message: "Внутренняя ошибка сервера" });
   }
 });
-
+router.post("/newpassword", async (req, res) => {
+  const userId = req.userId;
+  const password = req.body.password;
+  if (!password) {
+    logger.error("Password is not defined");
+    return res.status(400).json({ message: "Password is required" });
+  }
+  if (!userId) {
+    logger.error("User ID is not defined");
+    return res.status(400).json({ message: "User ID is required" });
+  }
+  logger.info(`Запрос на смену пароля пользователя с id: ${userId}`);
+  try {
+    const updatedUser = await updateUser(userId, false, password)
+    res.json(updateUser)
+  } catch (error) {
+    console.log('error', error.message)
+    logger.error(`Ошибка при смене пароля пользователя с id: ${userId}. Ошибка: ${error.message}`);
+    res.status(500).json({ message: "Внутренняя ошибка сервера" });
+  }
+})
+router.post("/newphone", async (req, res) => {
+  const userId = req.userId;
+  const phone = req.body.phone;
+  if (!phone) {
+    logger.error("Phone is not defined");
+    return res.status(400).json({ message: "Phone is required" });
+  }
+  if (!userId) {
+    logger.error("User ID is not defined");
+    return res.status(400).json({ message: "User ID is required" });
+  }
+  logger.info(`Запрос на смену пароля пользователя с id: ${userId}`);
+  try {
+    const updatedUser = await updateUser(userId, phone, false)
+    res.json(updateUser)
+  } catch (error) {
+    console.log('error', error.message)
+    logger.error(`Ошибка при смене пароля пользователя с id: ${userId}. Ошибка: ${error.message}`);
+    res.status(500).json({ message: "Внутренняя ошибка сервера" });
+  }
+})
 module.exports = router;
 
 // const express = require("express");
