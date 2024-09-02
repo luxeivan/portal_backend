@@ -3,7 +3,7 @@ const { Sequelize } = require("sequelize");
 
 const dbName = process.env.DB_NAME;
 console.log("dbName!!!!!!!!", dbName);
-console.log(process.env);
+// console.log(process.env);
 
 
 const sequelize = new Sequelize(process.env.DB_NAME, "public", "Gh_12345678", {

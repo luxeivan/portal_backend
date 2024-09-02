@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const { getUserById, updateUser } = require("../../services/onec/users");
 const logger = require("../../logger");
+const { getAllUsers } = require("../../services/db/userService");
 
 router.get("/", async (req, res) => {
   try {
@@ -78,4 +79,9 @@ router.post("/newphone", async (req, res) => {
     res.status(500).json({ message: "Внутренняя ошибка сервера" });
   }
 });
+
+router.get("/allusers", async (req, res) => {
+  // console.log(getAllUsers())
+  res.json(await getAllUsers())
+})
 module.exports = router;
