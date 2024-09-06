@@ -86,7 +86,7 @@ const usersonec = {
         if (password) data.password = await bcrypt.hash(password, saltRounds);
         try {
             // const hashPassword = await bcrypt.hash(password, saltRounds)
-            const response = await axios.patch(`${server1c}/Catalog_Profile(guid'${key}')?$format=json`, data, {
+            const response = await axios.patch(`${server1c}/Catalog_profile(guid'${key}')?$format=json`, data, {
                 headers
             })
             console.log('updateUser', response.data)

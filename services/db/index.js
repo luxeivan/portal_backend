@@ -7,7 +7,7 @@ sequelize
     console.log("База данных синхронизирована");
 
     // Добавляем пользователей
-    await addUser("Райан123@example.com", "0987654321", "5678", 0);
+    await addUser("Райан12223@example.com", "0987654321", "5678", 0);
 
     // Удаляем пользователей по email
     // await deleteUserByEmail("user1@example.com");
