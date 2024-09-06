@@ -20,10 +20,11 @@ const otherServices = {
                 }
             );
             console.log('response.data: ', response.data);
-            if (!response.data) {
-                return false;
+            if (response.data && response.data.value && response.data.value.length > 0) {
+                return response.data.value[0]?.Цена;
+            } else {
+                return null;
             }
-            return response.data.value[0]?.Цена;
         } catch (error) {
             console.log('getPrice: ', error.message);
             return false;

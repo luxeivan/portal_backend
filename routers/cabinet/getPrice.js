@@ -33,7 +33,7 @@ router.get("/:type/:nomenclature", async (req, res) => {
 
     try {
         const price = await getPrice(type, nomenclature)
-        if (!price) res.status(500)
+        if (typeof price === 'null') res.json(false)
         res.json(price)
     } catch (error) {
         logger.error(
