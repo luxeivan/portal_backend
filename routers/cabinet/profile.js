@@ -70,7 +70,7 @@ router.post("/newphone", async (req, res) => {
   logger.info(`Запрос на смену пароля пользователя с id: ${userId}`);
   try {
     const updatedUser = await updateUser(userId, phone, false);
-    res.json(updateUser);
+    res.json(updatedUser);
   } catch (error) {
     console.log("error", error.message);
     logger.error(
@@ -81,7 +81,19 @@ router.post("/newphone", async (req, res) => {
 });
 
 router.get("/allusers", async (req, res) => {
-  // console.log(getAllUsers())
-  res.json(await getAllUsers())
-})
+  try {
+    const users = await getAllUsers();
+    res.json(await getAllUsers());
+  } catch (error) {
+    console.log("error", error.message);
+    logger.error(`Ошибка при получении всех пользователей: ${error.message}`);
+    res.status(500).json({ message: "Внутренняя ошибка сервера" });
+  }
+});
+
+// router.get("/allusers", async (req, res) => {
+//   // console.log(getAllUsers())
+//   res.json(await getAllUsers())
+// })
+
 module.exports = router;
