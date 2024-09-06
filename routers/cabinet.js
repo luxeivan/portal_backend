@@ -13,9 +13,9 @@ const getCadastral = require("./cabinet/getCadastral");
 const getFmsUnit = require("./cabinet/getFmsUnit");
 const sendSms = require("./cabinet/sendSms");
 const documentsRouter = require("./cabinet/documents");
-const claimstest = require("./cabinet/claimstest");
 const claims = require("./cabinet/claims");
 const getDaData = require('../routers/getDaData/getDaData');
+const getPrice = require('../routers/cabinet/getPrice');
 // ... и так далее для всех остальных файлов в папке cabinet ...
 
 router.use("/subjects", subjectsRouter);
@@ -26,11 +26,11 @@ router.use("/upload-file", uploadFile);
 router.use("/get-file", getFile);
 router.use("/get-fias", getFias);
 router.use("/get-inn", getInn);
+router.use("/get-price", getPrice);
 router.use("/get-cadastral", getCadastral);
 router.use("/get-fms", getFmsUnit);
 router.use("/send-sms", sendSms);
 router.use("/documents", documentsRouter);
-router.use("/claimstest", claimstest);
 router.use("/claims", claims);
 router.use("/getDaData", getDaData);
 // ... и так далее для всех остальных импортированных роутеров ...
