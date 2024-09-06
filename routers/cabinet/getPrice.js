@@ -32,7 +32,7 @@ router.get("/:type/:nomenclature", async (req, res) => {
     );
 
     try {
-        const price = getPrice(type, nomenclature)
+        const price = await getPrice(type, nomenclature)
         if (!price) res.status(500)
         res.json(price)
     } catch (error) {

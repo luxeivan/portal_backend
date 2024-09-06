@@ -14,7 +14,7 @@ const otherServices = {
     getPrice: async (type, nomenclature) => {
         try {
             const response = await axios.get(
-                `${server1c}/InformationRegister_ЦеныНоменклатуры_RecordType/SliceLast(,Condition='ТипЦен_Key eq '${type}' and Номенклатура_Key eq '${nomenclature}'')/?$format=json&$select=Цена`,
+                `${server1c}/InformationRegister_ЦеныНоменклатуры_RecordType/SliceLast(,Condition='ТипЦен_Key eq guid'${type}' and Номенклатура_Key eq guid'${nomenclature}'')/?$format=json&$select=Цена`,
                 {
                     headers,
                 }
@@ -23,7 +23,7 @@ const otherServices = {
             if (!response.data) {
                 return false;
             }
-            return response.data;
+            return response.data.value[0]?.Цена;
         } catch (error) {
             console.log('getPrice: ', error.message);
             return false;
