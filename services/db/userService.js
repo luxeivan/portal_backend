@@ -3,8 +3,18 @@ const User = require("./models/User");
 // Функция для добавления пользователя
 async function addUser(email, phone, tempCode, attempts) {
   try {
-    await User.create({ email, phone, tempCode, attempts });
+    const newUser = await User.create({ email, phone, tempCode, attempts });
     console.log("Пользователь успешно добавлен:", email);
+    return newUser
+  } catch (error) {
+    console.error("Ошибка при добавлении пользователя:", error);
+  }
+}
+async function getAllUsers() {
+  try {
+    const allUsers = await User.findAll();
+    console.log(allUsers)
+    return allUsers
   } catch (error) {
     console.error("Ошибка при добавлении пользователя:", error);
   }
@@ -25,4 +35,5 @@ async function deleteUserByEmail(email) {
 module.exports = {
   addUser,
   deleteUserByEmail,
+  getAllUsers
 };
