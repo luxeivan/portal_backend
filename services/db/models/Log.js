@@ -1,7 +1,7 @@
 const { DataTypes } = require("sequelize");
-const db = require("../config/database"); 
+const sequelize = require("../config/database");
 
-const Log = db.define(
+const Log = sequelize.define(
   "Log",
   {
     level: {
