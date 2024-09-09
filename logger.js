@@ -15,13 +15,23 @@ const logFormat = format.printf(({ level, message, timestamp, stack }) => {
 // Функция для записи логов в базу данных с корректировкой времени
 const saveLogToDatabase = async (level, message, timestamp, stack) => {
   try {
-    const correctedTimestamp = moment(timestamp).tz(timezone).toDate(); // Корректируем время для сохранения
-    await Log.create({ level, message, timestamp: correctedTimestamp, stack });
+    const utcTimestamp = moment(timestamp).utc().format(); // Преобразуем в UTC
+    await Log.create({ level, message, timestamp: utcTimestamp, stack });
     console.log("Log saved to the database");
   } catch (error) {
     console.error("Failed to save log to the database", error);
   }
 };
+
+// const saveLogToDatabase = async (level, message, timestamp, stack) => {
+//   try {
+//     const correctedTimestamp = moment(timestamp).tz(timezone).toDate();
+//     await Log.create({ level, message, timestamp: correctedTimestamp, stack });
+//     console.log("Log saved to the database");
+//   } catch (error) {
+//     console.error("Failed to save log to the database", error);
+//   }
+// };
 
 const dailyRotateFileTransport = new transports.DailyRotateFile({
   filename: "logs/error-%DATE%.log",
