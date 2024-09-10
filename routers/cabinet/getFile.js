@@ -9,9 +9,9 @@ router.get("/:filename", async function (req, res) {
   const userId = req.userId;
   const dirName = `${pathFileStorage}/${userId}`;
   const file = `${dirName}/${req.params.filename}`;
-  logger.info(
-    `Получен запрос на скачивание файла ${req.params.filename} для пользователя с id: ${userId}`
-  );
+  // logger.info(
+  //   `Получен запрос на скачивание файла ${req.params.filename} для пользователя с id: ${userId}`
+  // );
 
   try {
     res.download(file, (err) => {
@@ -23,9 +23,9 @@ router.get("/:filename", async function (req, res) {
           .status(500)
           .json({ message: "Внутренняя ошибка сервера при скачивании файла" });
       } else {
-        logger.info(
-          `Файл ${req.params.filename} успешно скачан для пользователя с id: ${userId}`
-        );
+        // logger.info(
+        //   `Файл ${req.params.filename} успешно скачан для пользователя с id: ${userId}`
+        // );
       }
     });
   } catch (error) {
