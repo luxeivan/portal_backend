@@ -41,7 +41,7 @@ const dailyRotateFileTransport = new transports.DailyRotateFile({
   maxFiles: "30d",
   level: "error",
 });
-
+// console.log('timezone',moment().tz(timezone).format())
 const logger = createLogger({
   level: "info",
   format: format.combine(
