@@ -13,7 +13,7 @@ const Log = sequelize.define(
       allowNull: false,
     },
     timestamp: {
-      type: DataTypes.DATE,
+      type: DataTypes.TIME,
       defaultValue: DataTypes.NOW,
     },
     stack: {
