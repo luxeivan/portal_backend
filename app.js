@@ -16,6 +16,7 @@ const cabinet = require("./routers/cabinet");
 const services = require("./routers/services");
 const formonec = require("./routers/formonec");
 const getDaData = require('./routers/getDaData/getDaData');
+const contactRouter = require('./routers/contact')
 
 const session = require("express-session");
 
@@ -110,6 +111,7 @@ app.use("/api/cabinet", checkAuth, cabinet);
 app.use("/api/services", services);
 app.use("/api/formonec", formonec);
 app.use('/api/getDaData', getDaData);
+app.use('/api/contacts', contactRouter);
 
 swaggerSetup(app);
 
