@@ -27,9 +27,9 @@ router.get("/:type/:nomenclature", async (req, res) => {
     const userId = req.userId;
     const nomenclature = req.params.nomenclature
     const type = req.params.type
-    logger.info(
-        `Получен запрос на получение цены номенклатуры от пользователя: ${userId}`
-    );
+    // logger.info(
+    //     `Получен запрос на получение цены номенклатуры от пользователя: ${userId}`
+    // );
 
     try {
         const price = await getPrice(type, nomenclature)

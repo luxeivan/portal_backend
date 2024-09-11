@@ -49,11 +49,11 @@ router.post("/", async (req, res) => {
   try {
     const userId = req.userId;
     const { body } = req;
-    logger.info(
-      `Получены данные для добавления объекта от пользователя с id: ${userId}. Данные: ${JSON.stringify(
-        body
-      )}`
-    );
+    // logger.info(
+    //   `Получены данные для добавления объекта от пользователя с id: ${userId}. Данные: ${JSON.stringify(
+    //     body
+    //   )}`
+    // );
     const object = await addObject(body, userId);
     res.status(201).json(object);
     logger.info(`Объект успешно добавлен для пользователя с id: ${userId}`);
@@ -85,14 +85,14 @@ router.get("/", async (req, res) => {
     const authHeader = req.headers.authorization;
     const accessToken = authHeader.split(" ")[1];
     const userData = jwt.verify(accessToken, process.env.JWT_SECRET);
-    logger.info(
-      `Получен запрос на получение объектов для пользователя с id: ${userData.id}`
-    );
+    // logger.info(
+    //   `Получен запрос на получение объектов для пользователя с id: ${userData.id}`
+    // );
     const objects = await getObjects(userData.id);
     res.json(objects);
-    logger.info(
-      `Объекты успешно получены для пользователя с id: ${userData.id}`
-    );
+    // logger.info(
+    //   `Объекты успешно получены для пользователя с id: ${userData.id}`
+    // );
   } catch (error) {
     logger.error(
       `Ошибка при получении объектов для пользователя. Ошибка: ${error.message}`
@@ -129,16 +129,16 @@ router.get("/:id", async (req, res) => {
   try {
     const userId = req.userId;
     const idObject = req.params.id;
-    logger.info(
-      `Получен запрос на получение объекта с id: ${idObject} для пользователя с id: ${userId}`
-    );
+    // logger.info(
+    //   `Получен запрос на получение объекта с id: ${idObject} для пользователя с id: ${userId}`
+    // );
     const object = await getObjectItem(idObject);
     if (object.attributes.profil.data.id === userId) {
       object.attributes.profil = undefined;
       res.json(object);
-      logger.info(
-        `Объект с id: ${idObject} успешно получен для пользователя с id: ${userId}`
-      );
+      // logger.info(
+      //   `Объект с id: ${idObject} успешно получен для пользователя с id: ${userId}`
+      // );
     } else {
       logger.warn(
         `Объект с id: ${idObject} не найден для пользователя с id: ${userId}`
@@ -182,9 +182,9 @@ router.delete("/:id", async (req, res) => {
   try {
     const userId = req.userId;
     const idObject = req.params.id;
-    logger.info(
-      `Получен запрос на удаление объекта с id: ${idObject} для пользователя с id: ${userId}`
-    );
+    // logger.info(
+    //   `Получен запрос на удаление объекта с id: ${idObject} для пользователя с id: ${userId}`
+    // );
     const object = await getObjectItem(idObject);
     if (object.attributes.profil.data.id === userId) {
       const statusDel = await deleteObjectItem(idObject);
