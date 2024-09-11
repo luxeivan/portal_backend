@@ -14,7 +14,7 @@ router.get("/", async (req, res) => {
       return res.status(400).json({ message: "User ID is required" });
     }
 
-    logger.info(`Запрос на получение профиля пользователя с id: ${userId}`);
+    // logger.info(`Запрос на получение профиля пользователя с id: ${userId}`);
     const profile = await getUserById(userId); // Используем метод из 1С
     // console.log('profile',profile)
 
@@ -24,7 +24,7 @@ router.get("/", async (req, res) => {
       email: profile.email,
       phone: profile.phone,
     });
-    logger.info(`Профиль пользователя с id: ${userId} успешно получен`);
+    // logger.info(`Профиль пользователя с id: ${userId} успешно получен`);
   } catch (error) {
     console.log("error", error.message);
     logger.error(
@@ -44,7 +44,7 @@ router.post("/newpassword", async (req, res) => {
     logger.error("User ID is not defined");
     return res.status(400).json({ message: "User ID is required" });
   }
-  logger.info(`Запрос на смену пароля пользователя с id: ${userId}`);
+  // logger.info(`Запрос на смену пароля пользователя с id: ${userId}`);
   try {
     const updatedUser = await updateUser(userId, false, password);
     res.json(updateUser);
@@ -67,7 +67,7 @@ router.post("/newphone", async (req, res) => {
     logger.error("User ID is not defined");
     return res.status(400).json({ message: "User ID is required" });
   }
-  logger.info(`Запрос на смену пароля пользователя с id: ${userId}`);
+  // logger.info(`Запрос на смену пароля пользователя с id: ${userId}`);
   try {
     const updatedUser = await updateUser(userId, phone, false);
     res.json(updatedUser);
