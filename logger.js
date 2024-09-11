@@ -69,10 +69,16 @@ if (process.env.NODE_ENV !== "production") {
   );
 }
 
-// Логируем в базу данных
+// Логируем в базу данных с защитой от ошибок подключения к БД
 logger.on("data", (log) => {
   const { level, message, timestamp, stack } = log;
-  saveLogToDatabase(level, message, timestamp, stack);
+  try {
+    saveLogToDatabase(level, message, timestamp, stack);
+  } catch (error) {
+    console.error(
+      "Ошибка записи в базу данных"
+    );
+  }
 });
 
 module.exports = logger;
