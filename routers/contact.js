@@ -10,19 +10,43 @@ const headers = {
   Authorization: server1c_auth,
 };
 
-// Создаем маршрут для получения контактной информации
+// Наш новый крутой эндпоинт
 router.get("/", async (req, res) => {
   try {
-    const response = await axios.get(
+    // Сначала запрашиваем контактную инфу
+    const contactInfoResponse = await axios.get(
       `${SERVER_1C}/InformationRegister_portalContactInformation?$format=json&$orderby=lineNum`,
-      {
-        headers,
-      }
+      { headers }
     );
-    console.log(response);
 
-    // Возвращаем данные полученные из 1C
-    res.status(200).json(response.data);
+    // Теперь тянем фотки
+    const photosResponse = await axios.get(
+      `${SERVER_1C}/Catalog_РайоныЭлектрическихСетейПрисоединенныеФайлы?$format=json&$expand=Том&$select=Ref_Key,Description,ВладелецФайла_Key,ПутьКФайлу,Том,ТипХраненияФайла,Том/ПолныйПутьWindows,ФайлХранилище&$filter=DeletionMark%20eq%20false`,
+      { headers }
+    );
+
+    const contactInfo = contactInfoResponse.data.value;
+    const photos = photosResponse.data.value;
+
+    // Объединяем массивы
+    const combinedData = contactInfo.map((contact) => {
+      // Ищем все фотки для каждого контакта
+      const matchedPhotos = photos.filter(
+        (photo) => photo.ВладелецФайла_Key === contact.object
+      );
+
+      // Добавляем все найденные фотки в массив photos
+      return {
+        ...contact,
+        photos: matchedPhotos.map((photo) => ({
+          ПутьКФайлу: photo.ПутьКФайлу,
+          ПолныйПутьWindows: photo.Том.ПолныйПутьWindows,
+        })),
+      };
+    });
+
+    // Возвращаем всё это добро на фронт
+    res.status(200).json(combinedData);
   } catch (error) {
     console.error("Ошибка при получении данных из 1C:", error);
     res.status(500).json({ message: "Ошибка при получении данных из 1C" });
