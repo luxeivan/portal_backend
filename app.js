@@ -7,7 +7,7 @@ const https = require("https");
 require("dotenv").config();
 const logger = require("./logger");
 const rateLimit = require("express-rate-limit");
-const swaggerSetup = require('./swagger');
+const swaggerSetup = require("./swagger");
 
 const auth = require("./routers/auth");
 const registration = require("./routers/registration");
@@ -15,12 +15,13 @@ const sendMail = require("./routers/sendmail");
 const cabinet = require("./routers/cabinet");
 const services = require("./routers/services");
 const formonec = require("./routers/formonec");
-const getDaData = require('./routers/getDaData/getDaData');
-const contactRouter = require('./routers/contact')
+const getDaData = require("./routers/getDaData/getDaData");
+const contactRouter = require("./routers/contact");
+const chatRouter = require("./routers/chatRouter");
 
 const session = require("express-session");
 
-const bodyParser = require("body-parser");
+// const bodyParser = require("body-parser");
 const fileUpload = require("express-fileupload");
 const FileStore = require("session-file-store")(session);
 
@@ -32,14 +33,16 @@ const portSSL = process.env.PORT_SSL;
 const cert = process.env.CERT;
 const certKey = process.env.CERT_KEY;
 
-
-
 const options = {
   cert: fs.readFileSync(cert),
   key: fs.readFileSync(certKey),
 };
 
 const app = express();
+
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
 app.use(cors({ credentials: true, origin: true }));
 app.use(
   session({
@@ -57,15 +60,13 @@ app.use(
   })
 );
 
-app.use(bodyParser.json());
-app.use(
-  fileUpload({
-    limits: { fileSize: 50 * 1024 * 1024 },
-    useTempFiles: true,
-    tempFileDir: "/tmp/",
-  })
-);
-
+// app.use(
+//   fileUpload({
+//     limits: { fileSize: 50 * 1024 * 1024 },
+//     useTempFiles: true,
+//     tempFileDir: "/tmp/",
+//   })
+// );
 
 // Настраиваем rate limiter
 const limiter = rateLimit({
@@ -110,8 +111,9 @@ app.use("/api/registration", registration);
 app.use("/api/cabinet", checkAuth, cabinet);
 app.use("/api/services", services);
 app.use("/api/formonec", formonec);
-app.use('/api/getDaData', getDaData);
-app.use('/api/contacts', contactRouter);
+app.use("/api/getDaData", getDaData);
+app.use("/api/contacts", contactRouter);
+app.use("/api/chat", chatRouter);
 
 swaggerSetup(app);
 
