@@ -26,6 +26,7 @@ const fileUpload = require("express-fileupload");
 const FileStore = require("session-file-store")(session);
 
 const checkAuth = require("./middleware/checkAuth");
+const gigaChatRouter = require("./routers/gigaChat");
 
 const secretSession = process.env.SECRET_SESSION;
 const port = process.env.PORT;
@@ -107,6 +108,7 @@ app.get("/", (req, res) => {
 });
 
 app.use("/api/auth", auth);
+app.use("/api/gigachat", gigaChatRouter);
 app.use("/api/registration", registration);
 app.use("/api/cabinet", checkAuth, cabinet);
 app.use("/api/services", services);
