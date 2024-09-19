@@ -9,6 +9,22 @@ const headers = {
 };
 
 const servicesOneC = {
+  getPictureFile: async (key) => {
+    try {
+      const response = await axios.get(
+        `${server1c}/Catalog_Файлы(guid'${key}')?$format=json`,
+        {
+          headers,
+        }
+      )
+      if (!response.data) {
+        return false;
+      }
+      return response.data;
+    } catch (error) {
+
+    }
+  },
   getServicesByKey: async (key = "00000000-0000-0000-0000-000000000000") => {
     try {
       const response = await axios.get(
@@ -18,10 +34,17 @@ const servicesOneC = {
           headers,
         }
       );
-      console.log('response.data: ', response.data);
+      // console.log('response.data: ', response.data);
+
       if (!response.data) {
         return false;
       }
+      await Promise.all(response.data.value.map(async item => {
+        return new Promise(async (resolve, reject) => {
+          if (item.picture_Key && item.picture_Key !== '00000000-0000-0000-0000-000000000000') item.picture = await servicesOneC.getPictureFile(item.picture_Key)
+          resolve(item);
+        })
+      }))
       return response.data;
     } catch (error) {
       console.log('getServicesByKey: ', error.message);
