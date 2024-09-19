@@ -1,4 +1,5 @@
 const axios = require("axios");
+const moment = require("moment");
 const qs = require("qs");
 const { v4 } = require("uuid");
 
@@ -13,9 +14,10 @@ const getAccessToken = async () => {
   try {
     const uuid = v4()
     const stringBody = qs.stringify({ scope: "GIGACHAT_API_PERS" })
-    console.log("uuid: ", uuid)
-    console.log("stringBody: ", stringBody)
-    console.log("encodedAuthData: ", encodedAuthData)
+    console.log("прошла генерация getAccessToken.")
+    // console.log("uuid: ", uuid)
+    // console.log("stringBody: ", stringBody)
+    // console.log("encodedAuthData: ", encodedAuthData)
     // console.log("encodedAuthData1: ", encodedAuthData1)
     const response = await axios.post(
       "https://ngw.devices.sberbank.ru:9443/api/v2/oauth",
@@ -30,8 +32,8 @@ const getAccessToken = async () => {
       }
     );
 
-    const { access_token, expires_at } = response.data;
-    return access_token;
+    // const { access_token, expires_at } = response.data;
+    return response.data;
   } catch (error) {
     console.error("Ошибка при получении токена доступа:", error);
     throw error;
@@ -39,11 +41,12 @@ const getAccessToken = async () => {
 };
 
 
+let token = { access_token: '', expires_at: null }
 // Функция для отправки сообщения и получения ответа от GigaChat
 const sendMessageToGigachat = async (message) => {
-  
+
   try {
-    const accessToken = await getAccessToken();
+    if (token.access_token === '' || token.expires_at < moment().millisecond()) token = await getAccessToken();
     const response = await axios.post(
       "https://gigachat.devices.sberbank.ru/api/v1/chat/completions",
       {
@@ -54,7 +57,7 @@ const sendMessageToGigachat = async (message) => {
         headers: {
           "Content-Type": "application/json",
           Accept: "application/json",
-          Authorization: `Bearer ${accessToken}`,
+          Authorization: `Bearer ${token.access_token}`,
         },
       }
     );
