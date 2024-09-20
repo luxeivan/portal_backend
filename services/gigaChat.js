@@ -46,7 +46,10 @@ let token = { access_token: '', expires_at: null }
 const sendMessageToGigachat = async (message) => {
 
   try {
-    if (token.access_token === '' || token.expires_at < moment().millisecond()) token = await getAccessToken();
+    if (token.access_token === '' || token.expires_at < moment().valueOf()) {
+
+      token = await getAccessToken();
+    }
     const response = await axios.post(
       "https://gigachat.devices.sberbank.ru/api/v1/chat/completions",
       {
