@@ -1,7 +1,5 @@
-// const axios = require("axios");
 const express = require("express");
 const sendMessageToGigachat = require("../services/gigaChat")
-// const { validationResult, query } = require("express-validator");
 const gigaChatRouter = express.Router();
 
 gigaChatRouter.post('/', async (req, res) => {
