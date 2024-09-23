@@ -78,7 +78,7 @@ const servicesOneC = {
         console.log("Услуги с таким ключом не существует.");
         throw new Error("Услуги с таким ключом не существует.");
       }
-
+console.log(resp[1].data.value)
       try {
         resp[0].data.value[0].fields = await Promise.all(
           resp[1].data.value.map((item) => {
