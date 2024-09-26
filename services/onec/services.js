@@ -78,7 +78,7 @@ const servicesOneC = {
         console.log("Услуги с таким ключом не существует.");
         throw new Error("Услуги с таким ключом не существует.");
       }
-console.log(resp[1].data.value)
+      // console.log(resp[1].data.value)
       try {
         resp[0].data.value[0].fields = await Promise.all(
           resp[1].data.value.map((item) => {
@@ -200,6 +200,19 @@ console.log(resp[1].data.value)
       } catch (error) {
         console.log(error);
         throw new Error("Что-то пошло не так при получении данных.");
+      }
+      if (resp[0].data.value[0].categoriesFiles && resp[0].data.value[0].categoriesFiles.length > 0) {
+        const typeDocs = await axios.get(
+          `${server1c}/Catalog_ВидыФайлов?$format=json`,
+          {
+            headers,
+          }
+        );
+        console.log('typeDocs: ',typeDocs)
+        resp[0].data.value[0].categoriesFiles.map(item => {
+          item.categoryName = typeDocs.data.value.find(val => val.Ref_Key === item.category_Key).Description
+          return item
+        })
       }
       return resp[0].data.value[0];
     } catch (error) {
