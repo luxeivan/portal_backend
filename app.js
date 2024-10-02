@@ -61,13 +61,13 @@ app.use(
   })
 );
 
-// app.use(
-//   fileUpload({
-//     limits: { fileSize: 50 * 1024 * 1024 },
-//     useTempFiles: true,
-//     tempFileDir: "/tmp/",
-//   })
-// );
+app.use(
+  fileUpload({
+    limits: { fileSize: 50 * 1024 * 1024 },
+    useTempFiles: true,
+    tempFileDir: "/tmp/",
+  })
+);
 
 // Настраиваем rate limiter
 const limiter = rateLimit({
