@@ -181,7 +181,12 @@ router.get("/item/:key", async (req, res) => {
 
   try {
     const key = req.params.key;
-    const services = await getServiceItemByKey(key);
+    let withFields = req.query.withFields;
+    if (withFields === "false") withFields = false
+    if (withFields === "true") withFields = true
+
+    console.log('withFields: ', withFields)
+    const services = await getServiceItemByKey(key, withFields);
     // logger.info(`Элемент услуги с ключом ${key} успешно получен`);
     res.json(services);
   } catch (error) {
