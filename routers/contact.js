@@ -21,12 +21,13 @@ router.get("/", async (req, res) => {
 
     // Теперь тянем фотки
     const photosResponse = await axios.get(
-      `${SERVER_1C}/Catalog_РайоныЭлектрическихСетейПрисоединенныеФайлы?$format=json&$expand=Том&$select=Ref_Key,Description,ВладелецФайла_Key,ПутьКФайлу,Том,ТипХраненияФайла,Том/ПолныйПутьWindows,ФайлХранилище&$filter=DeletionMark%20eq%20false`,
+      `${SERVER_1C}/Catalog_РайоныЭлектрическихСетейПрисоединенныеФайлы?$format=json&$expand=Том&$select=Ref_Key,Description,ВладелецФайла_Key,ПутьКФайлу,РеквизитДопУпорядочивания,Том,ТипХраненияФайла,Том/ПолныйПутьWindows,ФайлХранилище&$filter=DeletionMark%20eq%20false`,
       { headers }
     );
 
     const contactInfo = contactInfoResponse.data.value;
     const photos = photosResponse.data.value;
+console.log(photos);
 
     // Объединяем массивы
     const combinedData = contactInfo.map((contact) => {
