@@ -108,6 +108,7 @@ const servicesOneC = {
                                   headers,
                                 }
                               );
+                              console.log(allValues)
                               tableField.component_Expanded.options =
                                 allValues.data.value
                                   .sort((a, b) => {
@@ -171,6 +172,7 @@ const servicesOneC = {
                         .map((item) => ({
                           value: item.Ref_Key,
                           label: item.Description,
+                          unit: item['ЕдиницаИзмерения']?.Description
                         }));
                     }
                   }
@@ -210,7 +212,7 @@ const servicesOneC = {
             headers,
           }
         );
-        console.log('typeDocs: ', typeDocs)
+        // console.log('typeDocs: ', typeDocs)
         resp[0].data.value[0].categoriesFiles.map(item => {
           item.categoryName = typeDocs.data.value.find(val => val.Ref_Key === item.category_Key).Description
           return item
