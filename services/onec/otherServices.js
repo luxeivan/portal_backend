@@ -14,14 +14,16 @@ const otherServices = {
     getPrice: async (type, nomenclature) => {
         try {
             const response = await axios.get(
-                `${server1c}/InformationRegister_ЦеныНоменклатуры_RecordType/SliceLast(,Condition='ТипЦен_Key eq guid'${type}' and Номенклатура_Key eq guid'${nomenclature}'')/?$format=json&$select=Цена`,
+                `${server1c}/InformationRegister_ЦеныНоменклатуры_RecordType/SliceLast(,Condition='ТипЦен_Key eq guid'${type}' and Номенклатура_Key eq guid'${nomenclature}'')/?$format=json&$select=*&$expand=Валюта`,
                 {
                     headers,
                 }
             );
             console.log('response.data: ', response.data);
             if (response.data && response.data.value && response.data.value.length > 0) {
-                return response.data.value[0]?.Цена;
+                console.log(response.data.value[0]);
+
+                return { price: response.data.value[0]?.Цена, currency: response.data.value[0]?.Валюта.Description };
             } else {
                 return null;
             }
