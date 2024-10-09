@@ -172,6 +172,7 @@ const servicesOneC = {
                         .map((item) => ({
                           value: item.Ref_Key,
                           label: item.Description,
+                          unit: item['ЕдиницаИзмерения']?.Description
                         }));
                     }
                   }
