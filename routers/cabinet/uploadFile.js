@@ -7,8 +7,10 @@ const { v4: uuidv4 } = require("uuid");
 const logger = require("../../logger");
 const { PDFDocument } = require("pdf-lib");
 
-const pathFileStorage = process.env.PATH_FILESTORAGE;
-const maxSizeFile = 10;
+const pathFileStorage =
+  process.env.PATH_FILESTORAGE ||
+  "/Users/yanutstas/Desktop/Project/portal_backend/files";
+const maxSizeFile = 10 * 1024 * 1024; // 10 MB
 
 router.post("/", async function (req, res) {
   const uuid = uuidv4();
@@ -23,11 +25,13 @@ router.post("/", async function (req, res) {
     });
   }
 
+  const files = Object.values(req.files.files); // Получаем массив файлов
+
   let bigFile = false;
-  for (const key in req.files) {
-    const file = req.files[key];
-    if (file.size > maxSizeFile * 1024 * 1024) {
+  for (const file of files) {
+    if (file.size > maxSizeFile) {
       bigFile = true;
+      break;
     }
   }
 
@@ -42,26 +46,35 @@ router.post("/", async function (req, res) {
   }
 
   try {
-    await fs.promises.access(dirName);
-  } catch (err) {
-    if (err && err.code === "ENOENT") {
-      await fs.promises.mkdir(dirName, { recursive: true });
-    }
-  }
+    // Создаём директорию, если она не существует
+    await fs.promises.mkdir(dirName, { recursive: true });
 
-  try {
+    // Сохраняем файлы во временную директорию
+    for (const file of files) {
+      const filePath = `${dirName}/${file.name}`;
+      await file.mv(filePath);
+    }
+
     // Создаем новый PDF-документ
     const pdfDoc = await PDFDocument.create();
 
-    for (const key in req.files) {
-      const file = req.files[key];
-      const imageBytes = await fs.promises.readFile(file.tempFilePath);
+    for (const file of files) {
+      const filePath = `${dirName}/${file.name}`;
+      const fileBuffer = await fs.promises.readFile(filePath);
 
       let pdfImage;
       if (file.mimetype === "image/jpeg" || file.mimetype === "image/jpg") {
-        pdfImage = await pdfDoc.embedJpg(imageBytes);
+        pdfImage = await pdfDoc.embedJpg(fileBuffer);
       } else if (file.mimetype === "image/png") {
-        pdfImage = await pdfDoc.embedPng(imageBytes);
+        pdfImage = await pdfDoc.embedPng(fileBuffer);
+      } else if (file.mimetype === "application/pdf") {
+        const donorPdfDoc = await PDFDocument.load(fileBuffer);
+        const donorPages = await pdfDoc.copyPages(
+          donorPdfDoc,
+          donorPdfDoc.getPageIndices()
+        );
+        donorPages.forEach((page) => pdfDoc.addPage(page));
+        continue;
       } else {
         continue;
       }
@@ -85,13 +98,13 @@ router.post("/", async function (req, res) {
     );
 
     // Удаление временных файлов
-    for (const key in req.files) {
-      const file = req.files[key];
+    for (const file of files) {
+      const filePath = `${dirName}/${file.name}`;
       try {
-        await fs.promises.unlink(file.tempFilePath);
+        await fs.promises.unlink(filePath);
       } catch (err) {
         logger.error(
-          `Не удалось удалить временный файл: ${file.tempFilePath}. Ошибка: ${err.message}`
+          `Не удалось удалить временный файл: ${filePath}. Ошибка: ${err.message}`
         );
       }
     }
