@@ -81,6 +81,18 @@ const servicesOneC = {
       // console.log(resp[1].data.value)
       if (withFields) {
         try {
+          
+          const categoriesFiles = await axios.get(
+            `${server1c}/Catalog_services_categoriesFiles?$format=json&$filter=Ref_Key eq guid'${key}'&$expand=category`,
+            {
+              headers,
+            }
+          );
+          resp[0].data.value[0].categoriesFiles = categoriesFiles.data.value
+        } catch (error) {
+          console.log("categoriesFiles",error.response.data)
+        }
+        try {
           resp[0].data.value[0].fields = await Promise.all(
             resp[1].data.value.map((item) => {
               return new Promise(async (resolve, reject) => {
@@ -201,7 +213,7 @@ const servicesOneC = {
             })
           );
         } catch (error) {
-          console.log(error);
+          console.log(error.message);
           throw new Error("Что-то пошло не так при получении данных.");
         }
       }
