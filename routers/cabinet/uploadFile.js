@@ -6,6 +6,14 @@ const fs = require("fs");
 const { v4: uuidv4 } = require("uuid");
 const logger = require("../../logger");
 const { PDFDocument } = require("pdf-lib");
+const axios = require("axios");
+require("dotenv").config();
+
+const SERVER_1C = process.env.SERVER_1C;
+const server1c_auth = process.env.SERVER_1C_AUTHORIZATION;
+const headers = {
+  Authorization: server1c_auth,
+};
 
 const pathFileStorage =
   process.env.PATH_FILESTORAGE ||
@@ -16,6 +24,26 @@ router.post("/", async function (req, res) {
   const uuid = uuidv4();
   const userId = req.userId;
   const dirName = `${pathFileStorage}/${userId}`;
+
+  // Шаг 1: Получение настроек обмена из 1С
+  try {
+    const exchangeSettingsResponse = await axios.get(
+      `${SERVER_1C}/InformationRegister_exchangeSettings/SliceLast()?$format=json`,
+      { headers }
+    );
+    const exchangeSettings = exchangeSettingsResponse.data.value[0];
+    console.log("Получены настройки обмена из 1С:", exchangeSettings); // Выводим настройки обмена
+    const user_Key = exchangeSettings.user_Key;
+    const mainVolume_Key = exchangeSettings.mainVolume_Key;
+    console.log("user_Key:", user_Key); // Выводим user_Key
+    console.log("mainVolume_Key:", mainVolume_Key); // Выводим mainVolume_Key
+  } catch (error) {
+    console.error("Ошибка при получении настроек обмена из 1С:", error);
+    return res.status(500).json({
+      status: "error",
+      message: "Ошибка при получении настроек обмена",
+    });
+  }
 
   if (!req.files || Object.keys(req.files).length === 0) {
     logger.warn(`Запрос на загрузку файлов не содержит файлов. UUID: ${uuid}`);

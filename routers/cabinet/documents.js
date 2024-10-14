@@ -13,7 +13,43 @@ const maxSizeFile = 10;
 
 const documentsStore = {}; // Ключ — userId, значение — массив документов пользователя
 
-const server1C = "http://45.89.189.5/InfoBase/odata/standard.odata";
+const SERVER_1C = process.env.SERVER_1C;
+const server1c_auth = process.env.SERVER_1C_AUTHORIZATION;
+const headers = {
+  Authorization: server1c_auth,
+};
+
+/**
+ * @swagger
+ * tags:
+ *   - name: Documents
+ *     description: Маршруты для работы с документами профиля пользователя
+ */
+
+// Новый маршрут для получения категорий документов из 1С
+router.get("/categories", async function (req, res) {
+  try {
+    // Шаг 2: Получение категорий документов из 1С
+    const response = await axios.get(
+      `${SERVER_1C}/Catalog_services_categoriesFiles/?$format=json&$select=**&$filter=Ref_Key%20eq%20guid'6739b454-176f-11ef-94f0-5ef3fcb042f8'&$expand=category`,
+      { headers }
+    );
+
+    const categoriesData = response.data.value;
+    console.log("Получены категории документов из 1С:", categoriesData); // Выводим категории документов
+
+    res.json({
+      status: "ok",
+      categories: categoriesData,
+    });
+  } catch (error) {
+    console.error("Ошибка при получении категорий документов из 1С:", error);
+    res.status(500).json({
+      status: "error",
+      message: "Ошибка при получении категорий документов",
+    });
+  }
+});
 
 /**
  * @swagger
