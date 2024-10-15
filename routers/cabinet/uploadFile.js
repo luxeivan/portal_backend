@@ -1,7 +1,5 @@
 const express = require("express");
-const jwt = require("jsonwebtoken");
 const router = express.Router();
-const path = require("path");
 const fs = require("fs");
 const { v4: uuidv4 } = require("uuid");
 const logger = require("../../logger");
@@ -13,30 +11,31 @@ const SERVER_1C = process.env.SERVER_1C;
 const server1c_auth = process.env.SERVER_1C_AUTHORIZATION;
 const headers = {
   Authorization: server1c_auth,
+  "Content-Type": "application/json",
 };
 
 const pathFileStorage =
   process.env.PATH_FILESTORAGE ||
   "/Users/yanutstas/Desktop/Project/portal_backend/files";
-const maxSizeFile = 10 * 1024 * 1024; // 10 MB
 
 router.post("/", async function (req, res) {
   const uuid = uuidv4();
   const userId = req.userId;
   const dirName = `${pathFileStorage}/${userId}`;
 
-  // Шаг 1: Получение настроек обмена из 1С
+  // Получение настроек обмена из 1С
+  let user_Key, mainVolume_Key;
   try {
     const exchangeSettingsResponse = await axios.get(
       `${SERVER_1C}/InformationRegister_exchangeSettings/SliceLast()?$format=json`,
       { headers }
     );
     const exchangeSettings = exchangeSettingsResponse.data.value[0];
-    console.log("Получены настройки обмена из 1С:", exchangeSettings); // Выводим настройки обмена
-    const user_Key = exchangeSettings.user_Key;
-    const mainVolume_Key = exchangeSettings.mainVolume_Key;
-    console.log("user_Key:", user_Key); // Выводим user_Key
-    console.log("mainVolume_Key:", mainVolume_Key); // Выводим mainVolume_Key
+    console.log("Получены настройки обмена из 1С:", exchangeSettings);
+    user_Key = exchangeSettings.user_Key;
+    mainVolume_Key = exchangeSettings.mainVolume_Key;
+    console.log("user_Key:", user_Key);
+    console.log("mainVolume_Key:", mainVolume_Key);
   } catch (error) {
     console.error("Ошибка при получении настроек обмена из 1С:", error);
     return res.status(500).json({
@@ -53,23 +52,64 @@ router.post("/", async function (req, res) {
     });
   }
 
-  const files = Object.values(req.files.files); // Получаем массив файлов
+  const files = Array.isArray(req.files.files)
+    ? req.files.files
+    : [req.files.files];
 
-  let bigFile = false;
+  // Получение допустимых расширений и максимального размера из 1С
+  let allowedExtensions = [];
+  let maxSizeFile = 10 * 1024 * 1024; // По умолчанию 10 МБ
+  const { categoryKey } = req.body; // Получаем ключ категории из запроса
+  console.log("Полученный categoryKey:", categoryKey); // Логируем полученный categoryKey
+
+  try {
+    const requestUrl = `${SERVER_1C}/Catalog_services_categoriesFiles?$format=json&$filter=category_Key eq guid'${categoryKey}'&$expand=category`;
+    console.log("Запрос к 1С:", requestUrl); // Логируем запрос
+    const response = await axios.get(requestUrl, { headers });
+    console.log("Ответ от 1С:", response.data); // Логируем ответ от 1С
+
+    if (response.data.value && response.data.value.length > 0) {
+      const categoryData = response.data.value[0].category;
+      allowedExtensions = JSON.parse(categoryData.availableExtensionsJSON);
+      maxSizeFile = parseInt(categoryData.maximumSize) * 1024 * 1024;
+      console.log("Допустимые расширения из 1С:", allowedExtensions);
+      console.log("Максимальный размер файла из 1С:", maxSizeFile);
+    } else {
+      console.error("Данные из 1С не найдены для данного categoryKey.");
+      return res.status(400).json({
+        status: "error",
+        message: "Неверный categoryKey или данные не найдены.",
+      });
+    }
+  } catch (error) {
+    console.error("Ошибка при получении данных категории из 1С:", error);
+    return res.status(500).json({
+      status: "error",
+      message: "Ошибка при получении данных категории",
+    });
+  }
+
+  // Проверка расширений и размера файлов
+  let invalidFile = false;
   for (const file of files) {
+    const fileExtension = file.name.split(".").pop().toUpperCase();
+    if (!allowedExtensions.includes(fileExtension)) {
+      invalidFile = true;
+      break;
+    }
     if (file.size > maxSizeFile) {
-      bigFile = true;
+      invalidFile = true;
       break;
     }
   }
 
-  if (bigFile) {
+  if (invalidFile) {
     logger.warn(
-      `Один или несколько файлов превышают допустимый размер. UUID: ${uuid}`
+      `Один или несколько файлов не соответствуют требованиям. UUID: ${uuid}`
     );
     return res.status(400).json({
       status: "error",
-      message: "Файлы больше 10МБ не принимаются",
+      message: "Файлы не соответствуют требованиям по размеру или типу",
     });
   }
 
@@ -93,8 +133,22 @@ router.post("/", async function (req, res) {
       let pdfImage;
       if (file.mimetype === "image/jpeg" || file.mimetype === "image/jpg") {
         pdfImage = await pdfDoc.embedJpg(fileBuffer);
+        const page = pdfDoc.addPage([pdfImage.width, pdfImage.height]);
+        page.drawImage(pdfImage, {
+          x: 0,
+          y: 0,
+          width: pdfImage.width,
+          height: pdfImage.height,
+        });
       } else if (file.mimetype === "image/png") {
         pdfImage = await pdfDoc.embedPng(fileBuffer);
+        const page = pdfDoc.addPage([pdfImage.width, pdfImage.height]);
+        page.drawImage(pdfImage, {
+          x: 0,
+          y: 0,
+          width: pdfImage.width,
+          height: pdfImage.height,
+        });
       } else if (file.mimetype === "application/pdf") {
         const donorPdfDoc = await PDFDocument.load(fileBuffer);
         const donorPages = await pdfDoc.copyPages(
@@ -102,18 +156,9 @@ router.post("/", async function (req, res) {
           donorPdfDoc.getPageIndices()
         );
         donorPages.forEach((page) => pdfDoc.addPage(page));
-        continue;
       } else {
         continue;
       }
-
-      const page = pdfDoc.addPage([pdfImage.width, pdfImage.height]);
-      page.drawImage(pdfImage, {
-        x: 0,
-        y: 0,
-        width: pdfImage.width,
-        height: pdfImage.height,
-      });
     }
 
     const pdfBytes = await pdfDoc.save();
@@ -137,14 +182,68 @@ router.post("/", async function (req, res) {
       }
     }
 
-    return res.json({ status: "ok", file: pdfFilename });
+    // Отправка файла в 1С
+    try {
+      const fileData = fs.readFileSync(pdfPath);
+      const base64File = fileData.toString("base64");
+
+      const currentDate = new Date();
+      const formattedDate = currentDate
+        .toISOString()
+        .slice(0, 10)
+        .replace(/-/g, "");
+      const filePathIn1C = `claimsProject\\${formattedDate}\\${pdfFilename}`;
+
+      const payload = {
+        Description: req.body.documentName,
+        ВладелецФайла_Key: userId,
+        Автор_Key: user_Key,
+        ДатаМодификацииУниверсальная: currentDate.toISOString(),
+        ДатаСоздания: currentDate.toISOString(),
+        ПутьКФайлу: filePathIn1C,
+        Размер: fileData.length.toString(),
+        Расширение: "pdf",
+        ТипХраненияФайла: "ВТомахНаДиске",
+        Том_Key: mainVolume_Key,
+        ВидФайла_Key: categoryKey,
+        ФайлХранилище_Type: "application/octet-stream",
+        ФайлХранилище_Base64Data: base64File,
+      };
+
+      const uploadResponse = await axios.post(
+        `${SERVER_1C}/Catalog_profileПрисоединенныеФайлы?$format=json`,
+        payload,
+        { headers }
+      );
+      console.log("Файл успешно загружен в 1С:", uploadResponse.data); // Логируем успешную загрузку
+    } catch (error) {
+      console.error(
+        "Ошибка при отправке файла в 1С:",
+        error.response ? error.response.data : error.message
+      );
+      return res.status(500).json({
+        status: "error",
+        message: "Ошибка при загрузке файла в 1С",
+      });
+    }
+
+    // Удаляем объединенный PDF после загрузки
+    try {
+      await fs.promises.unlink(pdfPath);
+    } catch (err) {
+      logger.error(
+        `Не удалось удалить объединенный PDF: ${pdfPath}. Ошибка: ${err.message}`
+      );
+    }
+
+    return res.json({ status: "ok", message: "Файл успешно загружен" });
   } catch (error) {
     logger.error(
-      `Ошибка при создании объединенного PDF файла. UUID: ${uuid}. Ошибка: ${error.message}`
+      `Ошибка при обработке файлов. UUID: ${uuid}. Ошибка: ${error.message}`
     );
     return res.status(500).json({
       status: "error",
-      message: "Ошибка при создании PDF файла",
+      message: "Ошибка при обработке файлов",
     });
   }
 });
