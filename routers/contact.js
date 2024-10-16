@@ -6,6 +6,7 @@ const router = express.Router();
 
 const SERVER_1C = process.env.SERVER_1C;
 const server1c_auth = process.env.SERVER_1C_AUTHORIZATION;
+
 const headers = {
   Authorization: server1c_auth,
 };
@@ -27,7 +28,7 @@ router.get("/", async (req, res) => {
 
     const contactInfo = contactInfoResponse.data.value;
     const photos = photosResponse.data.value;
-console.log(photos);
+    // console.log(photos);
 
     // Объединяем массивы
     const combinedData = contactInfo.map((contact) => {
