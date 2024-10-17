@@ -191,7 +191,8 @@ router.post("/", async function (req, res) {
         ПутьКФайлу: filePathIn1C, // Убедитесь, что путь корректен для чтения в 1С
         Размер: fileData.length.toString(),
         Расширение: "pdf",
-        ТипХраненияФайла: "ВТомахНаДиске",
+        // ТипХраненияФайла: "ВТомахНаДиске",
+        ТипХраненияФайла: "ВБазеДанных",
         Том_Key: mainVolume_Key,
         ВидФайла_Key: categoryKey,
         ФайлХранилище_Type: "application/octet-stream",
