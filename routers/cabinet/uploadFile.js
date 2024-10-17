@@ -57,11 +57,11 @@ router.post("/", async function (req, res) {
   const { categoryKey } = req.body;
 
   try {
-    const requestUrl = `${SERVER_1C}/Catalog_services_categoriesFiles?$format=json&$filter=Ref_Key eq guid'${categoryKey}'`;
+    const requestUrl = `${SERVER_1C}/Catalog_services_categoriesFiles(guid'${categoryKey}')?$format=json`;
     const response = await axios.get(requestUrl, { headers });
 
-    if (response.data.value && response.data.value.length > 0) {
-      const categoryData = response.data.value[0];
+    if (response.data) {
+      const categoryData = response.data;
       allowedExtensions = JSON.parse(categoryData.availableExtensionsJSON);
       maxSizeFile = parseInt(categoryData.maximumSize) * 1024 * 1024;
     } else {
@@ -166,6 +166,11 @@ router.post("/", async function (req, res) {
       const base64File = fileData.toString("base64");
 
       const currentDate = new Date();
+      const formattedDate = currentDate
+        .toISOString()
+        .slice(0, 10)
+        .replace(/-/g, "");
+      const filePathIn1C = `PortalFiles\\${formattedDate}\\${pdfFilename}`;
 
       const payload = {
         Description: req.body.documentName,
@@ -173,9 +178,11 @@ router.post("/", async function (req, res) {
         Автор_Key: user_Key,
         ДатаМодификацииУниверсальная: currentDate.toISOString(),
         ДатаСоздания: currentDate.toISOString(),
+        ПутьКФайлу: filePathIn1C,
         Размер: fileData.length.toString(),
         Расширение: "pdf",
-        ТипХраненияФайла: "ВБазеДанных",
+        ТипХраненияФайла: "ВТомахНаДиске",
+        Том_Key: mainVolume_Key,
         ВидФайла_Key: categoryKey,
         ФайлХранилище_Type: "application/octet-stream",
         ФайлХранилище_Base64Data: base64File,
