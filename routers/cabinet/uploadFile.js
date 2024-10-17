@@ -2,7 +2,6 @@ const express = require("express");
 const router = express.Router();
 const fs = require("fs");
 const { v4: uuidv4 } = require("uuid");
-const logger = require("../../logger");
 const axios = require("axios");
 require("dotenv").config();
 
@@ -30,13 +29,9 @@ router.post("/", async function (req, res) {
       { headers }
     );
     const exchangeSettings = exchangeSettingsResponse.data.value[0];
-    console.log("Получены настройки обмена из 1С:", exchangeSettings);
     user_Key = exchangeSettings.user_Key;
     mainVolume_Key = exchangeSettings.mainVolume_Key;
-    console.log("user_Key:", user_Key);
-    console.log("mainVolume_Key:", mainVolume_Key);
   } catch (error) {
-    console.error("Ошибка при получении настроек обмена из 1С:", error);
     return res.status(500).json({
       status: "error",
       message: "Ошибка при получении настроек обмена",
@@ -44,7 +39,6 @@ router.post("/", async function (req, res) {
   }
 
   if (!req.files || Object.keys(req.files).length === 0) {
-    logger.warn(`Запрос на загрузку файлов не содержит файлов. UUID: ${uuid}`);
     return res.status(400).json({
       status: "error",
       message: "Нет файлов для загрузки",
@@ -59,29 +53,22 @@ router.post("/", async function (req, res) {
   let allowedExtensions = [];
   let maxSizeFile = 10 * 1024 * 1024; // По умолчанию 10 МБ
   const { categoryKey } = req.body; // Получаем ключ категории из запроса
-  console.log("Полученный categoryKey:", categoryKey); // Логируем полученный categoryKey
 
   try {
     const requestUrl = `${SERVER_1C}/Catalog_services_categoriesFiles?$format=json&$filter=Ref_Key eq guid'${categoryKey}'`;
-    console.log("Запрос к 1С для получения данных категории:", requestUrl);
     const response = await axios.get(requestUrl, { headers });
-    console.log("Ответ от 1С по категории:", response.data);
 
     if (response.data.value && response.data.value.length > 0) {
       const categoryData = response.data.value[0];
       allowedExtensions = JSON.parse(categoryData.availableExtensionsJSON);
       maxSizeFile = parseInt(categoryData.maximumSize) * 1024 * 1024;
-      console.log("Допустимые расширения из 1С:", allowedExtensions);
-      console.log("Максимальный размер файла из 1С:", maxSizeFile);
     } else {
-      console.error("Данные из 1С не найдены для данного categoryKey.");
       return res.status(400).json({
         status: "error",
         message: "Неверный categoryKey или данные не найдены.",
       });
     }
   } catch (error) {
-    console.error("Ошибка при получении данных категории из 1С:", error);
     return res.status(500).json({
       status: "error",
       message: "Ошибка при получении данных категории",
@@ -103,9 +90,6 @@ router.post("/", async function (req, res) {
   }
 
   if (invalidFile) {
-    logger.warn(
-      `Один или несколько файлов не соответствуют требованиям. UUID: ${uuid}`
-    );
     return res.status(400).json({
       status: "error",
       message: "Файлы не соответствуют требованиям по размеру или типу",
@@ -120,73 +104,55 @@ router.post("/", async function (req, res) {
     for (const file of files) {
       const filePath = `${dirName}/${file.name}`;
       await file.mv(filePath);
-    }
 
-    // Загружаем каждый файл в 1С напрямую без конвертации
-    for (const file of files) {
-      const filePath = `${dirName}/${file.name}`;
-      const fileData = await fs.promises.readFile(filePath);
-      const base64File = fileData.toString("base64");
-
-      const fileExtension = file.name.split(".").pop();
-      const mimeType = file.mimetype; // Используем MIME-тип из загруженного файла
-
-      const currentDate = new Date();
-      const formattedDate = currentDate
-        .toISOString()
-        .slice(0, 10)
-        .replace(/-/g, "");
-      const filePathIn1C = `claimsProject\\${formattedDate}\\${file.name}`; // Используем оригинальное имя файла
-
-      const payload = {
-        Description: req.body.documentName,
-        ВладелецФайла_Key: userId,
-        Автор_Key: user_Key,
-        ДатаМодификацииУниверсальная: currentDate.toISOString(),
-        ДатаСоздания: currentDate.toISOString(),
-        ПутьКФайлу: filePathIn1C,
-        Размер: fileData.length.toString(),
-        Расширение: fileExtension,
-        ТипХраненияФайла: "ВТомахНаДиске",
-        Том_Key: mainVolume_Key,
-        ВидФайла_Key: categoryKey,
-        ФайлХранилище_Type: mimeType,
-        ФайлХранилище_Base64Data: base64File,
-      };
-
+      // Отправка файла в 1С
       try {
+        const fileData = fs.readFileSync(filePath);
+        const base64File = fileData.toString("base64");
+
+        const currentDate = new Date();
+        const formattedDate = currentDate
+          .toISOString()
+          .slice(0, 10)
+          .replace(/-/g, "");
+        const filePathIn1C = `claimsProject/${formattedDate}/${pdfFilename}`; 
+
+              const payload = {
+                Description: req.body.documentName,
+                ВладелецФайла_Key: userId,
+                Автор_Key: user_Key,
+                ДатаМодификацииУниверсальная: currentDate.toISOString(),
+                ДатаСоздания: currentDate.toISOString(),
+                ПутьКФайлу: filePathIn1C, 
+                Размер: fileData.length.toString(),
+                Расширение: "pdf",
+                ТипХраненияФайла: "ВТомахНаДиске",
+                Том_Key: mainVolume_Key,
+                ВидФайла_Key: categoryKey,
+                ФайлХранилище_Type: "application/octet-stream",
+                ФайлХранилище_Base64Data: base64File,
+              };
+
         const uploadResponse = await axios.post(
           `${SERVER_1C}/Catalog_profileПрисоединенныеФайлы?$format=json`,
           payload,
           { headers }
         );
-        console.log("Файл успешно загружен в 1С:", uploadResponse.data);
       } catch (error) {
-        console.error(
-          "Ошибка при отправке файла в 1С:",
-          error.response ? error.response.data : error.message
-        );
         return res.status(500).json({
           status: "error",
           message: "Ошибка при загрузке файла в 1С",
         });
       }
 
-      // Удаляем файл после загрузки
+      // Удаляем временный файл после загрузки
       try {
         await fs.promises.unlink(filePath);
-      } catch (err) {
-        logger.error(
-          `Не удалось удалить временный файл: ${filePath}. Ошибка: ${err.message}`
-        );
-      }
+      } catch (err) {}
     }
 
-    return res.json({ status: "ok", message: "Файл(ы) успешно загружен(ы)" });
+    return res.json({ status: "ok", message: "Файл успешно загружен" });
   } catch (error) {
-    logger.error(
-      `Ошибка при обработке файлов. UUID: ${uuid}. Ошибка: ${error.message}`
-    );
     return res.status(500).json({
       status: "error",
       message: "Ошибка при обработке файлов",
