@@ -79,6 +79,7 @@ router.post("/", async function (req, res) {
 
     if (response.data.value && response.data.value.length > 0) {
       const categoryData = response.data.value[0];
+      console.log("Полученные данные категории:", categoryData);
       allowedExtensions = JSON.parse(categoryData.availableExtensionsJSON);
       maxSizeFile = parseInt(categoryData.maximumSize) * 1024 * 1024;
       console.log("Допустимые расширения из 1С:", allowedExtensions);
@@ -102,6 +103,7 @@ router.post("/", async function (req, res) {
   let invalidFile = false;
   for (const file of files) {
     const fileExtension = file.name.split(".").pop().toUpperCase();
+    console.log(`Проверка файла ${file.name}, расширение: ${fileExtension}`);
     if (!allowedExtensions.includes(fileExtension)) {
       console.warn(`Недопустимое расширение файла: ${file.name}`);
       invalidFile = true;
