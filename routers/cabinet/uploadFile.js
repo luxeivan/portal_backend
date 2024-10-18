@@ -3,7 +3,7 @@ const router = express.Router();
 const fs = require("fs");
 const { v4: uuidv4 } = require("uuid");
 const logger = require("../../logger");
-// const { PDFDocument } = require("pdf-lib"); // Закомментировано, так как больше не используется
+const { PDFDocument } = require("pdf-lib");
 const axios = require("axios");
 require("dotenv").config();
 
@@ -121,63 +121,110 @@ router.post("/", async function (req, res) {
     for (const file of files) {
       const filePath = `${dirName}/${file.name}`;
       await file.mv(filePath);
+    }
 
-      // Отправка файла в 1С
-      try {
-        const fileData = fs.readFileSync(filePath);
-        const base64File = fileData.toString("base64");
+    // Создаем новый PDF-документ
+    const pdfDoc = await PDFDocument.create();
 
-        const currentDate = new Date();
-        const formattedDate = currentDate
-          .toISOString()
-          .slice(0, 10)
-          .replace(/-/g, "");
-        const filePathIn1C = `claimsProject/${formattedDate}/${file.name}`; // Используем оригинальное имя файла
+    for (const file of files) {
+      const filePath = `${dirName}/${file.name}`;
+      const fileBuffer = await fs.promises.readFile(filePath);
 
-        const payload = {
-          Description: req.body.documentName,
-          ВладелецФайла_Key: userId,
-          Автор_Key: user_Key,
-          ДатаМодификацииУниверсальная: currentDate.toISOString(),
-          ДатаСоздания: currentDate.toISOString(),
-          ПутьКФайлу: filePathIn1C, // Убедитесь, что путь корректен для чтения в 1С
-          Размер: fileData.length.toString(),
-          Расширение: file.name.split(".").pop(),
-          ТипХраненияФайла: "ВТомахНаДиске",
-          Том_Key: mainVolume_Key,
-          ВидФайла_Key: categoryKey,
-          ФайлХранилище_Type: "application/octet-stream",
-          ФайлХранилище_Base64Data: base64File,
-        };
-
-        const uploadResponse = await axios.post(
-          `${SERVER_1C}/Catalog_profileПрисоединенныеФайлы?$format=json`,
-          payload,
-          { headers }
-        );
-        console.log("Файл успешно загружен в 1С:", uploadResponse.data); // Логируем успешную загрузку
-      } catch (error) {
-        console.error(
-          "Ошибка при отправке файла в 1С:",
-          error.response ? error.response.data : error.message
-        );
-        return res.status(500).json({
-          status: "error",
-          message: "Ошибка при загрузке файла в 1С",
+      let pdfImage;
+      if (file.mimetype === "image/jpeg" || file.mimetype === "image/jpg") {
+        pdfImage = await pdfDoc.embedJpg(fileBuffer);
+        const page = pdfDoc.addPage([pdfImage.width, pdfImage.height]);
+        page.drawImage(pdfImage, {
+          x: 0,
+          y: 0,
+          width: pdfImage.width,
+          height: pdfImage.height,
         });
-      }
-
-      // Удаляем временный файл после загрузки
-      try {
-        await fs.promises.unlink(filePath);
-      } catch (err) {
-        logger.error(
-          `Не удалось удалить временный файл: ${filePath}. Ошибка: ${err.message}`
+      } else if (file.mimetype === "image/png") {
+        pdfImage = await pdfDoc.embedPng(fileBuffer);
+        const page = pdfDoc.addPage([pdfImage.width, pdfImage.height]);
+        page.drawImage(pdfImage, {
+          x: 0,
+          y: 0,
+          width: pdfImage.width,
+          height: pdfImage.height,
+        });
+      } else if (file.mimetype === "application/pdf") {
+        const donorPdfDoc = await PDFDocument.load(fileBuffer);
+        const donorPages = await pdfDoc.copyPages(
+          donorPdfDoc,
+          donorPdfDoc.getPageIndices()
         );
+        donorPages.forEach((page) => pdfDoc.addPage(page));
+      } else {
+        continue;
       }
     }
 
-    return res.json({ status: "ok", message: "Файлы успешно загружены" });
+    const pdfBytes = await pdfDoc.save();
+    const pdfFilename = `combined_document_${uuid}.pdf`;
+    const pdfPath = `${dirName}/${pdfFilename}`;
+
+    await fs.promises.writeFile(pdfPath, pdfBytes);
+    logger.info(
+      `Объединенный PDF успешно создан: ${pdfFilename}. UUID: ${uuid}`
+    );
+
+    // Отправка файла в 1С
+    try {
+      const fileData = fs.readFileSync(pdfPath);
+      const base64File = fileData.toString("base64");
+
+      const currentDate = new Date();
+      const formattedDate = currentDate
+        .toISOString()
+        .slice(0, 10)
+        .replace(/-/g, "");
+      const filePathIn1C = `claimsProject/${formattedDate}/${pdfFilename}`; // Изменение: замена '\' на '/' для корректного формирования пути
+
+      const payload = {
+        Description: req.body.documentName,
+        ВладелецФайла_Key: userId,
+        Автор_Key: user_Key,
+        ДатаМодификацииУниверсальная: currentDate.toISOString(),
+        ДатаСоздания: currentDate.toISOString(),
+        ПутьКФайлу: filePathIn1C, // Убедитесь, что путь корректен для чтения в 1С
+        Размер: fileData.length.toString(),
+        Расширение: "pdf",
+        ТипХраненияФайла: "ВТомахНаДиске",
+        Том_Key: mainVolume_Key,
+        ВидФайла_Key: categoryKey,
+        ФайлХранилище_Type: "application/octet-stream",
+        ФайлХранилище_Base64Data: base64File,
+      };
+
+      const uploadResponse = await axios.post(
+        `${SERVER_1C}/Catalog_profileПрисоединенныеФайлы?$format=json`,
+        payload,
+        { headers }
+      );
+      console.log("Файл успешно загружен в 1С:", uploadResponse.data); // Логируем успешную загрузку
+    } catch (error) {
+      console.error(
+        "Ошибка при отправке файла в 1С:",
+        error.response ? error.response.data : error.message
+      );
+      return res.status(500).json({
+        status: "error",
+        message: "Ошибка при загрузке файла в 1С",
+      });
+    }
+
+    // Удаляем объединенный PDF после загрузки
+    try {
+      await fs.promises.unlink(pdfPath);
+    } catch (err) {
+      logger.error(
+        `Не удалось удалить объединенный PDF: ${pdfPath}. Ошибка: ${err.message}`
+      );
+    }
+
+    return res.json({ status: "ok", message: "Файл успешно загружен" });
   } catch (error) {
     logger.error(
       `Ошибка при обработке файлов. UUID: ${uuid}. Ошибка: ${error.message}`
