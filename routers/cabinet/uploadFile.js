@@ -188,8 +188,7 @@ router.post("/", async function (req, res) {
         Автор_Key: user_Key,
         ДатаМодификацииУниверсальная: currentDate.toISOString(),
         ДатаСоздания: currentDate.toISOString(),
-        ПутьКФайлу: ПутьКФайлу, 
-        // ПутьКФайлу: filePathIn1C, 
+        ПутьКФайлу: filePathIn1C, // Убедитесь, что путь корректен для чтения в 1С
         Размер: fileData.length.toString(),
         Расширение: "pdf",
         ТипХраненияФайла: "ВТомахНаДиске",
