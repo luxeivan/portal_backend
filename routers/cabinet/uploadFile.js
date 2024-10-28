@@ -176,6 +176,26 @@ router.post("/", async function (req, res) {
       `Объединенный PDF успешно создан: ${pdfFilename}. UUID: ${uuid}`
     );
 
+    // Удаляем объединенный PDF после загрузки
+    try {
+      for (const file of files) {
+        const filePath = `${dirName}/${file.name}`;
+        // console.log("Файл сохраняется по пути:", filePath); // Логируем путь сохранения файла
+        await fs.promises.unlink(filePath);
+      }
+    } catch (err) {
+      logger.error(
+        `Не удалось удалить файлы. Ошибка: ${err.message}`
+      );
+    }
+    // try {
+    //   await fs.promises.unlink(pdfPath);
+    // } catch (err) {
+    //   logger.error(
+    //     `Не удалось удалить объединенный PDF: ${pdfPath}. Ошибка: ${err.message}`
+    //   );
+    // }
+
     // Отправка файла в 1С
     try {
       const fileData = fs.readFileSync(pdfPath);
@@ -186,7 +206,7 @@ router.post("/", async function (req, res) {
         .toISOString()
         .slice(0, 10)
         .replace(/-/g, "");
-      const filePathIn1C = `claimsProject/${formattedDate}/${pdfFilename}`; // заменил '\' на '/' для корректного формирования пути
+      const filePathIn1C = `${userId}/${pdfFilename}`; // заменил '\' на '/' для корректного формирования пути
 
       console.log("Файл отправляется в 1С по пути:", filePathIn1C); // Логируем путь для отправки в 1С
 
@@ -202,8 +222,8 @@ router.post("/", async function (req, res) {
         ТипХраненияФайла: "ВТомахНаДиске",
         Том_Key: mainVolume_Key,
         ВидФайла_Key: categoryKey,
-        ФайлХранилище_Type: "application/octet-stream",
-        ФайлХранилище_Base64Data: base64File,
+        // ФайлХранилище_Type: "application/octet-stream",
+        // ФайлХранилище_Base64Data: base64File,
       };
 
       const uploadResponse = await axios.post(
@@ -223,14 +243,6 @@ router.post("/", async function (req, res) {
       });
     }
 
-    // Удаляем объединенный PDF после загрузки
-    try {
-      await fs.promises.unlink(pdfPath);
-    } catch (err) {
-      logger.error(
-        `Не удалось удалить объединенный PDF: ${pdfPath}. Ошибка: ${err.message}`
-      );
-    }
 
     return res.json({ status: "ok", message: "Файл успешно загружен" });
   } catch (error) {
