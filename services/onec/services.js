@@ -81,7 +81,7 @@ const servicesOneC = {
       // console.log(resp[1].data.value)
       if (withFields) {
         try {
-          
+
           const categoriesFiles = await axios.get(
             `${server1c}/Catalog_services_categoriesFiles?$format=json&$filter=Ref_Key eq guid'${key}'&$expand=category`,
             {
@@ -90,7 +90,7 @@ const servicesOneC = {
           );
           resp[0].data.value[0].categoriesFiles = categoriesFiles.data.value
         } catch (error) {
-          console.log("categoriesFiles",error.response.data)
+          console.log("categoriesFiles", error.response.data)
         }
         try {
           resp[0].data.value[0].fields = await Promise.all(
@@ -191,19 +191,61 @@ const servicesOneC = {
                   // -------------Если GroupFieldsInput
                   if (item.component_Type.includes("GroupFieldsInput")) {
                     // console.log(`${server1c}/InformationRegister_portalFields?$format=json&$select=*&$expand=name,component,dependName,dependСondition&$filter=cast(object,'Catalog_componentsGroupFieldsInput') eq guid'${item.component}'`)
-                    const tableFields = await axios.get(
+                    const groupFields = await axios.get(
                       `${server1c}/InformationRegister_portalFields?$format=json&$select=*&$expand=name,component,dependName,dependСondition&$filter=cast(object,'Catalog_componentsGroupFieldsInput') eq guid'${item.component}'`,
                       {
                         headers,
                       }
                     );
                     // console.log(item)
-                    if (tableFields.data && tableFields.data.value) {
-                      item.component_Expanded.fields =
-                        tableFields.data.value.sort(
-                          (a, b) => a.lineNum - b.lineNum
-                        );
+                    if (groupFields.data && groupFields.data.value) {
+                      item.component_Expanded.fields = groupFields.data.value.sort((a, b) => a.lineNum - b.lineNum)
+
+                      // -------------Если LinkInput (ссылка на справочник и установлен флаг allValues)
+                      await Promise.all(item.component_Expanded.fields.map(async item => {
+                        return new Promise(async (resolve, reject) => {
+                          if (
+                            item.component_Type.includes("LinkInput") &&
+                            item.component_Expanded.allValues
+                          ) {
+                            const allValues = await axios.get(
+                              `${server1c}${item.component_Expanded.linkUrl}`,
+                              {
+                                headers,
+                              }
+                            );
+                            if (allValues.data && allValues.data.value) {
+                              item.component_Expanded.options = allValues.data.value
+                                .sort((a, b) => {
+                                  if (
+                                    a.Description.toLowerCase() <
+                                    b.Description.toLowerCase()
+                                  ) {
+                                    return -1;
+                                  }
+                                  if (
+                                    a.Description.toLowerCase() >
+                                    b.Description.toLowerCase()
+                                  ) {
+                                    return 1;
+                                  }
+                                  return 0;
+                                })
+                                .map((item) => ({
+                                  value: item.Ref_Key,
+                                  label: item.Description,
+                                  unit: item['ЕдиницаИзмерения']?.Description
+                                }));
+                            }
+                          }
+                          resolve(item);
+                        })
+                      }))
+
+
+
                     }
+
                   }
                   resolve(item);
                 } catch (error) {
