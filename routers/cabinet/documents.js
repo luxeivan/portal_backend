@@ -11,9 +11,45 @@ const logger = require("../../logger");
 const pathFileStorage = process.env.PATH_FILESTORAGE;
 const maxSizeFile = 10;
 
-const documentsStore = {}; // Ключ — userId, значение — массив документов пользователя
+const documentsStore = {}; 
 
-const server1C = "http://45.89.189.5/InfoBase/odata/standard.odata";
+const SERVER_1C = process.env.SERVER_1C;
+const server1c_auth = process.env.SERVER_1C_AUTHORIZATION;
+const headers = {
+  Authorization: server1c_auth,
+};
+
+/**
+ * @swagger
+ * tags:
+ *   - name: Documents
+ *     description: Маршруты для работы с документами профиля пользователя
+ */
+
+// Новый маршрут для получения категорий документов из 1С
+router.get("/categories", async function (req, res) {
+  try {
+    // Шаг 2: Получение категорий документов из 1С
+    const response = await axios.get(
+      `${SERVER_1C}/Catalog_services_categoriesFiles/?$format=json&$select=**&$filter=Ref_Key%20eq%20guid'6739b454-176f-11ef-94f0-5ef3fcb042f8'&$expand=category`,
+      { headers }
+    );
+
+    const categoriesData = response.data.value;
+    console.log("Получены категории документов из 1С:", categoriesData); // Выводим категории документов
+
+    res.json({
+      status: "ok",
+      categories: categoriesData,
+    });
+  } catch (error) {
+    console.error("Ошибка при получении категорий документов из 1С:", error);
+    res.status(500).json({
+      status: "error",
+      message: "Ошибка при получении категорий документов",
+    });
+  }
+});
 
 /**
  * @swagger
@@ -58,68 +94,6 @@ const server1C = "http://45.89.189.5/InfoBase/odata/standard.odata";
  *       500:
  *         description: Ошибка при сохранении документа
  */
-
-// router.post("/", async function (req, res) {
-//   try {
-//     const userId = req.userId;
-//     const { documentName, files, nameDoc_Key } = req.body;
-
-//     if (!documentName && !files) {
-//       logger.error(
-//         `Отсутствуют необходимые поля в запросе от пользователя с id: ${userId}`
-//       );
-//       return res.status(400).json({
-//         status: "error",
-//         message: "Нет нужных полей",
-//       });
-//     }
-
-//     const filesData = files.map((file, index) => ({
-//       LineNumber: index + 1,
-//       fileName: file.name,
-//       fileType: file.name.split(".").pop(),
-//       fileSize: "1000",
-//     }));
-
-//     const payload = {
-//       Description: documentName,
-//       profile: userId,
-//       files: filesData,
-//       nameDoc_Key,
-//     };
-
-//     // logger.info(
-//     //   `Получен запрос на сохранение документа от пользователя с id: ${userId}`
-//     // );
-
-//     const response = await axios.post(
-//       `${server1C}/Catalog_DocumentsOfProfiles?$format=json`,
-//       payload,
-//       {
-//         headers: {
-//           "Content-Type": "application/json",
-//         },
-//       }
-//     );
-
-//     if (response.data) {
-//       logger.info(`Документ успешно сохранен для пользователя с id: ${userId}`);
-//       res.json({
-//         status: "ok",
-//         message: "Документ успешно сохранен",
-//         data: response.data,
-//       });
-//     }
-//   } catch (error) {
-//     // logger.error(
-//     //   `Ошибка при отправке данных в 1С для пользователя с id: ${userId}. Ошибка: ${error.message}`
-//     // );
-//     res.status(500).json({
-//       status: "error",
-//       message: "Ошибка при отправке данных в 1С",
-//     });
-//   }
-// });
 
 router.post("/", async function (req, res) {
   try {
@@ -181,44 +155,6 @@ router.post("/", async function (req, res) {
  *       500:
  *         description: Ошибка при получении данных
  */
-
-// router.get("/", async function (req, res) {
-//   const userId = req.userId;
-
-//   // logger.info(
-//   //   `Получен запрос на получение документов пользователя с id: ${userId}`
-//   // );
-
-//   try {
-//     const response = await axios.get(
-//       `${server1C}/Catalog_DocumentsOfProfiles?$format=json&$filter=(profile eq '${userId}') and (DeletionMark eq false)`
-//     );
-
-//     if (response.data) {
-//       logger.info(
-//         `Документы успешно получены для пользователя с id: ${userId}`
-//       );
-//       return res.json({
-//         status: "ok",
-//         documents: response.data.value,
-//       });
-//     } else {
-//       logger.warn(`Нет данных для пользователя с id: ${userId}`);
-//       return res.status(404).json({
-//         status: "error",
-//         message: "Нет данных",
-//       });
-//     }
-//   } catch (error) {
-//     logger.error(
-//       `Ошибка при получении данных из 1С для пользователя с id: ${userId}. Ошибка: ${error.message}`
-//     );
-//     return res.status(500).json({
-//       status: "error",
-//       message: "Ошибка при получении данных из 1С",
-//     });
-//   }
-// });
 
 router.get("/", async function (req, res) {
   const userId = req.userId;
