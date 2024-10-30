@@ -7,6 +7,7 @@ const fs = require("fs");
 const { v4: uuidv4 } = require("uuid");
 
 const logger = require("../../logger");
+const { log } = require("console");
 
 const pathFileStorage = process.env.PATH_FILESTORAGE;
 const maxSizeFile = 10;
@@ -453,6 +454,9 @@ router.put("/:id", async function (req, res) {
 router.delete("/:id", async function (req, res) {
   const userId = req.userId;
   const fileId = req.params.id;
+
+  console.log("ПРОВЕРЯЕМ УДАЛЕНИЕ В ТЕРМИНАЛЕ. req.userId:", req.userId);
+  console.log("ПРОВЕРЯЕМ УДАЛЕНИЕ В ТЕРМИНАЛЕ. req.params.id:", req.params.id);
 
   try {
     const connectionResponse = await axios.get(
