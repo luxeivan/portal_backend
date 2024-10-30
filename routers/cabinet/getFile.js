@@ -14,6 +14,18 @@ router.get("/:id", async function (req, res) {
   const userId = req.userId;
   const fileId = req.params.id;
 
+  console.log(
+    `Получен запрос на получение файла. userId: ${userId}, fileId: ${fileId}`
+  );
+
+  if (!userId) {
+    console.error("userId не определён");
+    return res.status(401).json({
+      status: "error",
+      message: "нет авторизации",
+    });
+  }
+
   try {
     const connectionResponse = await axios.get(
       `${SERVER_1C}/InformationRegister_connectionsOfElements?$format=json&$filter=element1 eq cast(guid'${fileId}', 'Catalog_profileПрисоединенныеФайлы') and element2 eq cast(guid'${userId}', 'Catalog_profile') and usage eq true`,
