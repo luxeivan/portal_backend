@@ -1,3 +1,5 @@
+// /routers/cabinet/getFile.js
+
 const express = require("express");
 const router = express.Router();
 const axios = require("axios");
@@ -15,7 +17,6 @@ router.get("/:id", async function (req, res) {
   const fileId = req.params.id;
 
   try {
-    // Проверяем, есть ли связь между файлом и пользователем
     const connectionResponse = await axios.get(
       `${SERVER_1C}/InformationRegister_connectionsOfElements?$format=json&$filter=element1 eq cast(guid'${fileId}', 'Catalog_profileПрисоединенныеФайлы') and element2 eq cast(guid'${userId}', 'Catalog_profile') and usage eq true`,
       { headers }
@@ -30,7 +31,6 @@ router.get("/:id", async function (req, res) {
       });
     }
 
-    // Получаем информацию о файле из 1С
     const fileInfoResponse = await axios.get(
       `${SERVER_1C}/Catalog_profileПрисоединенныеФайлы(guid'${fileId}')?$format=json`,
       { headers }
@@ -38,7 +38,6 @@ router.get("/:id", async function (req, res) {
 
     const fileInfo = fileInfoResponse.data;
 
-    // Запрос файла из 1С
     const fileResponse = await axios.get(
       `${SERVER_1C}/Catalog_profileПрисоединенныеФайлы(guid'${fileId}')/DownloadFile`,
       {
