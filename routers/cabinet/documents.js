@@ -139,11 +139,11 @@ router.post("/", async function (req, res) {
   }
 });
 
+
 router.get("/", async function (req, res) {
   const userId = req.userId;
 
   try {
-    // Запрос связей документов с профилем пользователя
     const requestUrl = `${SERVER_1C}/InformationRegister_connectionsOfElements?$format=json&$filter=element2 eq cast(guid'${userId}', 'Catalog_profile') and usage eq true and element1_Type eq 'StandardODATA.Catalog_profileПрисоединенныеФайлы'&$expand=element1`;
 
     console.log("Запрос к 1С для получения документов:", requestUrl);
@@ -159,8 +159,9 @@ router.get("/", async function (req, res) {
       });
     }
 
-    // Извлекаем документы из полученных связей
-    const documents = connections.map((connection) => connection.element1_Expanded);
+    const documents = connections.map(
+      (connection) => connection.element1_Expanded
+    );
 
     return res.json({
       status: "ok",
@@ -175,7 +176,7 @@ router.get("/", async function (req, res) {
   }
 });
 
-
+module.exports = router;
 
 // /**
 //  * @swagger
