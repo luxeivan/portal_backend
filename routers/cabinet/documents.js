@@ -139,19 +139,28 @@ router.post("/", async function (req, res) {
   }
 });
 
-// /routers/cabinet/documents.js
-
 router.get("/", async function (req, res) {
   const userId = req.userId;
 
   try {
-    // Запрос в 1С для получения документов пользователя
-    const response = await axios.get(
-      `${SERVER_1C}/Catalog_profileПрисоединенныеФайлы?$format=json&$filter=ВладелецФайла_Key eq guid'${userId}'`,
-      { headers }
-    );
+    // Запрос связей документов с профилем пользователя
+    const requestUrl = `${SERVER_1C}/InformationRegister_connectionsOfElements?$format=json&$filter=element2 eq cast(guid'${userId}', 'Catalog_profile') and usage eq true and element1_Type eq 'StandardODATA.Catalog_profileПрисоединенныеФайлы'&$expand=element1`;
 
-    const documents = response.data.value;
+    console.log("Запрос к 1С для получения документов:", requestUrl);
+
+    const response = await axios.get(requestUrl, { headers });
+
+    const connections = response.data.value;
+
+    if (!connections || connections.length === 0) {
+      return res.json({
+        status: "ok",
+        documents: [],
+      });
+    }
+
+    // Извлекаем документы из полученных связей
+    const documents = connections.map((connection) => connection.element1_Expanded);
 
     return res.json({
       status: "ok",
@@ -165,6 +174,8 @@ router.get("/", async function (req, res) {
     });
   }
 });
+
+
 
 // /**
 //  * @swagger
