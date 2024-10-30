@@ -11,7 +11,7 @@ const logger = require("../../logger");
 const pathFileStorage = process.env.PATH_FILESTORAGE;
 const maxSizeFile = 10;
 
-const documentsStore = {}; 
+const documentsStore = {};
 
 const SERVER_1C = process.env.SERVER_1C;
 const server1c_auth = process.env.SERVER_1C_AUTHORIZATION;
@@ -139,44 +139,71 @@ router.post("/", async function (req, res) {
   }
 });
 
-/**
- * @swagger
- * /api/cabinet/documents:
- *   get:
- *     summary: Получение документов
- *     description: Получает список всех документов пользователя.
- *     tags:
- *       - Documents
- *     responses:
- *       200:
- *         description: Список документов успешно получен
- *       404:
- *         description: Нет данных
- *       500:
- *         description: Ошибка при получении данных
- */
+// /routers/cabinet/documents.js
 
 router.get("/", async function (req, res) {
   const userId = req.userId;
 
   try {
-    // Получаем документы пользователя из хранилища
-    const userDocuments = documentsStore[userId] || [];
+    // Запрос в 1С для получения документов пользователя
+    const response = await axios.get(
+      `${SERVER_1C}/Catalog_profileПрисоединенныеФайлы?$format=json&$filter=ВладелецФайла_Key eq guid'${userId}'`,
+      { headers }
+    );
+
+    const documents = response.data.value;
 
     return res.json({
       status: "ok",
-      documents: userDocuments,
+      documents: documents,
     });
   } catch (error) {
-    console.error(
-      `Ошибка при получении документов для пользователя с id: ${userId}. Ошибка: ${error.message}`
-    );
+    console.error(`Ошибка при получении документов из 1С: ${error.message}`);
     return res.status(500).json({
       status: "error",
       message: "Ошибка при получении документов",
     });
   }
 });
+
+// /**
+//  * @swagger
+//  * /api/cabinet/documents:
+//  *   get:
+//  *     summary: Получение документов
+//  *     description: Получает список всех документов пользователя.
+//  *     tags:
+//  *       - Documents
+//  *     responses:
+//  *       200:
+//  *         description: Список документов успешно получен
+//  *       404:
+//  *         description: Нет данных
+//  *       500:
+//  *         description: Ошибка при получении данных
+//  */
+
+// router.get("/", async function (req, res) {
+//   const userId = req.userId;
+
+//   try {
+//     // Получаем документы пользователя из хранилища
+//     const userDocuments = documentsStore[userId] || [];
+
+//     return res.json({
+//       status: "ok",
+//       documents: userDocuments,
+//     });
+//   } catch (error) {
+//     console.error(
+//       `Ошибка при получении документов для пользователя с id: ${userId}. Ошибка: ${error.message}`
+//     );
+//     return res.status(500).json({
+//       status: "error",
+//       message: "Ошибка при получении документов",
+//     });
+//   }
+// });
 
 /**
  * @swagger
