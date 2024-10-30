@@ -1,5 +1,3 @@
-// /routers/cabinet/getFile.js
-
 const express = require("express");
 const router = express.Router();
 const axios = require("axios");
@@ -51,7 +49,7 @@ router.get("/:id", async function (req, res) {
     const fileInfo = fileInfoResponse.data;
 
     const fileResponse = await axios.get(
-      `${SERVER_1C}/Catalog_profileПрисоединенныеФайлы(guid'${fileId}')/DownloadFile`,
+      `${SERVER_1C}/Catalog_profileПрисоединенныеФайлы(guid'${fileId}')`,
       {
         headers,
         responseType: "arraybuffer",
@@ -70,7 +68,8 @@ router.get("/:id", async function (req, res) {
     res.send(fileData);
   } catch (error) {
     console.error(`Ошибка при получении файла из 1С: ${error.message}`);
-    res.status(500).json({
+    res.status(200).json({
+      error,
       status: "error",
       message: "Ошибка при получении файла",
     });
