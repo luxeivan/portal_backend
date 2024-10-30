@@ -457,6 +457,8 @@ router.delete("/:id", async function (req, res) {
   const userId = req.userId;
   const fileId = req.params.id;
 
+  console.log(`Запрос на удаление файла. userId: ${userId}, fileId: ${fileId}`);
+
   try {
     // Проверяем связь документа с пользователем
     const connectionResponse = await axios.get(
