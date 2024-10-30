@@ -139,7 +139,6 @@ router.post("/", async function (req, res) {
   }
 });
 
-
 router.get("/", async function (req, res) {
   const userId = req.userId;
 
@@ -450,6 +449,65 @@ router.put("/:id", async function (req, res) {
     res.status(500).json({
       status: "error",
       message: "Ошибка при обновлении данных в 1С",
+    });
+  }
+});
+
+router.delete("/:id", async function (req, res) {
+  const userId = req.userId;
+  const fileId = req.params.id;
+
+  try {
+    // Проверяем связь документа с пользователем
+    const connectionResponse = await axios.get(
+      `${SERVER_1C}/InformationRegister_connectionsOfElements?$format=json&$filter=element1 eq cast(guid'${fileId}', 'Catalog_profileПрисоединенныеФайлы') and element2 eq cast(guid'${userId}', 'Catalog_profile') and usage eq true`,
+      { headers }
+    );
+
+    const connections = connectionResponse.data.value;
+
+    if (!connections || connections.length === 0) {
+      return res.status(403).json({
+        status: "error",
+        message: "У вас нет доступа к этому документу",
+      });
+    }
+
+    // Устанавливаем usage = false для связи
+    const connectionEntry = connections[0];
+    const updatePayload = {
+      Period: moment().format(),
+      usage: false,
+      element1: connectionEntry.element1,
+      element1_Type: connectionEntry.element1_Type,
+      element2: connectionEntry.element2,
+      element2_Type: connectionEntry.element2_Type,
+      reason: "Удаление документа из профиля пользователя",
+    };
+
+    await axios.patch(
+      `${SERVER_1C}/InformationRegister_connectionsOfElements(Period=datetime'${encodeURIComponent(
+        connectionEntry.Period
+      )}',Recorder=@Unavailable)`,
+      updatePayload,
+      { headers }
+    );
+
+    // Удаляем сам документ из 1С
+    await axios.delete(
+      `${SERVER_1C}/Catalog_profileПрисоединенныеФайлы(guid'${fileId}')`,
+      { headers }
+    );
+
+    res.json({
+      status: "ok",
+      message: "Документ успешно удален",
+    });
+  } catch (error) {
+    console.error(`Ошибка при удалении документа: ${error.message}`);
+    res.status(500).json({
+      status: "error",
+      message: "Ошибка при удалении документа",
     });
   }
 });
