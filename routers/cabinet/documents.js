@@ -146,7 +146,8 @@ router.get("/", async function (req, res) {
   const userId = req.userId;
 
   try {
-    const requestUrl = `${SERVER_1C}/InformationRegister_connectionsOfElements?$format=json&$filter=element2 eq cast(guid'${userId}', 'Catalog_profile') and usage eq true and element1_Type eq 'StandardODATA.Catalog_profileПрисоединенныеФайлы'&$expand=element1`;
+    const requestUrl = `${SERVER_1C}/InformationRegister_connectionsOfElements/SliceLast(,Condition='element2 eq cast(guid'${userId}', 'Catalog_profile')')?$format=json&$expand=element1&$filter=usage eq true`;
+    // const requestUrl = `${SERVER_1C}/InformationRegister_connectionsOfElements?$format=json&$filter=element2 eq cast(guid'${userId}', 'Catalog_profile') and usage eq true and element1_Type eq 'StandardODATA.Catalog_profileПрисоединенныеФайлы'&$expand=element1`;
 
     const response = await axios.get(requestUrl, { headers });
 
@@ -456,13 +457,10 @@ router.delete("/:id", async function (req, res) {
   const userId = req.userId;
   const fileId = req.params.id;
 
-  console.log("ПРОВЕРЯЕМ УДАЛЕНИЕ В ТЕРМИНАЛЕ. req.userId:", req.userId);
-  console.log("ПРОВЕРЯЕМ УДАЛЕНИЕ В ТЕРМИНАЛЕ. req.params.id:", req.params.id);
-
   try {
     // Шаг 1: Получаем существующую связь из 1С
     const connectionResponse = await axios.get(
-      `${SERVER_1C}/InformationRegister_connectionsOfElements?$format=json&$filter=element1 eq cast(guid'${fileId}', 'Catalog_profileПрисоединенныеФайлы') and element2 eq cast(guid'${userId}', 'Catalog_profile') and usage eq true`,
+      `${SERVER_1C}/InformationRegister_connectionsOfElements/SliceLast(,Condition='element1 eq cast(guid'${fileId}', 'Catalog_profileПрисоединенныеФайлы') and element2 eq cast(guid'${userId}', 'Catalog_profile')')?$format=json&$filter=usage eq true`,
       { headers }
     );
 
@@ -479,8 +477,8 @@ router.delete("/:id", async function (req, res) {
 
     // Шаг 2: Добавляем новую запись в регистр с usage: false
     const newEntry = {
-      Period: new Date().toISOString(),
-      Recorder: null, // Или используйте подходящее значение для вашего случая
+      Period: moment().format(),
+      Recorder: null,
       usage: false,
       element1: connectionEntry.element1,
       element1_Type: connectionEntry.element1_Type,
@@ -489,20 +487,10 @@ router.delete("/:id", async function (req, res) {
       reason: "Удаление документа из профиля пользователя",
     };
 
-    // Удаляем Recorder из ключа, если он отсутствует
-    const recorder =
-      connectionEntry.Recorder || "00000000-0000-0000-0000-000000000000";
-
     // Добавляем новую запись
     await axios.post(
       `${SERVER_1C}/InformationRegister_connectionsOfElements`,
       newEntry,
-      { headers }
-    );
-
-    // Шаг 3: Удаляем сам документ из 1С
-    await axios.delete(
-      `${SERVER_1C}/Catalog_profileПрисоединенныеФайлы(guid'${fileId}')`,
       { headers }
     );
 
