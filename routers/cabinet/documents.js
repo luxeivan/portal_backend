@@ -178,6 +178,28 @@ router.get("/", async function (req, res) {
   }
 });
 
+router.get("/by-category", async function (req, res) {
+  const userId = req.userId;
+  const categoryKey = req.query.categoryKey;
+
+  try {
+    const requestUrl = `${SERVER_1C}/InformationRegister_connectionsOfElements/SliceLast(,Condition='element2 eq cast(guid'${userId}', 'Catalog_profile')')?$format=json&$expand=element1&$filter=usage eq true and element1/category_Key eq guid'${categoryKey}'`;
+    const response = await axios.get(requestUrl, { headers });
+    const connections = response.data.value;
+
+    if (!connections || connections.length === 0) {
+      return res.json({ status: "ok", documents: [] });
+    }
+
+    const documents = connections.map((connection) => connection.element1_Expanded);
+    return res.json({ status: "ok", documents });
+  } catch (error) {
+    console.error(`Ошибка при получении документов из 1С: ${error.message}`);
+    return res.status(500).json({ status: "error", message: "Ошибка при получении документов" });
+  }
+});
+
+
 // /**
 //  * @swagger
 //  * /api/cabinet/documents:
