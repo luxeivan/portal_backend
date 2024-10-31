@@ -5,6 +5,7 @@ const axios = require("axios");
 const path = require("path");
 const fs = require("fs");
 const { v4: uuidv4 } = require("uuid");
+const moment = require("moment");
 
 const logger = require("../../logger");
 const { log } = require("console");
@@ -459,6 +460,7 @@ router.delete("/:id", async function (req, res) {
   console.log("ПРОВЕРЯЕМ УДАЛЕНИЕ В ТЕРМИНАЛЕ. req.params.id:", req.params.id);
 
   try {
+    // Шаг 1: Получаем существующую связь из 1С
     const connectionResponse = await axios.get(
       `${SERVER_1C}/InformationRegister_connectionsOfElements?$format=json&$filter=element1 eq cast(guid'${fileId}', 'Catalog_profileПрисоединенныеФайлы') and element2 eq cast(guid'${userId}', 'Catalog_profile') and usage eq true`,
       { headers }
@@ -474,8 +476,11 @@ router.delete("/:id", async function (req, res) {
     }
 
     const connectionEntry = connections[0];
-    const updatePayload = {
-      Period: moment().format(),
+
+    // Шаг 2: Добавляем новую запись в регистр с usage: false
+    const newEntry = {
+      Period: new Date().toISOString(),
+      Recorder: null, // Или используйте подходящее значение для вашего случая
       usage: false,
       element1: connectionEntry.element1,
       element1_Type: connectionEntry.element1_Type,
@@ -484,14 +489,18 @@ router.delete("/:id", async function (req, res) {
       reason: "Удаление документа из профиля пользователя",
     };
 
-    await axios.patch(
-      `${SERVER_1C}/InformationRegister_connectionsOfElements(Period=datetime'${encodeURIComponent(
-        connectionEntry.Period
-      )}',Recorder=@Unavailable)`,
-      updatePayload,
+    // Удаляем Recorder из ключа, если он отсутствует
+    const recorder =
+      connectionEntry.Recorder || "00000000-0000-0000-0000-000000000000";
+
+    // Добавляем новую запись
+    await axios.post(
+      `${SERVER_1C}/InformationRegister_connectionsOfElements`,
+      newEntry,
       { headers }
     );
 
+    // Шаг 3: Удаляем сам документ из 1С
     await axios.delete(
       `${SERVER_1C}/Catalog_profileПрисоединенныеФайлы(guid'${fileId}')`,
       { headers }
@@ -503,6 +512,9 @@ router.delete("/:id", async function (req, res) {
     });
   } catch (error) {
     console.error(`Ошибка при удалении документа: ${error.message}`);
+    if (error.response) {
+      console.error("Ответ от сервера 1С:", error.response.data);
+    }
     res.status(500).json({
       status: "error",
       message: "Ошибка при удалении документа",
