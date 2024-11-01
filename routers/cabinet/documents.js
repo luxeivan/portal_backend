@@ -5,18 +5,21 @@ const axios = require("axios");
 const path = require("path");
 const fs = require("fs");
 const { v4: uuidv4 } = require("uuid");
+const moment = require("moment");
 
 const logger = require("../../logger");
+const { log } = require("console");
 
 const pathFileStorage = process.env.PATH_FILESTORAGE;
 const maxSizeFile = 10;
 
-const documentsStore = {}; 
+const documentsStore = {};
 
 const SERVER_1C = process.env.SERVER_1C;
 const server1c_auth = process.env.SERVER_1C_AUTHORIZATION;
 const headers = {
   Authorization: server1c_auth,
+  "Content-Type": "application/json",
 };
 
 /**
@@ -139,44 +142,102 @@ router.post("/", async function (req, res) {
   }
 });
 
-/**
- * @swagger
- * /api/cabinet/documents:
- *   get:
- *     summary: Получение документов
- *     description: Получает список всех документов пользователя.
- *     tags:
- *       - Documents
- *     responses:
- *       200:
- *         description: Список документов успешно получен
- *       404:
- *         description: Нет данных
- *       500:
- *         description: Ошибка при получении данных
- */
-
 router.get("/", async function (req, res) {
   const userId = req.userId;
 
   try {
-    // Получаем документы пользователя из хранилища
-    const userDocuments = documentsStore[userId] || [];
+    //добавить + параметр в фильтр(Категории)
+    const requestUrl = `${SERVER_1C}/InformationRegister_connectionsOfElements/SliceLast(,Condition='element2 eq cast(guid'${userId}', 'Catalog_profile')')?$format=json&$expand=element1&$filter=usage eq true`;
+    // const requestUrl = `${SERVER_1C}/InformationRegister_connectionsOfElements?$format=json&$filter=element2 eq cast(guid'${userId}', 'Catalog_profile') and usage eq true and element1_Type eq 'StandardODATA.Catalog_profileПрисоединенныеФайлы'&$expand=element1`;
+
+    const response = await axios.get(requestUrl, { headers });
+
+    const connections = response.data.value;
+
+    if (!connections || connections.length === 0) {
+      return res.json({
+        status: "ok",
+        documents: [],
+      });
+    }
+
+    const documents = connections.map(
+      (connection) => connection.element1_Expanded
+    );
 
     return res.json({
       status: "ok",
-      documents: userDocuments,
+      documents: documents,
     });
   } catch (error) {
-    console.error(
-      `Ошибка при получении документов для пользователя с id: ${userId}. Ошибка: ${error.message}`
-    );
+    console.error(`Ошибка при получении документов из 1С: ${error.message}`);
     return res.status(500).json({
       status: "error",
       message: "Ошибка при получении документов",
     });
   }
 });
+
+router.get("/by-category", async function (req, res) {
+  const userId = req.userId;
+  const categoryKey = req.query.categoryKey;
+
+  try {
+    const requestUrl = `${SERVER_1C}/InformationRegister_connectionsOfElements/SliceLast(,Condition='element2 eq cast(guid'${userId}', 'Catalog_profile')')?$format=json&$expand=element1&$filter=usage eq true and element1/category_Key eq guid'${categoryKey}'`;
+    const response = await axios.get(requestUrl, { headers });
+    const connections = response.data.value;
+
+    if (!connections || connections.length === 0) {
+      return res.json({ status: "ok", documents: [] });
+    }
+
+    const documents = connections.map((connection) => connection.element1_Expanded);
+    return res.json({ status: "ok", documents });
+  } catch (error) {
+    console.error(`Ошибка при получении документов из 1С: ${error.message}`);
+    return res.status(500).json({ status: "error", message: "Ошибка при получении документов" });
+  }
+});
+
+
+// /**
+//  * @swagger
+//  * /api/cabinet/documents:
+//  *   get:
+//  *     summary: Получение документов
+//  *     description: Получает список всех документов пользователя.
+//  *     tags:
+//  *       - Documents
+//  *     responses:
+//  *       200:
+//  *         description: Список документов успешно получен
+//  *       404:
+//  *         description: Нет данных
+//  *       500:
+//  *         description: Ошибка при получении данных
+//  */
+
+// router.get("/", async function (req, res) {
+//   const userId = req.userId;
+
+//   try {
+//     // Получаем документы пользователя из хранилища
+//     const userDocuments = documentsStore[userId] || [];
+
+//     return res.json({
+//       status: "ok",
+//       documents: userDocuments,
+//     });
+//   } catch (error) {
+//     console.error(
+//       `Ошибка при получении документов для пользователя с id: ${userId}. Ошибка: ${error.message}`
+//     );
+//     return res.status(500).json({
+//       status: "error",
+//       message: "Ошибка при получении документов",
+//     });
+//   }
+// });
 
 /**
  * @swagger
@@ -411,6 +472,63 @@ router.put("/:id", async function (req, res) {
     res.status(500).json({
       status: "error",
       message: "Ошибка при обновлении данных в 1С",
+    });
+  }
+});
+
+router.delete("/:id", async function (req, res) {
+  const userId = req.userId;
+  const fileId = req.params.id;
+
+  try {
+    // Шаг 1: Получаем существующую связь из 1С
+    const connectionResponse = await axios.get(
+      `${SERVER_1C}/InformationRegister_connectionsOfElements/SliceLast(,Condition='element1 eq cast(guid'${fileId}', 'Catalog_profileПрисоединенныеФайлы') and element2 eq cast(guid'${userId}', 'Catalog_profile')')?$format=json&$filter=usage eq true`,
+      { headers }
+    );
+
+    const connections = connectionResponse.data.value;
+
+    if (!connections || connections.length === 0) {
+      return res.status(403).json({
+        status: "error",
+        message: "У вас нет доступа к этому документу",
+      });
+    }
+
+    const connectionEntry = connections[0];
+
+    // Шаг 2: Добавляем новую запись в регистр с usage: false
+    const newEntry = {
+      Period: moment().format(),
+      Recorder: null,
+      usage: false,
+      element1: connectionEntry.element1,
+      element1_Type: connectionEntry.element1_Type,
+      element2: connectionEntry.element2,
+      element2_Type: connectionEntry.element2_Type,
+      reason: "Удаление документа из профиля пользователя",
+    };
+
+    // Добавляем новую запись
+    await axios.post(
+      `${SERVER_1C}/InformationRegister_connectionsOfElements`,
+      newEntry,
+      { headers }
+    );
+
+    res.json({
+      status: "ok",
+      message: "Документ успешно удален",
+    });
+  } catch (error) {
+    console.error(`Ошибка при удалении документа: ${error.message}`);
+    if (error.response) {
+      console.error("Ответ от сервера 1С:", error.response.data);
+    }
+    res.status(500).json({
+      status: "error",
+      message: "Ошибка при удалении документа",
     });
   }
 });
