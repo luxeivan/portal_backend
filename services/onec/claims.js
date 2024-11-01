@@ -64,11 +64,12 @@ const claimsOneC = {
                 if (index == 20) {
                     console.log('field', field)
                 }
+                // if (item.value && item.value === "" && field.component_Expanded.typeOData === "Edm.DateTime") item.value = moment("0001-01-01").format()
                 return {
                     LineNumber: index + 1,
                     name_Key: field.name_Key,
-                    value: item.value ? item.value : undefined,
-                    value_Type: item.value ? field.component_Expanded.typeOData : undefined,
+                    value: item.value,
+                    value_Type: field.component_Expanded.typeOData,
                     idLine: field.idLine,
                 }
             })
@@ -86,12 +87,18 @@ const claimsOneC = {
             }
             //console.log('arr',arr)
             arr.forEach((element, index2) => {
+                if (!element.value && field.component_Expanded.fields.find(el => el.idLine === element.key).component_Expanded.typeOData === "Edm.DateTime") {                    
+                    element.value = moment("0001-01-01").format()
+                    console.log("element.value: ",element.value);
+                    
+                }
+                    
                 fields.push({
                     LineNumber: fields.length + 1,
                     name_Key: field.component_Expanded.fields.find(el => el.idLine === element.key).name_Key,
                     nameOwner_Key: field.name_Key,
                     value: element.value,
-                    value_Type: field.component_Expanded.fields.find(el => el.idLine === element.key).component_Expanded.typeOData,
+                    value_Type: field.component_Expanded.fields.find(el => el.idLine === element.key).component_Expanded.typeOData ? field.component_Expanded.fields.find(el => el.idLine === element.key).component_Expanded.typeOData : undefined,
                     idLine: field.component_Expanded.fields.find(el => el.idLine === element.key).idLine,
                 })
 
@@ -125,13 +132,14 @@ const claimsOneC = {
                         arr.push({ key, value })
                     }
                     arr.forEach(tableRow => {
+                        // if (tableRow.value && tableRow.value === "" && table.component_Expanded.fields.find(item => item.idLine === tableRow.key).component_Expanded.typeOData === "Edm.DateTime") tableRow.value = moment("0001-01-001").format()
                         tableFields.push({
                             LineNumber,
                             lineNum: indexRow + 1,
                             nameTable_Key: table.component_Expanded.nameTable_Key,
                             name_Key: table.component_Expanded.fields.find(item => item.idLine === tableRow.key).name_Key,
-                            value: tableRow.value ? tableRow.value : undefined,
-                            value_Type: tableRow.value ? table.component_Expanded.fields.find(item => item.idLine === tableRow.key).component_Expanded.typeOData : undefined,
+                            value: tableRow.value,
+                            value_Type: table.component_Expanded.fields.find(item => item.idLine === tableRow.key).component_Expanded.typeOData,
                             idLine: table.component_Expanded.fields.find(item => item.idLine === tableRow.key).idLine,
                         })
                         LineNumber = LineNumber + 1
@@ -145,6 +153,8 @@ const claimsOneC = {
             tableFields,
             Date: moment().format(),
             template_Key: data.service,
+            versionChecksum: service.versionChecksum,
+            idVersion: service.idVersion
             // profile: userId
         }, {
             headers
