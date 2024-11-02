@@ -53,7 +53,7 @@ router.post("/", async (req, res) => {
     logger.info(`Заявка успешно создана для пользователя с ID: ${userId}`);
     res.json(newClaim);
   } catch (error) {
-    console.log(error);
+    // console.log(error);
     logger.error(
       `Ошибка при создании заявки для пользователя с ID ${userId}: ${error.message}`
     );
