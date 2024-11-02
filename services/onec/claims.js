@@ -110,6 +110,7 @@ const claimsOneC = {
                 // console.log(fieldTemp);
                 if (fieldTemp.component_Type.includes("AddressInput")) { 
                     element.value = element.value?.fullAddress 
+                    fieldTemp.component_Expanded.typeOData = "Edm.String"
                     console.log(element.value);                                        
                     console.log(fieldTemp.component_Expanded);                                        
                 }
