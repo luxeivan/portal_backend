@@ -59,12 +59,12 @@ const claimsOneC = {
             return true
         })
             .map((item, index) => {
-                const field = service.fields.find(field => field.idLine === item.key)
-                //console.log(index)
-                if (index == 20) {
-                    console.log('field', field)
+                const field = service.fields.find(field => field.idLine === item.key)   
+                if (field.component_Type.includes("AddressInput")) {
+                    item.value = item.value?.fullAddress             
+                    console.log(field.component_Type)
+                    console.log(item.value)
                 }
-                // if (item.value && item.value === "" && field.component_Expanded.typeOData === "Edm.DateTime") item.value = moment("0001-01-01").format()
                 return {
                     LineNumber: index + 1,
                     name_Key: field.name_Key,
@@ -73,6 +73,21 @@ const claimsOneC = {
                     idLine: field.idLine,
                 }
             })
+        // // --GroupFieldsInput----------------------------------------------------------------------
+        // values.filter(item => {
+        //     const field = service.fields.find(field => field.idLine === item.key)
+        //     if (field.component_Type.includes("AddressInput")) return true
+        //     return false
+        // }).map((item, index) => {
+        //     const field = service.fields.find(field => field.idLine === item.key)            
+        //     return {
+        //         LineNumber: index + 1,
+        //         name_Key: field.name_Key,
+        //         value: item.value?.fullAddress,
+        //         value_Type: field.component_Expanded.typeOData,
+        //         idLine: field.idLine,
+        //     }
+        // })
         // --GroupFieldsInput----------------------------------------------------------------------
         values.filter(item => {
             const field = service.fields.find(field => field.idLine === item.key)
@@ -87,19 +102,25 @@ const claimsOneC = {
             }
             //console.log('arr',arr)
             arr.forEach((element, index2) => {
-                if (!element.value && field.component_Expanded.fields.find(el => el.idLine === element.key).component_Expanded.typeOData === "Edm.DateTime") {                    
+                const fieldTemp = field.component_Expanded.fields.find(el => el.idLine === element.key)
+                if (!element.value && fieldTemp.component_Expanded.typeOData === "Edm.DateTime") {                    
                     element.value = moment("0001-01-01").format()
-                    console.log("element.value: ",element.value);
-                    
+                    // console.log("element.value: ",element.value);                    
                 }
-                    
+                // console.log(fieldTemp);
+                if (fieldTemp.component_Type.includes("AddressInput")) { 
+                    element.value = element.value?.fullAddress 
+                    fieldTemp.component_Expanded.typeOData = "Edm.String"
+                    console.log(element.value);                                        
+                    console.log(fieldTemp.component_Expanded);                                        
+                }
                 fields.push({
                     LineNumber: fields.length + 1,
-                    name_Key: field.component_Expanded.fields.find(el => el.idLine === element.key).name_Key,
+                    name_Key: fieldTemp.name_Key,
                     nameOwner_Key: field.name_Key,
                     value: element.value,
-                    value_Type: field.component_Expanded.fields.find(el => el.idLine === element.key).component_Expanded.typeOData ? field.component_Expanded.fields.find(el => el.idLine === element.key).component_Expanded.typeOData : undefined,
-                    idLine: field.component_Expanded.fields.find(el => el.idLine === element.key).idLine,
+                    value_Type: fieldTemp.component_Expanded.typeOData ? fieldTemp.component_Expanded.typeOData : undefined,
+                    idLine: fieldTemp.idLine,
                 })
 
             })
