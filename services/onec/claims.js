@@ -59,15 +59,16 @@ const claimsOneC = {
             return true
         })
             .map((item, index) => {
-                const field = service.fields.find(field => field.idLine === item.key)   
+                const field = service.fields.find(field => field.idLine === item.key)
                 if (field.component_Type.includes("AddressInput")) {
-                    item.value = item.value?.fullAddress             
+                    item.value = item.value?.fullAddress
                     console.log(field.component_Type)
                     console.log(item.value)
                 }
                 return {
                     LineNumber: index + 1,
                     name_Key: field.name_Key,
+                    nameOwner_Key: field.nameOwner_Key,
                     value: item.value,
                     value_Type: field.component_Expanded.typeOData,
                     idLine: field.idLine,
@@ -103,16 +104,16 @@ const claimsOneC = {
             //console.log('arr',arr)
             arr.forEach((element, index2) => {
                 const fieldTemp = field.component_Expanded.fields.find(el => el.idLine === element.key)
-                if (!element.value && fieldTemp.component_Expanded.typeOData === "Edm.DateTime") {                    
+                if (!element.value && fieldTemp.component_Expanded.typeOData === "Edm.DateTime") {
                     element.value = moment("0001-01-01").format()
                     // console.log("element.value: ",element.value);                    
                 }
                 // console.log(fieldTemp);
-                if (fieldTemp.component_Type.includes("AddressInput")) { 
-                    element.value = element.value?.fullAddress 
+                if (fieldTemp.component_Type.includes("AddressInput")) {
+                    element.value = element.value?.fullAddress
                     fieldTemp.component_Expanded.typeOData = "Edm.String"
-                    console.log(element.value);                                        
-                    console.log(fieldTemp.component_Expanded);                                        
+                    console.log(element.value);
+                    console.log(fieldTemp.component_Expanded);
                 }
                 fields.push({
                     LineNumber: fields.length + 1,
@@ -197,6 +198,182 @@ const claimsOneC = {
         // console.log(response.data)
         return newClaim.data
 
+    },
+    createNewClaim: async (data, userId) => {
+        const values = data.values
+        let fields = []
+        let tableFields = []
+
+        // const pushToFields = (field, value, group = false) => {
+        //     fields.push({
+        //         name_Key: field.name_Key,
+        //         nameOwner_Key: field.nameOwner_Key,
+        //         label: field.label,
+        //         value: values,
+        //         value_Type: "Edm.String",
+        //         idLine: field.idLine,
+        //     })
+        // }
+
+        //Обработка адреса-------------------------------------------
+        const handlerAddressField = (address, values) => {
+            console.log("address: ", address);
+            console.log("address_values: ", values);
+            if (!values.fullAddress) return false
+            return fields.push({
+                name_Key: address.name_Key,
+                nameOwner_Key: address.nameOwner_Key,
+                label: address.label,
+                value: values.fullAddress,
+                value_Type: "Edm.String",
+                idLine: address.idLine,
+            })
+        }
+        //Обработка групп полей-------------------------------------------
+        const handlerGroupFields = (group, values) => {
+            // console.log("group: ", group);
+            //Перебираем все поля в группе
+            group.component_Expanded.fields.forEach((field) => {
+                if (!values[field.idLine]) return false
+                //Если адрес в группе
+                if (field.component_Type.includes("AddressInput")) {
+                    return handlerAddressField(field, values[field.idLine])
+                }
+                //Если группа в группе
+                if (field.component_Type.includes("GroupFieldsInput")) {
+                    return handlerGroupFields(field, values[field.idLine])
+                }
+                //Если таблица 
+                if (field.component_Type.includes("TableFieldsInput")) {
+                    return handlerTableField(field, values[field.idLine])
+                }
+                return fields.push({
+                    name_Key: field.name_Key,
+                    nameOwner_Key: group.name_Key,
+                    label: field.label,
+                    value: values[field.idLine],
+                    value_Type: field.component_Expanded.typeOData,
+                    idLine: field.idLine,
+                })
+                
+            })
+        }
+        
+        //Обработка таблиц
+        const handlerTableField = (tableField, arrValues) => {
+            console.log("tableField: ", tableField);
+            console.log("values_table: ", values);
+            arrValues.forEach((values,indexRow)=>{
+                tableField.component_Expanded.fields.forEach((field) => {
+                    // if (!values[field.idLine]) return false
+                    // //Если адрес в группе
+                    // if (field.component_Type.includes("AddressInput")) {
+                    //     return handlerAddressField(field, values[field.idLine])
+                    // }
+                    // //Если группа в таблице
+                    // if (field.component_Type.includes("GroupFieldsInput")) {
+                    //     return handlerGroupFields(field, values[field.idLine])
+                    // }
+                    return tableFields.push({
+                        name_Key: field.name_Key,
+                        lineNum: indexRow + 1,
+                        nameOwner_Key: tableField.name_Key,
+                        nameTable_Key: tableField.component_Expanded.nameTable_Key,
+                        label: field.label,
+                        value: values[field.idLine],
+                        value_Type: field.component_Expanded.typeOData,
+                        idLine: field.idLine,
+                    })
+    
+                })
+
+            })
+        }
+        //-------------------------------------------
+
+        //Запрос шаблона заявки из 1С
+        const service = await services.getServiceItemByKey(data.service)
+
+        //Перебор всех полей в заявке
+        service.fields.forEach((field) => {
+            if (!data.values[field.idLine]) return false
+            //Если скрытое поле 
+            if (field.component_Type.includes("HiddenInput")) {
+                return fields.push({
+                    // LineNumber: index + 1,
+                    name_Key: field.name_Key,
+                    nameOwner_Key: field.nameOwner_Key,
+                    label: field.label,
+                    value: field.value,
+                    value_Type: field.component_Expanded.typeOData,
+                    idLine: field.idLine,
+                })
+            }
+            //Если адрес 
+            if (field.component_Type.includes("AddressInput")) {
+                return handlerAddressField(field, values[field.idLine])
+            }
+
+            //Если группа 
+            if (field.component_Type.includes("GroupFieldsInput")) {
+                return handlerGroupFields(field, values[field.idLine])
+            }
+            //Если таблица 
+            if (field.component_Type.includes("TableInput")) {
+                return handlerTableField(field, values[field.idLine])
+            }
+
+            return fields.push({
+                // LineNumber: index + 1,
+                name_Key: field.name_Key,
+                nameOwner_Key: field.nameOwner_Key,
+                label: field.label,
+                value: data.values[field.idLine],
+                value_Type: field.component_Expanded.typeOData,
+                idLine: field.idLine,
+            })
+        })
+        fields = fields.map((item, index) => {
+            item.LineNumber = index + 1
+            return item
+        })
+        tableFields = tableFields.map((item, index) => {
+            item.LineNumber = index + 1
+            return item
+        })
+        console.log("fields: ", fields);
+        console.log("tableFields: ", tableFields);
+
+
+        const newClaim = await axios.post(`${server1c}/Document_claimsProject?$format=json`, {
+            fields,
+            tableFields,
+            Date: moment().format(),
+            template_Key: data.service,
+            versionChecksum: service.versionChecksum,
+            idVersion: service.idVersion
+            // profile: userId
+        }, {
+            headers
+        })
+        if (!newClaim.data) {
+            return false
+        }
+        const connectionsOfElements = await axios.post(`${server1c}/InformationRegister_connectionsOfElements?$format=json`, {
+            "Period": moment().format(),
+            "usage": true,
+            "element1": userId,
+            "element1_Type": "StandardODATA.Catalog_profile",
+            "element2": newClaim.data.Ref_Key,
+            "element2_Type": "StandardODATA.Document_claimsProject",
+            "reason": "Установка соединения с профилем при создании заявки"
+        }, {
+            headers
+        })
+
+        return newClaim.data
+
+        return { status: "Проверка ОК" }
     },
 
 }
