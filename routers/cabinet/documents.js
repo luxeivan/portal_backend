@@ -184,6 +184,9 @@ router.get("/by-category", async function (req, res) {
 
   try {
     const requestUrl = `${SERVER_1C}/InformationRegister_connectionsOfElements/SliceLast(,Condition='element2 eq cast(guid'${userId}', 'Catalog_profile')')?$format=json&$expand=element1&$filter=usage eq true and element1/category_Key eq guid'${categoryKey}'`;
+
+    
+    // const requestUrl = `${SERVER_1C}/InformationRegister_connectionsOfElements?$format=json&$expand=element1&$filter=usage eq true and element2_Key eq guid'${userId}' and element1/VidFayla_Key eq guid'${categoryKey}'`;
     const response = await axios.get(requestUrl, { headers });
     const connections = response.data.value;
 
