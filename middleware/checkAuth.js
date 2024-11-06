@@ -8,7 +8,7 @@ module.exports = (req, res, next) => {
         }
         const accessToken = authHeader.split(' ')[1];
         const userData = jwt.verify(accessToken, process.env.JWT_SECRET);
-        console.log(userData)
+        // console.log(userData)
         if (!userData) {
             return res.status(401).json({ status: 'error', message: 'нет авторизации' })
         }
