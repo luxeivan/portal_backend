@@ -22,13 +22,6 @@ const headers = {
   "Content-Type": "application/json",
 };
 
-/**
- * @swagger
- * tags:
- *   - name: Documents
- *     description: Маршруты для работы с документами профиля пользователя
- */
-
 // Новый маршрут для получения категорий документов из 1С
 router.get("/categories", async function (req, res) {
   try {
@@ -54,49 +47,6 @@ router.get("/categories", async function (req, res) {
   }
 });
 
-/**
- * @swagger
- * tags:
- *   - name: Documents
- *     description: Маршруты для работы с документами профиля пользователя
- */
-
-/**
- * @swagger
- * /api/cabinet/documents:
- *   post:
- *     summary: Сохранение документа
- *     description: Сохраняет новый документ в системе.
- *     tags:
- *       - Documents
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               documentName:
- *                 type: string
- *               files:
- *                 type: array
- *                 items:
- *                   type: object
- *                   properties:
- *                     name:
- *                       type: string
- *                       description: Имя файла
- *               nameDoc_Key:
- *                 type: string
- *                 description: Ключ документа
- *     responses:
- *       200:
- *         description: Документ успешно сохранен
- *       400:
- *         description: Нет нужных полей
- *       500:
- *         description: Ошибка при сохранении документа
- */
 
 router.post("/", async function (req, res) {
   try {
@@ -202,62 +152,6 @@ router.get("/by-category", async function (req, res) {
   }
 });
 
-
-// /**
-//  * @swagger
-//  * /api/cabinet/documents:
-//  *   get:
-//  *     summary: Получение документов
-//  *     description: Получает список всех документов пользователя.
-//  *     tags:
-//  *       - Documents
-//  *     responses:
-//  *       200:
-//  *         description: Список документов успешно получен
-//  *       404:
-//  *         description: Нет данных
-//  *       500:
-//  *         description: Ошибка при получении данных
-//  */
-
-// router.get("/", async function (req, res) {
-//   const userId = req.userId;
-
-//   try {
-//     // Получаем документы пользователя из хранилища
-//     const userDocuments = documentsStore[userId] || [];
-
-//     return res.json({
-//       status: "ok",
-//       documents: userDocuments,
-//     });
-//   } catch (error) {
-//     console.error(
-//       `Ошибка при получении документов для пользователя с id: ${userId}. Ошибка: ${error.message}`
-//     );
-//     return res.status(500).json({
-//       status: "error",
-//       message: "Ошибка при получении документов",
-//     });
-//   }
-// });
-
-/**
- * @swagger
- * /api/cabinet/documents/getNameDocs:
- *   get:
- *     summary: Получение наименований документов профиля
- *     description: Получает наименования документов профиля.
- *     tags:
- *       - Documents
- *     responses:
- *       200:
- *         description: Наименования документов успешно получены
- *       404:
- *         description: Нет данных
- *       500:
- *         description: Ошибка при получении данных
- */
 router.get("/getNameDocs", async function (req, res) {
   logger.info("Получен запрос на получение наименований документов профиля");
 
@@ -290,31 +184,6 @@ router.get("/getNameDocs", async function (req, res) {
   }
 });
 
-/**
- * @swagger
- * /api/cabinet/documents/{id}:
- *   get:
- *     summary: Получение документа по ID
- *     description: Получает информацию о документе по его ID.
- *     tags:
- *       - Documents
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: string
- *         description: Идентификатор документа
- *     responses:
- *       200:
- *         description: Документ успешно получен
- *       400:
- *         description: Не верный ID документа
- *       404:
- *         description: Документ не найден
- *       500:
- *         description: Ошибка при получении данных
- */
 router.get("/:id", async function (req, res) {
   const userId = req.userId;
   const idDocument = req.params.id;
@@ -362,48 +231,6 @@ router.get("/:id", async function (req, res) {
   }
 });
 
-/**
- * @swagger
- * /api/cabinet/documents/{id}:
- *   put:
- *     summary: Обновление документа
- *     description: Обновляет информацию о документе по его ID.
- *     tags:
- *       - Documents
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: string
- *         description: Идентификатор документа
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               documentName:
- *                 type: string
- *               files:
- *                 type: array
- *                 items:
- *                   type: object
- *                   properties:
- *                     name:
- *                       type: string
- *               nameDoc_Key:
- *                 type: string
- *                 description: Ключ документа
- *     responses:
- *       200:
- *         description: Документ успешно обновлен
- *       400:
- *         description: Нет нужных полей или неверный ID
- *       500:
- *         description: Ошибка при обновлении документа
- */
 router.put("/:id", async function (req, res) {
   const userId = req.userId;
   const idDocument = req.params.id;
