@@ -60,37 +60,10 @@ router.post("/", async function (req, res) {
     : [req.files.files];
 
   // Получение допустимых расширений и максимального размера из 1С
-  let allowedExtensions = [];
+  let allowedExtensions = ["JPEG", "JPG", "PDF", "HREF", "PNG"];
   let maxSizeFile = 10 * 1024 * 1024; // По умолчанию 10 МБ
   const { categoryKey } = req.body;
   console.log("Полученный categoryKey:", categoryKey);
-
-  try {
-    const requestUrl = `${SERVER_1C}/Catalog_services_categoriesFiles?$format=json&$filter=category_Key eq guid'${categoryKey}'&$expand=category`;
-    console.log("Запрос к 1С:", requestUrl);
-    const response = await axios.get(requestUrl, { headers });
-    console.log("Ответ от 1С:", response.data);
-
-    if (response.data.value && response.data.value.length > 0) {
-      const categoryData = response.data.value[0].category;
-      allowedExtensions = JSON.parse(categoryData.availableExtensionsJSON);
-      maxSizeFile = parseInt(categoryData.maximumSize) * 1024 * 1024;
-      console.log("Допустимые расширения из 1С:", allowedExtensions);
-      console.log("Максимальный размер файла из 1С:", maxSizeFile);
-    } else {
-      console.error("Данные из 1С не найдены для данного categoryKey.");
-      return res.status(400).json({
-        status: "error",
-        message: "Неверный categoryKey или данные не найдены.",
-      });
-    }
-  } catch (error) {
-    console.error("Ошибка при получении данных категории из 1С:", error);
-    return res.status(500).json({
-      status: "error",
-      message: "Ошибка при получении данных категории",
-    });
-  }
 
   // Проверка расширений и размера файлов
   let invalidFile = false;

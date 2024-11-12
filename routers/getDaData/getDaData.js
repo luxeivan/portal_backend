@@ -15,6 +15,8 @@ const getDaDataUrl = (type) => {
       return `${DADATA_BASE_URL}/suggest/fio`;
     case "ИНН":
       return `${DADATA_BASE_URL}/findById/party`;
+    case "БИК":
+      return `${DADATA_BASE_URL}/findById/bank`;
     case "Страна":
     case "Регион":
     case "Город":
