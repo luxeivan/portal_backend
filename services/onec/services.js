@@ -120,7 +120,7 @@ const servicesOneC = {
                                   headers,
                                 }
                               );
-                              console.log(allValues)
+                              // console.log(allValues)
                               tableField.component_Expanded.options =
                                 allValues.data.value
                                   .sort((a, b) => {
@@ -200,10 +200,68 @@ const servicesOneC = {
                     // console.log(item)
                     if (groupFields.data && groupFields.data.value) {
                       item.component_Expanded.fields = groupFields.data.value.sort((a, b) => a.lineNum - b.lineNum)
-
-                      // -------------Если LinkInput (ссылка на справочник и установлен флаг allValues)
+                      
+                      // -------------Проход по типам получаемых полей в группе
                       await Promise.all(item.component_Expanded.fields.map(async item => {
                         return new Promise(async (resolve, reject) => {
+                          // -------------Если таблица
+                          if (item.component_Type.includes("TableInput")) {
+                            const tableFields = await axios.get(
+                              `${server1c}/InformationRegister_portalFields?$format=json&$select=*&$expand=name,component,dependName,dependСondition&$filter=cast(object,'Catalog_componentsTableInput') eq guid'${item.component}'`,
+                              {
+                                headers,
+                              }
+                            );
+                            
+                            if (tableFields.data && tableFields.data.value) {
+                              tableFields.data.value = await Promise.all(
+                                tableFields.data.value.map((tableField) => {
+                                  return new Promise(async (resolve, reject) => {
+                                    if (
+                                      tableField.component_Type.includes("LinkInput") &&
+                                      tableField.component_Expanded.allValues
+                                    ) {
+                                      const allValues = await axios.get(
+                                        `${server1c}${tableField.component_Expanded.linkUrl}`,
+                                        {
+                                          headers,
+                                        }
+                                      );
+                                      // console.log(allValues)
+                                      tableField.component_Expanded.options =
+                                      allValues.data.value
+                                      .sort((a, b) => {
+                                        if (
+                                          a.Description.toLowerCase() <
+                                          b.Description.toLowerCase()
+                                        ) {
+                                          return -1;
+                                        }
+                                        if (
+                                          a.Description.toLowerCase() >
+                                          b.Description.toLowerCase()
+                                        ) {
+                                          return 1;
+                                        }
+                                        return 0;
+                                      })
+                                          .map((item) => ({
+                                            value: item.Ref_Key,
+                                            label: item.Description,
+                                          }));
+                                        }
+                                        resolve(tableField);
+                                      });
+                                    })
+                                  );
+                              item.component_Expanded.fields =
+                                tableFields.data.value.sort(
+                                  (a, b) => a.lineNum - b.lineNum
+                                );
+                              }
+                            }
+                            
+                            // -------------Если LinkInput (ссылка на справочник и установлен флаг allValues)
                           if (
                             item.component_Type.includes("LinkInput") &&
                             item.component_Expanded.allValues
