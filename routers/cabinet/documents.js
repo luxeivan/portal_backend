@@ -27,7 +27,8 @@ router.get("/categories", async function (req, res) {
   try {
     // Шаг 2: Получение категорий документов из 1С
     const response = await axios.get(
-      `${SERVER_1C}/Catalog_services_categoriesFiles/?$format=json&$select=**&$filter=Ref_Key%20eq%20guid'6739b454-176f-11ef-94f0-5ef3fcb042f8'&$expand=category`,
+      // `${SERVER_1C}/Catalog_services_categoriesFiles/?$format=json&$select=**&$filter=Ref_Key eq guid'6739b454-176f-11ef-94f0-5ef3fcb042f8'&$expand=category`,
+      `${SERVER_1C}/Catalog_ВидыФайлов?$format=json&$select=Description,label,Ref_Key,maximumSize`,
       { headers }
     );
 
