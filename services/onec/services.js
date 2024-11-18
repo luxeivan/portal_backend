@@ -53,6 +53,8 @@ const servicesOneC = {
   },
   getServiceItemByKey: async (key, withFields = true) => {
     if (key === '00000000-0000-0000-0000-000000000000') return true;
+    let serviceItem = {}
+
     try {
       const resp = await Promise.all([
         axios.get(
@@ -72,208 +74,178 @@ const servicesOneC = {
       if (!resp[0].data || !resp[0].data.value) {
         console.log("Что-то пошло не так при получении данных.");
         throw new Error("Что-то пошло не так при получении данных.");
+      } else {
+        serviceItem = resp[0].data.value[0]
       }
 
       if (resp[0].data.value.length === 0) {
         console.log("Услуги с таким ключом не существует.");
         throw new Error("Услуги с таким ключом не существует.");
       }
-      // console.log(resp[1].data.value)
-      if (withFields) {
-        try {
-
-          const categoriesFiles = await axios.get(
-            `${server1c}/Catalog_services_categoriesFiles?$format=json&$filter=Ref_Key eq guid'${key}'&$expand=category`,
-            {
-              headers,
-            }
-          );
-          resp[0].data.value[0].categoriesFiles = categoriesFiles.data.value
-        } catch (error) {
-          console.log("categoriesFiles", error.response.data)
+      // } catch (error) {
+      //   console.log('getServiceItemByKey: ', error.message);
+      //   throw new Error("Что-то пошло не так при получении данных заявки.");
+      // }
+      // // console.log(resp[1].data.value)
+      // try {
+      // -------------Функция получения группы-------------------------------------------
+      const getGroupInput = async (guid, item) => {
+        const groupFields = await axios.get(
+          `${server1c}/InformationRegister_portalFields?$format=json&$select=*&$expand=name,dependName,dependСondition,component&$filter=cast(object,'Catalog_componentsGroupFieldsInput') eq guid'${guid}'`,
+          {
+            headers,
+          }
+        );
+        if (groupFields.data && groupFields.data.value) {
+          item.component_Expanded.fields = groupFields.data.value.sort((a, b) => a.lineNum - b.lineNum)
+          // -------------Проход по типам получаемых полей в группе
+          await Promise.all(item.component_Expanded.fields.map(async item => {
+            return new Promise(async (resolve, reject) => {
+              // -------------Если группа
+              if (item.component_Type.includes("GroupFieldsInput")) {
+                return resolve(await getGroupInput(item.component, item))
+              }
+              // -------------Если таблица
+              if (item.component_Type.includes("TableInput")) {
+                return resolve(await getTableInput(item.component, item))
+              }
+              // -------------Если LinkInput (ссылка на справочник и установлен флаг allValues)
+              if (item.component_Type.includes("LinkInput") && item.component_Expanded.allValues) {
+                return resolve(await getLinkInput(item))
+              }
+              return resolve(item);
+            })
+          }))
         }
-        try {
-          resp[0].data.value[0].fields = await Promise.all(
-            resp[1].data.value.map((item) => {
-              return new Promise(async (resolve, reject) => {
-                try {
-                  // -------------Если таблица
-                  if (item.component_Type.includes("TableInput")) {
-                    const tableFields = await axios.get(
-                      `${server1c}/InformationRegister_portalFields?$format=json&$select=*&$expand=name,component,dependName,dependСondition&$filter=cast(object,'Catalog_componentsTableInput') eq guid'${item.component}'`,
-                      {
-                        headers,
-                      }
-                    );
+        // console.log('item in group: ', item.label)
+        return item
+      }
 
-                    if (tableFields.data && tableFields.data.value) {
-                      tableFields.data.value = await Promise.all(
-                        tableFields.data.value.map((tableField) => {
-                          return new Promise(async (resolve, reject) => {
-                            if (
-                              tableField.component_Type.includes("LinkInput") &&
-                              tableField.component_Expanded.allValues
-                            ) {
-                              const allValues = await axios.get(
-                                `${server1c}${tableField.component_Expanded.linkUrl}`,
-                                {
-                                  headers,
-                                }
-                              );
-                              // console.log(allValues)
-                              tableField.component_Expanded.options =
-                                allValues.data.value
-                                  .sort((a, b) => {
-                                    if (
-                                      a.Description.toLowerCase() <
-                                      b.Description.toLowerCase()
-                                    ) {
-                                      return -1;
-                                    }
-                                    if (
-                                      a.Description.toLowerCase() >
-                                      b.Description.toLowerCase()
-                                    ) {
-                                      return 1;
-                                    }
-                                    return 0;
-                                  })
-                                  .map((item) => ({
-                                    value: item.Ref_Key,
-                                    label: item.Description,
-                                  }));
-                            }
-                            resolve(tableField);
-                          });
-                        })
-                      );
-                      item.component_Expanded.fields =
-                        tableFields.data.value.sort(
-                          (a, b) => a.lineNum - b.lineNum
-                        );
+      // -------------Функция получения LinkInput-------------------------------------------
+      const getLinkInput = async (item) => {
+        const allValues = await axios.get(
+          `${server1c}${item.component_Expanded.linkUrl}`,
+          {
+            headers,
+          }
+        );
+        if (allValues.data && allValues.data.value) {
+          item.component_Expanded.options = allValues.data.value
+            .sort((a, b) => {
+              if (
+                a.Description.toLowerCase() <
+                b.Description.toLowerCase()
+              ) {
+                return -1;
+              }
+              if (
+                a.Description.toLowerCase() >
+                b.Description.toLowerCase()
+              ) {
+                return 1;
+              }
+              return 0;
+            })
+            .map((item) => ({
+              value: item.Ref_Key,
+              label: item.Description,
+              unit: item['ЕдиницаИзмерения']?.Description
+            }));
+        }
+        return item
+      }
+
+      // -------------Функция получения TableInput-------------------------------------------
+      const getTableInput = async (guid, item) => {
+        const tableFields = await axios.get(
+          `${server1c}/InformationRegister_portalFields?$format=json&$select=*&$expand=name,component,dependName,dependСondition&$filter=cast(object,'Catalog_componentsTableInput') eq guid'${guid}'`,
+          {
+            headers,
+          }
+        );
+        console.log('tableFields: ',tableFields)
+        if (tableFields.data && tableFields.data.value) {
+          tableFields.data.value = await Promise.all(
+            tableFields.data.value.map((tableField) => {
+              return new Promise(async (resolve, reject) => {
+                if (tableField.component_Type.includes("LinkInput") && tableField.component_Expanded.allValues) {
+                  return resolve(await getLinkInput(item))
+                }
+                resolve(tableField);
+              });
+            })
+          );
+          item.component_Expanded.fields =
+            tableFields.data.value.sort(
+              (a, b) => a.lineNum - b.lineNum
+            );
+        }
+        return item
+      }
+
+      // -------------Если надо получать поля услуги-------------------------------------------
+      if (withFields) {
+        serviceItem.fields = await Promise.all(resp[1].data.value.map(item => {
+
+          return new Promise(async (resolve, reject) => {
+            if (item.component_Type.includes("GroupFieldsInput")) {
+              // console.log('GroupFieldsInput')
+              return resolve(await getGroupInput(item.component, item))
+            }
+            if (item.component_Type.includes("TableInput")) {
+              return resolve(await getTableInput(item.component, item))
+            }
+            // -------------Если LinkInput (ссылка на справочник и установлен флаг allValues)
+            if (item.component_Type.includes("LinkInput") && item.component_Expanded.allValues) {
+              return resolve(await getLinkInput(item))
+            }
+            return resolve(item)
+          })
+
+        }))
+      }
+      if (withFields) {
+        // console.log('serviceItem: ', serviceItem)
+      }
+      return serviceItem;
+    } catch (error) {
+      console.log('getServiceItemByKeyFields: ', error.message);
+      throw new Error("Что-то пошло не так при получении данных полей заявки.");
+    }
+  },
+  getServiceItemByKey_old: async (key, withFields = true) => {
+    if (withFields) {
+      try {
+        resp[0].data.value[0].fields = await Promise.all(
+          resp[1].data.value.map((item) => {
+            return new Promise(async (resolve, reject) => {
+              try {
+                // -------------Если таблица
+                if (item.component_Type.includes("TableInput")) {
+                  const tableFields = await axios.get(
+                    `${server1c}/InformationRegister_portalFields?$format=json&$select=*&$expand=name,component,dependName,dependСondition&$filter=cast(object,'Catalog_componentsTableInput') eq guid'${item.component}'`,
+                    {
+                      headers,
                     }
-                  }
-                  // -------------Если LinkInput (ссылка на справочник и установлен флаг allValues)
-                  if (
-                    item.component_Type.includes("LinkInput") &&
-                    item.component_Expanded.allValues
-                  ) {
-                    const allValues = await axios.get(
-                      `${server1c}${item.component_Expanded.linkUrl}`,
-                      {
-                        headers,
-                      }
-                    );
-                    if (allValues.data && allValues.data.value) {
-                      item.component_Expanded.options = allValues.data.value
-                        .sort((a, b) => {
-                          if (
-                            a.Description.toLowerCase() <
-                            b.Description.toLowerCase()
-                          ) {
-                            return -1;
-                          }
-                          if (
-                            a.Description.toLowerCase() >
-                            b.Description.toLowerCase()
-                          ) {
-                            return 1;
-                          }
-                          return 0;
-                        })
-                        .map((item) => ({
-                          value: item.Ref_Key,
-                          label: item.Description,
-                          unit: item['ЕдиницаИзмерения']?.Description
-                        }));
-                    }
-                  }
-                  // -------------Если GroupFieldsInput
-                  if (item.component_Type.includes("GroupFieldsInput")) {
-                    // console.log(`${server1c}/InformationRegister_portalFields?$format=json&$select=*&$expand=name,component,dependName,dependСondition&$filter=cast(object,'Catalog_componentsGroupFieldsInput') eq guid'${item.component}'`)
-                    const groupFields = await axios.get(
-                      `${server1c}/InformationRegister_portalFields?$format=json&$select=*&$expand=name,component,dependName,dependСondition&$filter=cast(object,'Catalog_componentsGroupFieldsInput') eq guid'${item.component}'`,
-                      {
-                        headers,
-                      }
-                    );
-                    // console.log(item)
-                    if (groupFields.data && groupFields.data.value) {
-                      item.component_Expanded.fields = groupFields.data.value.sort((a, b) => a.lineNum - b.lineNum)
-                      
-                      // -------------Проход по типам получаемых полей в группе
-                      await Promise.all(item.component_Expanded.fields.map(async item => {
+                  );
+
+                  if (tableFields.data && tableFields.data.value) {
+                    tableFields.data.value = await Promise.all(
+                      tableFields.data.value.map((tableField) => {
                         return new Promise(async (resolve, reject) => {
-                          // -------------Если таблица
-                          if (item.component_Type.includes("TableInput")) {
-                            const tableFields = await axios.get(
-                              `${server1c}/InformationRegister_portalFields?$format=json&$select=*&$expand=name,component,dependName,dependСondition&$filter=cast(object,'Catalog_componentsTableInput') eq guid'${item.component}'`,
-                              {
-                                headers,
-                              }
-                            );
-                            
-                            if (tableFields.data && tableFields.data.value) {
-                              tableFields.data.value = await Promise.all(
-                                tableFields.data.value.map((tableField) => {
-                                  return new Promise(async (resolve, reject) => {
-                                    if (
-                                      tableField.component_Type.includes("LinkInput") &&
-                                      tableField.component_Expanded.allValues
-                                    ) {
-                                      const allValues = await axios.get(
-                                        `${server1c}${tableField.component_Expanded.linkUrl}`,
-                                        {
-                                          headers,
-                                        }
-                                      );
-                                      // console.log(allValues)
-                                      tableField.component_Expanded.options =
-                                      allValues.data.value
-                                      .sort((a, b) => {
-                                        if (
-                                          a.Description.toLowerCase() <
-                                          b.Description.toLowerCase()
-                                        ) {
-                                          return -1;
-                                        }
-                                        if (
-                                          a.Description.toLowerCase() >
-                                          b.Description.toLowerCase()
-                                        ) {
-                                          return 1;
-                                        }
-                                        return 0;
-                                      })
-                                          .map((item) => ({
-                                            value: item.Ref_Key,
-                                            label: item.Description,
-                                          }));
-                                        }
-                                        resolve(tableField);
-                                      });
-                                    })
-                                  );
-                              item.component_Expanded.fields =
-                                tableFields.data.value.sort(
-                                  (a, b) => a.lineNum - b.lineNum
-                                );
-                              }
-                            }
-                            
-                            // -------------Если LinkInput (ссылка на справочник и установлен флаг allValues)
                           if (
-                            item.component_Type.includes("LinkInput") &&
-                            item.component_Expanded.allValues
+                            tableField.component_Type.includes("LinkInput") &&
+                            tableField.component_Expanded.allValues
                           ) {
                             const allValues = await axios.get(
-                              `${server1c}${item.component_Expanded.linkUrl}`,
+                              `${server1c}${tableField.component_Expanded.linkUrl}`,
                               {
                                 headers,
                               }
                             );
-                            if (allValues.data && allValues.data.value) {
-                              item.component_Expanded.options = allValues.data.value
+                            // console.log(allValues)
+                            tableField.component_Expanded.options =
+                              allValues.data.value
                                 .sort((a, b) => {
                                   if (
                                     a.Description.toLowerCase() <
@@ -292,50 +264,197 @@ const servicesOneC = {
                                 .map((item) => ({
                                   value: item.Ref_Key,
                                   label: item.Description,
-                                  unit: item['ЕдиницаИзмерения']?.Description
                                 }));
-                            }
                           }
-                          resolve(item);
-                        })
-                      }))
-
-
-
+                          resolve(tableField);
+                        });
+                      })
+                    );
+                    item.component_Expanded.fields =
+                      tableFields.data.value.sort(
+                        (a, b) => a.lineNum - b.lineNum
+                      );
+                  }
+                }
+                // -------------Если LinkInput (ссылка на справочник и установлен флаг allValues)
+                if (
+                  item.component_Type.includes("LinkInput") &&
+                  item.component_Expanded.allValues
+                ) {
+                  const allValues = await axios.get(
+                    `${server1c}${item.component_Expanded.linkUrl}`,
+                    {
+                      headers,
                     }
+                  );
+                  if (allValues.data && allValues.data.value) {
+                    item.component_Expanded.options = allValues.data.value
+                      .sort((a, b) => {
+                        if (
+                          a.Description.toLowerCase() <
+                          b.Description.toLowerCase()
+                        ) {
+                          return -1;
+                        }
+                        if (
+                          a.Description.toLowerCase() >
+                          b.Description.toLowerCase()
+                        ) {
+                          return 1;
+                        }
+                        return 0;
+                      })
+                      .map((item) => ({
+                        value: item.Ref_Key,
+                        label: item.Description,
+                        unit: item['ЕдиницаИзмерения']?.Description
+                      }));
+                  }
+                }
+                // -------------Если GroupFieldsInput
+                if (item.component_Type.includes("GroupFieldsInput")) {
+                  // console.log(`${server1c}/InformationRegister_portalFields?$format=json&$select=*&$expand=name,component,dependName,dependСondition&$filter=cast(object,'Catalog_componentsGroupFieldsInput') eq guid'${item.component}'`)
+                  const groupFields = await axios.get(
+                    `${server1c}/InformationRegister_portalFields?$format=json&$select=*&$expand=name,component,dependName,dependСondition&$filter=cast(object,'Catalog_componentsGroupFieldsInput') eq guid'${item.component}'`,
+                    {
+                      headers,
+                    }
+                  );
+                  // console.log(item)
+                  if (groupFields.data && groupFields.data.value) {
+                    item.component_Expanded.fields = groupFields.data.value.sort((a, b) => a.lineNum - b.lineNum)
+
+                    // -------------Проход по типам получаемых полей в группе
+                    await Promise.all(item.component_Expanded.fields.map(async item => {
+                      return new Promise(async (resolve, reject) => {
+                        // -------------Если таблица
+                        if (item.component_Type.includes("TableInput")) {
+                          const tableFields = await axios.get(
+                            `${server1c}/InformationRegister_portalFields?$format=json&$select=*&$expand=name,component,dependName,dependСondition&$filter=cast(object,'Catalog_componentsTableInput') eq guid'${item.component}'`,
+                            {
+                              headers,
+                            }
+                          );
+
+                          if (tableFields.data && tableFields.data.value) {
+                            tableFields.data.value = await Promise.all(
+                              tableFields.data.value.map((tableField) => {
+                                return new Promise(async (resolve, reject) => {
+                                  if (
+                                    tableField.component_Type.includes("LinkInput") &&
+                                    tableField.component_Expanded.allValues
+                                  ) {
+                                    const allValues = await axios.get(
+                                      `${server1c}${tableField.component_Expanded.linkUrl}`,
+                                      {
+                                        headers,
+                                      }
+                                    );
+                                    // console.log(allValues)
+                                    tableField.component_Expanded.options =
+                                      allValues.data.value
+                                        .sort((a, b) => {
+                                          if (
+                                            a.Description.toLowerCase() <
+                                            b.Description.toLowerCase()
+                                          ) {
+                                            return -1;
+                                          }
+                                          if (
+                                            a.Description.toLowerCase() >
+                                            b.Description.toLowerCase()
+                                          ) {
+                                            return 1;
+                                          }
+                                          return 0;
+                                        })
+                                        .map((item) => ({
+                                          value: item.Ref_Key,
+                                          label: item.Description,
+                                        }));
+                                  }
+                                  resolve(tableField);
+                                });
+                              })
+                            );
+                            item.component_Expanded.fields =
+                              tableFields.data.value.sort(
+                                (a, b) => a.lineNum - b.lineNum
+                              );
+                          }
+                        }
+
+                        // -------------Если LinkInput (ссылка на справочник и установлен флаг allValues)
+                        if (
+                          item.component_Type.includes("LinkInput") &&
+                          item.component_Expanded.allValues
+                        ) {
+                          const allValues = await axios.get(
+                            `${server1c}${item.component_Expanded.linkUrl}`,
+                            {
+                              headers,
+                            }
+                          );
+                          if (allValues.data && allValues.data.value) {
+                            item.component_Expanded.options = allValues.data.value
+                              .sort((a, b) => {
+                                if (
+                                  a.Description.toLowerCase() <
+                                  b.Description.toLowerCase()
+                                ) {
+                                  return -1;
+                                }
+                                if (
+                                  a.Description.toLowerCase() >
+                                  b.Description.toLowerCase()
+                                ) {
+                                  return 1;
+                                }
+                                return 0;
+                              })
+                              .map((item) => ({
+                                value: item.Ref_Key,
+                                label: item.Description,
+                                unit: item['ЕдиницаИзмерения']?.Description
+                              }));
+                          }
+                        }
+                        resolve(item);
+                      })
+                    }))
+
+
 
                   }
-                  resolve(item);
-                } catch (error) {
-                  reject(error);
+
                 }
-              });
-            })
-          );
-        } catch (error) {
-          console.log(error.message);
-          throw new Error("Что-то пошло не так при получении данных.");
-        }
-      }
-      if (resp[0].data.value[0].categoriesFiles && resp[0].data.value[0].categoriesFiles.length > 0) {
-        const typeDocs = await axios.get(
-          `${server1c}/Catalog_ВидыФайлов?$format=json`,
-          {
-            headers,
-          }
+                resolve(item);
+              } catch (error) {
+                reject(error);
+              }
+            });
+          })
         );
-        // console.log('typeDocs: ', typeDocs)
-        resp[0].data.value[0].categoriesFiles.map(item => {
-          item.categoryName = typeDocs.data.value.find(val => val.Ref_Key === item.category_Key).Description
-          return item
-        })
+      } catch (error) {
+        console.log(error.message);
+        throw new Error("Что-то пошло не так при получении данных.");
       }
-      return resp[0].data.value[0];
-    } catch (error) {
-      console.log('getServiceItemByKey: ', error.message);
-      throw new Error("Что-то пошло не так при получении данных.");
     }
-  },
+    // if (resp[0].data.value[0].categoriesFiles && resp[0].data.value[0].categoriesFiles.length > 0) {
+    //   const typeDocs = await axios.get(
+    //     `${server1c}/Catalog_ВидыФайлов?$format=json`,
+    //     {
+    //       headers,
+    //     }
+    //   );
+    //   // console.log('typeDocs: ', typeDocs)
+    //   resp[0].data.value[0].categoriesFiles.map(item => {
+    //     item.categoryName = typeDocs.data.value.find(val => val.Ref_Key === item.category_Key).Description
+    //     return item
+    //   })
+    // }
+  }
+
 };
 
 module.exports = servicesOneC;
