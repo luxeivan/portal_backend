@@ -133,14 +133,14 @@ const servicesOneC = {
           item.component_Expanded.options = allValues.data.value
             .sort((a, b) => {
               if (
-                a.Description.toLowerCase() <
-                b.Description.toLowerCase()
+                a.Description?.toLowerCase() <
+                b.Description?.toLowerCase()
               ) {
                 return -1;
               }
               if (
-                a.Description.toLowerCase() >
-                b.Description.toLowerCase()
+                a.Description?.toLowerCase() >
+                b.Description?.toLowerCase()
               ) {
                 return 1;
               }
