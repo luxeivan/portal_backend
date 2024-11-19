@@ -110,7 +110,7 @@ const servicesOneC = {
                 return resolve(await getTableInput(item.component, item))
               }
               // -------------Если LinkInput (ссылка на справочник и установлен флаг allValues)
-              if (item.component_Type.includes("LinkInput") && item.component_Expanded.allValues) {
+              if (item.component_Type.includes("LinkInput") && item.component_Expanded?.allValues) {
                 return resolve(await getLinkInput(item))
               }
               return resolve(item);
@@ -123,6 +123,8 @@ const servicesOneC = {
 
       // -------------Функция получения LinkInput-------------------------------------------
       const getLinkInput = async (item) => {
+        // console.log(item.component_Expanded.linkUrl);
+
         const allValues = await axios.get(
           `${server1c}${item.component_Expanded.linkUrl}`,
           {
@@ -130,6 +132,7 @@ const servicesOneC = {
           }
         );
         if (allValues.data && allValues.data.value) {
+          // console.log(allValues.data.value[0])
           item.component_Expanded.options = allValues.data.value
             .sort((a, b) => {
               if (
@@ -163,22 +166,21 @@ const servicesOneC = {
             headers,
           }
         );
-        console.log('tableFields: ',tableFields)
+        // console.log('tableFields: ',tableFields)
         if (tableFields.data && tableFields.data.value) {
           tableFields.data.value = await Promise.all(
             tableFields.data.value.map((tableField) => {
               return new Promise(async (resolve, reject) => {
-                if (tableField.component_Type.includes("LinkInput") && tableField.component_Expanded.allValues) {
-                  return resolve(await getLinkInput(item))
+                if (tableField.component_Type.includes("LinkInput") && tableField.component_Expanded?.allValues) {
+                  // console.log(item)
+                  return resolve(await getLinkInput(tableField))
                 }
                 resolve(tableField);
               });
             })
           );
           item.component_Expanded.fields =
-            tableFields.data.value.sort(
-              (a, b) => a.lineNum - b.lineNum
-            );
+            tableFields.data.value.sort((a, b) => a.lineNum - b.lineNum);
         }
         return item
       }
