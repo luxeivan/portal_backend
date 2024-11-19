@@ -60,7 +60,7 @@ router.post("/", async function (req, res) {
     : [req.files.files];
 
   // Получение допустимых расширений и максимального размера из 1С
-  let allowedExtensions = ["JPEG", "JPG", "PDF", "HREF", "PNG"];
+  let allowedExtensions = ["JPEG", "JPG", "PDF", "PNG"];
   let maxSizeFile = 10 * 1024 * 1024; // По умолчанию 10 МБ
   const { categoryKey } = req.body;
   console.log("Полученный categoryKey:", categoryKey);
