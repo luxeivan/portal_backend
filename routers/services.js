@@ -190,10 +190,8 @@ router.get("/item/:key", async (req, res) => {
     // logger.info(`Элемент услуги с ключом ${key} успешно получен`);
     // console.log('services: ', services)
     res.json(services);
-  } catch (error) {    
-    logger.error(
-      `Ошибка при получении элемента услуги с ключом ${req.params.key}: ${error.message}`
-    );
+  } catch (error) {
+    logger.error(`Ошибка при получении элемента услуги с ключом ${req.params.key}: ${error.message}`);
     res.status(500).json({
       status: "error",
       message: "Ошибка при получении элемента услуги",

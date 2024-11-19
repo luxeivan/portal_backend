@@ -19,7 +19,7 @@ const otherServices = {
                     headers,
                 }
             );
-            console.log('response.data: ', response.data);
+            // console.log('response.data: ', response.data);
             if (response.data && response.data.value && response.data.value.length > 0) {
                 console.log(response.data.value[0]);
 
