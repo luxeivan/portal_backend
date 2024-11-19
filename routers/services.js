@@ -188,8 +188,9 @@ router.get("/item/:key", async (req, res) => {
     // console.log('withFields: ', withFields)
     const services = await getServiceItemByKey(key, withFields);
     // logger.info(`Элемент услуги с ключом ${key} успешно получен`);
+    // console.log('services: ', services)
     res.json(services);
-  } catch (error) {
+  } catch (error) {    
     logger.error(
       `Ошибка при получении элемента услуги с ключом ${req.params.key}: ${error.message}`
     );
