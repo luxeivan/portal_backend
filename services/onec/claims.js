@@ -219,7 +219,7 @@ const claimsOneC = {
         const handlerAddressField = (address, values) => {
             console.log("address: ", address);
             console.log("address_values: ", values);
-            if (!values.fullAddress) return false
+            if (!values?.fullAddress) return false
             return fields.push({
                 name_Key: address.name_Key,
                 nameOwner_Key: address.nameOwner_Key,
@@ -230,40 +230,47 @@ const claimsOneC = {
             })
         }
         //Обработка групп полей-------------------------------------------
-        const handlerGroupFields = (group, values) => {
+        const handlerGroupFields = (group) => {
             // console.log("group: ", group);
             //Перебираем все поля в группе
-            group.component_Expanded.fields.forEach((field) => {
-                if (!values[field.idLine]) return false
-                //Если адрес в группе
-                if (field.component_Type.includes("AddressInput")) {
-                    return handlerAddressField(field, values[field.idLine])
-                }
-                //Если группа в группе
-                if (field.component_Type.includes("GroupFieldsInput")) {
-                    return handlerGroupFields(field, values[field.idLine])
-                }
-                //Если таблица 
-                if (field.component_Type.includes("TableFieldsInput")) {
-                    return handlerTableField(field, values[field.idLine])
-                }
-                return fields.push({
-                    name_Key: field.name_Key,
-                    nameOwner_Key: group.name_Key,
-                    label: field.label,
-                    value: values[field.idLine],
-                    value_Type: field.component_Expanded.typeOData,
-                    idLine: field.idLine,
+            try {
+
+                group.component_Expanded.fields.forEach((field) => {
+                    if (typeof values[field.idLine] === "undefined" || values[field.idLine] === "") return false
+                    //Если адрес в группе
+                    if (field.component_Type.includes("AddressInput")) {
+                        return handlerAddressField(field, values[field.idLine])
+                    }
+                    //Если группа в группе
+                    if (field.component_Type.includes("GroupFieldsInput")) {
+                        return handlerGroupFields(field)
+                    }
+                    //Если таблица 
+                    if (field.component_Type.includes("TableFieldsInput")) {
+                        return handlerTableField(field, values[field.idLine])
+                    }
+                    console.log("group: ", group)
+                    return fields.push({
+                        name_Key: field.name_Key,
+                        nameOwner_Key: group.name_Key,
+                        label: field.label,
+                        value: values[field.idLine],
+                        value_Type: field.component_Expanded.typeOData,
+                        idLine: field.idLine,
+                    })
+
                 })
-                
-            })
+            } catch (error) {
+                console.log(error);
+                throw error
+            }
         }
-        
+
         //Обработка таблиц
         const handlerTableField = (tableField, arrValues) => {
             console.log("tableField: ", tableField);
             console.log("values_table: ", values);
-            arrValues.forEach((values,indexRow)=>{
+            arrValues.forEach((values, indexRow) => {
                 tableField.component_Expanded.fields.forEach((field) => {
                     // if (!values[field.idLine]) return false
                     // //Если адрес в группе
@@ -284,7 +291,7 @@ const claimsOneC = {
                         value_Type: field.component_Expanded.typeOData,
                         idLine: field.idLine,
                     })
-    
+
                 })
 
             })
@@ -296,7 +303,11 @@ const claimsOneC = {
 
         //Перебор всех полей в заявке
         service.fields.forEach((field) => {
-            if (!data.values[field.idLine]) return false
+            if (values[field.idLine] === "") { return false }
+
+            //Если Divider 
+            if (field.component_Type.includes("Divider")) { return false }
+
             //Если скрытое поле 
             if (field.component_Type.includes("HiddenInput")) {
                 return fields.push({
@@ -315,8 +326,9 @@ const claimsOneC = {
             }
 
             //Если группа 
+            // console.log("field: ", field.component_Type);
             if (field.component_Type.includes("GroupFieldsInput")) {
-                return handlerGroupFields(field, values[field.idLine])
+                return handlerGroupFields(field)
             }
             //Если таблица 
             if (field.component_Type.includes("TableInput")) {
@@ -341,7 +353,7 @@ const claimsOneC = {
             item.LineNumber = index + 1
             return item
         })
-        console.log("fields: ", fields);
+        // console.log("fields: ", fields);
         console.log("tableFields: ", tableFields);
 
 
