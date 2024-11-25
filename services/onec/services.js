@@ -27,25 +27,41 @@ const servicesOneC = {
   },
   getServicesByKey: async (key = "00000000-0000-0000-0000-000000000000") => {
     try {
-      const response = await axios.get(
+      const response = await Promise.all([axios.get(
         `${server1c}/Catalog_services?$format=json&$filter=DeletionMark eq false and usage eq true and Parent_Key eq guid'${key}' and (( year(beginDate) eq 0001 or (year(beginDate) le ${moment().year()} and month(beginDate) le ${moment().month() + 1
         } and day(beginDate) le ${moment().date()})) and ( year(endDate) eq 0001 or (year(endDate) ne 0001 and year(endDate) ge ${moment().year()} and month(endDate) ge ${moment().month()} and day(endDate) ge ${moment().date()})))`,
         {
           headers,
         }
-      );
+      ).catch(err => { throw new Error("Ошибка получения услуг") }),
+      axios.get(
+        `${server1c}/Catalog_tags?$format=json&$expand=color`,
+        {
+          headers,
+        }
+      ).catch(err => { throw new Error("Ошибка получения тэгов услуги") }),
+      ])
       // console.log('response.data: ', response.data);
 
-      if (!response.data) {
+      if (!response[0].data) {
         return false;
       }
-      await Promise.all(response.data.value.map(async item => {
-        return new Promise(async (resolve, reject) => {
-          if (item.picture_Key && item.picture_Key !== '00000000-0000-0000-0000-000000000000') item.picture = await servicesOneC.getPictureFile(item.picture_Key)
-          resolve(item);
+      response[0].data.value = response[0].data.value.map(item => {
+        item.tags = item.tags.map(item=>{
+          item.tag = response[1].data.value.find(tag => item.tag_Key === tag.Ref_Key)
+          return item
         })
-      }))
-      return response.data;
+        return item
+      })
+      // await Promise.all(response.data.value.map(async item => {
+      //   return new Promise(async (resolve, reject) => {
+      //     if (item.picture_Key && item.picture_Key !== '00000000-0000-0000-0000-000000000000') item.picture = await servicesOneC.getPictureFile(item.picture_Key)
+      //     resolve(item);
+      //   })
+      // }))
+      // console.log("response[1].data.value",response[1].data.value);
+
+      return response[0].data;
     } catch (error) {
       console.log('getServicesByKey: ', error.message);
       return false;
@@ -62,13 +78,19 @@ const servicesOneC = {
           {
             headers,
           }
-        ).catch(err=>{throw new Error("Ошибка получения услуги")}),
+        ).catch(err => { throw new Error("Ошибка получения услуги") }),
         withFields ? axios.get(
           `${server1c}/InformationRegister_portalFields?$format=json&$select=*&$expand=name,component,dependName,dependСondition&$filter=cast(object,'Catalog_services') eq guid'${key}'`,
           {
             headers,
           }
-        ).catch(err=>{throw new Error("Ошибка получения полей услуги")}) : false,
+        ).catch(err => { throw new Error("Ошибка получения полей услуги") }) : false,
+        axios.get(
+          `${server1c}/Catalog_services_tags?$format=json&$expand=tag/color&$filter=Ref_Key eq guid'${key}'`,
+          {
+            headers,
+          }
+        ).catch(err => { throw new Error("Ошибка получения тэгов услуги") }),
       ]);
 
       if (!resp[0].data || !resp[0].data.value) {
@@ -82,6 +104,8 @@ const servicesOneC = {
         console.log("Услуги с таким ключом не существует.");
         throw new Error("Услуги с таким ключом не существует.");
       }
+
+      serviceItem.tags = resp[2].data.value
       // } catch (error) {
       //   console.log('getServiceItemByKey: ', error.message);
       //   throw new Error("Что-то пошло не так при получении данных заявки.");
