@@ -15,8 +15,15 @@ const headers = {
 router.get("/", async (req, res) => {
   try {
     //Запрашиваем инфу
+    // const hotQuestions = await axios.get(
+    //   `${SERVER_1C}/Catalog_quickAnswers/?$format=json`,
+    //   { headers }
+    // );
+
+    //$filter=DeletionMark%20eq%20false фильтр говорит серверу вернуть только те записи, у которых поле DeletionMark равно false, то есть объекты, не помеченные на удаление.
+
     const hotQuestions = await axios.get(
-      `${SERVER_1C}/Catalog_quickAnswers/?$format=json`,
+      `${SERVER_1C}/Catalog_quickAnswers/?$format=json&$filter=DeletionMark%20eq%20false`,
       { headers }
     );
 
@@ -31,7 +38,7 @@ router.get("/", async (req, res) => {
       answer: item.answer,
     }));
 
-    // console.log("Проверяем что тут приходит", formattedQuestions);
+    console.log("Проверяем что тут приходит", formattedQuestions);
 
     res.status(200).json(formattedQuestions);
   } catch (error) {
