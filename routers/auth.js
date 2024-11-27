@@ -86,7 +86,7 @@ router.post(
       }
 
       const founduser = await getUserByEmail(req.body.email.toLowerCase());
-      console.log("founduser", founduser);
+      // console.log("founduser", founduser);
 
       if (
         founduser &&

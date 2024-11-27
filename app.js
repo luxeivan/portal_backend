@@ -51,7 +51,7 @@ app.use(
       httpOnly: true,
       maxAge: 100000,
       sameSite: "none",
-      domain: "luxeivan.ru",
+      domain: process.env.DOMAIN,
       secure: true,
     },
     store: new FileStore({ retries: 1 }),
