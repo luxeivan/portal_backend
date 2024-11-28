@@ -34,10 +34,10 @@ function getRandomClaimData(serviceId) {
   return {
     service: serviceId,
     values: {
-      // Заполните необходимые поля заявки случайными данными
+
       field1: `value_${Math.floor(Math.random() * 1000000)}`,
       field2: `value_${Math.floor(Math.random() * 1000000)}`,
-      // Добавьте необходимые поля в соответствии с вашим API
+    
     },
   };
 }
