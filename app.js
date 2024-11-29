@@ -18,6 +18,7 @@ const formonec = require("./routers/formonec");
 const getDaData = require("./routers/getDaData/getDaData");
 const contactRouter = require("./routers/contact");
 const chatRouter = require("./routers/chatRouter");
+const hotQuestionsRouter = require("./routers/hotquestions");
 
 const session = require("express-session");
 
@@ -116,6 +117,7 @@ app.use("/api/formonec", formonec);
 app.use("/api/getDaData", getDaData);
 app.use("/api/contacts", contactRouter);
 app.use("/api/chat", chatRouter);
+app.use("/api/hotQuestions", hotQuestionsRouter);
 
 swaggerSetup(app);
 
