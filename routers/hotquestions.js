@@ -1,5 +1,6 @@
 const express = require("express");
 const axios = require("axios");
+const logger = require("../logger");
 require("dotenv").config();
 
 const router = express.Router();
@@ -15,13 +16,6 @@ const headers = {
 router.get("/", async (req, res) => {
   try {
     //Запрашиваем инфу
-    // const hotQuestions = await axios.get(
-    //   `${SERVER_1C}/Catalog_quickAnswers/?$format=json`,
-    //   { headers }
-    // );
-
-    //$filter=DeletionMark%20eq%20false фильтр говорит серверу вернуть только те записи, у которых поле DeletionMark равно false, то есть объекты, не помеченные на удаление.
-
     const hotQuestions = await axios.get(
       `${SERVER_1C}/Catalog_quickAnswers/?$format=json&$filter=DeletionMark%20eq%20false`,
       { headers }
