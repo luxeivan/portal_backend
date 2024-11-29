@@ -10,4 +10,4 @@ Linux (Debian/Ubuntu): sudo apt install k6
 
 node processResults.js 
 
-5) Удали файлик summary.json для следующей проверки 
+5) Удали файлик summary.json для следующе
