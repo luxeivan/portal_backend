@@ -5,9 +5,9 @@ export let options = {
   scenarios: {
     contacts: {
       executor: "constant-arrival-rate",
-      rate: 1000, // Количество запросов в секунду
+      rate: 100, // Количество запросов в секунду
       timeUnit: "1s", // Единица времени для параметра rate
-      duration: "10s", // Общая длительность теста
+      duration: "60s", // Общая длительность теста
       preAllocatedVUs: 50, // Начальное количество виртуальных пользователей
       maxVUs: 1000, // Максимальное количество виртуальных пользователей
     },
@@ -15,7 +15,7 @@ export let options = {
 };
 
 export default function () {
-  let res = http.get("https://portal.mosoblenergo.ru:5443/api/hotQuestions");
+  let res = http.get("https://portal.mosoblenergo.ru:5443/api/services/item/a90f7aa3-16ef-11ef-8681-c8d9d20cde1f?withFields=false");
   // let res = http.get('https://portal.mosoblenergo.ru/api/services');
 
   check(res, {
