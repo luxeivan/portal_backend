@@ -15,8 +15,8 @@ export let options = {
 };
 
 export default function () {
-  let res = http.get("https://portal.mosoblenergo.ru:5443/api/services/item/a90f7aa3-16ef-11ef-8681-c8d9d20cde1f?withFields=false");
-  // let res = http.get('https://portal.mosoblenergo.ru/api/services');
+  // let res = http.get("https://portal.mosoblenergo.ru:5443/api/hotQuestions");
+  let res = http.get('https://portal.mosoblenergo.ru:5443/api/services/item/0910d651-978b-11ef-9501-5ef3fcb042f8?withFields=false');
 
   check(res, {
     "Статус код 200": (r) => r.status === 200,
