@@ -3,6 +3,7 @@ const moment = require("moment");
 require("dotenv").config();
 
 const server1c = process.env.SERVER_1C;
+const server1cHttpService = process.env.SERVER_1C_HTTP_SERVICE;
 const server1c_auth = process.env.SERVER_1C_AUTHORIZATION;
 const headers = {
   Authorization: server1c_auth,
@@ -80,11 +81,17 @@ const servicesOneC = {
           }
         ).catch(err => { throw new Error("Ошибка получения услуги") }),
         withFields ? axios.get(
-          `${server1c}/InformationRegister_portalFields?$format=json&$select=*&$expand=name,component,dependName,dependСondition&$filter=cast(object,'Catalog_services') eq guid'${key}'`,
+          `${server1cHttpService}/portalFilds/services/${key}'`,
           {
             headers,
           }
         ).catch(err => { throw new Error("Ошибка получения полей услуги") }) : false,
+        // withFields ? axios.get(
+        //   `${server1c}/InformationRegister_portalFields?$format=json&$select=*&$expand=name,component,dependName,dependСondition&$filter=cast(object,'Catalog_services') eq guid'${key}'`,
+        //   {
+        //     headers,
+        //   }
+        // ).catch(err => { throw new Error("Ошибка получения полей услуги") }) : false,
         axios.get(
           `${server1c}/Catalog_services_tags?$format=json&$expand=tag/color&$filter=Ref_Key eq guid'${key}'`,
           {
@@ -232,284 +239,47 @@ const servicesOneC = {
 
       // -------------Если надо получать поля услуги-------------------------------------------
       if (withFields) {
-        serviceItem.fields = await Promise.all(resp[1].data.value.map(item => {
+        serviceItem.fields = resp[1].data.fields
+        serviceItem.styles = resp[1].data.styles
+        serviceItem.links = resp[1].data.links
+        serviceItem.idVersion = resp[1].data.idVersion
+        // await Promise.all(resp[1].data.value.map(item => {
 
-          return new Promise(async (resolve, reject) => {
+        //   return new Promise(async (resolve, reject) => {
 
-            if (item.component_Type.includes("GroupFieldsInput")) {
-              try {
-                return resolve(await getGroupInput(item.component, item))
-              } catch (error) {
-                return reject(new Error("Ошибка получения группы"))
-              }
-            }
-            if (item.component_Type.includes("TableInput")) {
-              try {
-                return resolve(await getTableInput(item.component, item))
-              } catch (error) {
-                return reject(new Error("Ошибка получения таблицы"))
-              }
-            }
-            // -------------Если LinkInput (ссылка на справочник и установлен флаг allValues)
-            if (item.component_Type.includes("LinkInput") && item.component_Expanded.allValues) {
-              try {
-                return resolve(await getLinkInput(item))
-              } catch (error) {
-                return reject(new Error("Ошибка получения справочника ссылочного типа"))
-              }
-            }
-            return resolve(item)
-          })
+        //     if (item.component_Type.includes("GroupFieldsInput")) {
+        //       try {
+        //         return resolve(await getGroupInput(item.component, item))
+        //       } catch (error) {
+        //         return reject(new Error("Ошибка получения группы"))
+        //       }
+        //     }
+        //     if (item.component_Type.includes("TableInput")) {
+        //       try {
+        //         return resolve(await getTableInput(item.component, item))
+        //       } catch (error) {
+        //         return reject(new Error("Ошибка получения таблицы"))
+        //       }
+        //     }
+        //     // -------------Если LinkInput (ссылка на справочник и установлен флаг allValues)
+        //     if (item.component_Type.includes("LinkInput") && item.component_Expanded.allValues) {
+        //       try {
+        //         return resolve(await getLinkInput(item))
+        //       } catch (error) {
+        //         return reject(new Error("Ошибка получения справочника ссылочного типа"))
+        //       }
+        //     }
+        //     return resolve(item)
+        //   })
 
-        }))
+        // }))
       }
       return serviceItem;
     } catch (error) {
       console.log("error: ", error.message)
       throw new Error(error.message)
     }
-  },
-  // getServiceItemByKey_old: async (key, withFields = true) => {
-  //   if (withFields) {
-  //     try {
-  //       resp[0].data.value[0].fields = await Promise.all(
-  //         resp[1].data.value.map((item) => {
-  //           return new Promise(async (resolve, reject) => {
-  //             try {
-  //               // -------------Если таблица
-  //               if (item.component_Type.includes("TableInput")) {
-  //                 const tableFields = await axios.get(
-  //                   `${server1c}/InformationRegister_portalFields?$format=json&$select=*&$expand=name,component,dependName,dependСondition&$filter=cast(object,'Catalog_componentsTableInput') eq guid'${item.component}'`,
-  //                   {
-  //                     headers,
-  //                   }
-  //                 )
-
-  //                 if (tableFields.data && tableFields.data.value) {
-  //                   tableFields.data.value = await Promise.all(
-  //                     tableFields.data.value.map((tableField) => {
-  //                       return new Promise(async (resolve, reject) => {
-  //                         if (
-  //                           tableField.component_Type.includes("LinkInput") &&
-  //                           tableField.component_Expanded.allValues
-  //                         ) {
-  //                           const allValues = await axios.get(
-  //                             `${server1c}${tableField.component_Expanded.linkUrl}`,
-  //                             {
-  //                               headers,
-  //                             }
-  //                           );
-  //                           // console.log(allValues)
-  //                           tableField.component_Expanded.options =
-  //                             allValues.data.value
-  //                               .sort((a, b) => {
-  //                                 if (
-  //                                   a.Description.toLowerCase() <
-  //                                   b.Description.toLowerCase()
-  //                                 ) {
-  //                                   return -1;
-  //                                 }
-  //                                 if (
-  //                                   a.Description.toLowerCase() >
-  //                                   b.Description.toLowerCase()
-  //                                 ) {
-  //                                   return 1;
-  //                                 }
-  //                                 return 0;
-  //                               })
-  //                               .map((item) => ({
-  //                                 value: item.Ref_Key,
-  //                                 label: item.Description,
-  //                               }));
-  //                         }
-  //                         resolve(tableField);
-  //                       });
-  //                     })
-  //                   );
-  //                   item.component_Expanded.fields =
-  //                     tableFields.data.value.sort(
-  //                       (a, b) => a.lineNum - b.lineNum
-  //                     );
-  //                 }
-  //               }
-  //               // -------------Если LinkInput (ссылка на справочник и установлен флаг allValues)
-  //               if (
-  //                 item.component_Type.includes("LinkInput") &&
-  //                 item.component_Expanded.allValues
-  //               ) {
-  //                 const allValues = await axios.get(
-  //                   `${server1c}${item.component_Expanded.linkUrl}`,
-  //                   {
-  //                     headers,
-  //                   }
-  //                 );
-  //                 if (allValues.data && allValues.data.value) {
-  //                   item.component_Expanded.options = allValues.data.value
-  //                     .sort((a, b) => {
-  //                       if (
-  //                         a.Description.toLowerCase() <
-  //                         b.Description.toLowerCase()
-  //                       ) {
-  //                         return -1;
-  //                       }
-  //                       if (
-  //                         a.Description.toLowerCase() >
-  //                         b.Description.toLowerCase()
-  //                       ) {
-  //                         return 1;
-  //                       }
-  //                       return 0;
-  //                     })
-  //                     .map((item) => ({
-  //                       value: item.Ref_Key,
-  //                       label: item.Description,
-  //                       unit: item['ЕдиницаИзмерения']?.Description
-  //                     }));
-  //                 }
-  //               }
-  //               // -------------Если GroupFieldsInput
-  //               if (item.component_Type.includes("GroupFieldsInput")) {
-  //                 // console.log(`${server1c}/InformationRegister_portalFields?$format=json&$select=*&$expand=name,component,dependName,dependСondition&$filter=cast(object,'Catalog_componentsGroupFieldsInput') eq guid'${item.component}'`)
-  //                 const groupFields = await axios.get(
-  //                   `${server1c}/InformationRegister_portalFields?$format=json&$select=*&$expand=name,component,dependName,dependСondition&$filter=cast(object,'Catalog_componentsGroupFieldsInput') eq guid'${item.component}'`,
-  //                   {
-  //                     headers,
-  //                   }
-  //                 );
-  //                 // console.log(item)
-  //                 if (groupFields.data && groupFields.data.value) {
-  //                   item.component_Expanded.fields = groupFields.data.value.sort((a, b) => a.lineNum - b.lineNum)
-
-  //                   // -------------Проход по типам получаемых полей в группе
-  //                   await Promise.all(item.component_Expanded.fields.map(async item => {
-  //                     return new Promise(async (resolve, reject) => {
-  //                       // -------------Если таблица
-  //                       if (item.component_Type.includes("TableInput")) {
-  //                         const tableFields = await axios.get(
-  //                           `${server1c}/InformationRegister_portalFields?$format=json&$select=*&$expand=name,component,dependName,dependСondition&$filter=cast(object,'Catalog_componentsTableInput') eq guid'${item.component}'`,
-  //                           {
-  //                             headers,
-  //                           }
-  //                         );
-
-  //                         if (tableFields.data && tableFields.data.value) {
-  //                           tableFields.data.value = await Promise.all(
-  //                             tableFields.data.value.map((tableField) => {
-  //                               return new Promise(async (resolve, reject) => {
-  //                                 if (
-  //                                   tableField.component_Type.includes("LinkInput") &&
-  //                                   tableField.component_Expanded.allValues
-  //                                 ) {
-  //                                   const allValues = await axios.get(
-  //                                     `${server1c}${tableField.component_Expanded.linkUrl}`,
-  //                                     {
-  //                                       headers,
-  //                                     }
-  //                                   );
-  //                                   // console.log(allValues)
-  //                                   tableField.component_Expanded.options =
-  //                                     allValues.data.value
-  //                                       .sort((a, b) => {
-  //                                         if (
-  //                                           a.Description.toLowerCase() <
-  //                                           b.Description.toLowerCase()
-  //                                         ) {
-  //                                           return -1;
-  //                                         }
-  //                                         if (
-  //                                           a.Description.toLowerCase() >
-  //                                           b.Description.toLowerCase()
-  //                                         ) {
-  //                                           return 1;
-  //                                         }
-  //                                         return 0;
-  //                                       })
-  //                                       .map((item) => ({
-  //                                         value: item.Ref_Key,
-  //                                         label: item.Description,
-  //                                       }));
-  //                                 }
-  //                                 resolve(tableField);
-  //                               });
-  //                             })
-  //                           );
-  //                           item.component_Expanded.fields =
-  //                             tableFields.data.value.sort(
-  //                               (a, b) => a.lineNum - b.lineNum
-  //                             );
-  //                         }
-  //                       }
-
-  //                       // -------------Если LinkInput (ссылка на справочник и установлен флаг allValues)
-  //                       if (
-  //                         item.component_Type.includes("LinkInput") &&
-  //                         item.component_Expanded.allValues
-  //                       ) {
-  //                         const allValues = await axios.get(
-  //                           `${server1c}${item.component_Expanded.linkUrl}`,
-  //                           {
-  //                             headers,
-  //                           }
-  //                         );
-  //                         if (allValues.data && allValues.data.value) {
-  //                           item.component_Expanded.options = allValues.data.value
-  //                             .sort((a, b) => {
-  //                               if (
-  //                                 a.Description.toLowerCase() <
-  //                                 b.Description.toLowerCase()
-  //                               ) {
-  //                                 return -1;
-  //                               }
-  //                               if (
-  //                                 a.Description.toLowerCase() >
-  //                                 b.Description.toLowerCase()
-  //                               ) {
-  //                                 return 1;
-  //                               }
-  //                               return 0;
-  //                             })
-  //                             .map((item) => ({
-  //                               value: item.Ref_Key,
-  //                               label: item.Description,
-  //                               unit: item['ЕдиницаИзмерения']?.Description
-  //                             }));
-  //                         }
-  //                       }
-  //                       resolve(item);
-  //                     })
-  //                   }))
-
-
-
-  //                 }
-
-  //               }
-  //               resolve(item);
-  //             } catch (error) {
-  //               reject(error);
-  //             }
-  //           });
-  //         })
-  //       );
-  //     } catch (error) {
-  //       console.log(error.message);
-  //       throw new Error("Что-то пошло не так при получении данных.");
-  //     }
-  //   }
-  //   // if (resp[0].data.value[0].categoriesFiles && resp[0].data.value[0].categoriesFiles.length > 0) {
-  //   //   const typeDocs = await axios.get(
-  //   //     `${server1c}/Catalog_ВидыФайлов?$format=json`,
-  //   //     {
-  //   //       headers,
-  //   //     }
-  //   //   );
-  //   //   // console.log('typeDocs: ', typeDocs)
-  //   //   resp[0].data.value[0].categoriesFiles.map(item => {
-  //   //     item.categoryName = typeDocs.data.value.find(val => val.Ref_Key === item.category_Key).Description
-  //   //     return item
-  //   //   })
-  //   // }
-  // }
+  },  
 
 };
 
