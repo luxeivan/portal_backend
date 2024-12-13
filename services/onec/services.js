@@ -242,7 +242,7 @@ const servicesOneC = {
         serviceItem.fields = resp[1].data.fields
         serviceItem.styles = resp[1].data.styles
         serviceItem.links = resp[1].data.links
-        serviceItem.idVersion = resp[1].data.idVersion
+        serviceItem.versionId = resp[1].data.versionId
         // await Promise.all(resp[1].data.value.map(item => {
 
         //   return new Promise(async (resolve, reject) => {
