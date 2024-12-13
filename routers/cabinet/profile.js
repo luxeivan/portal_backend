@@ -16,13 +16,14 @@ router.get("/", async (req, res) => {
 
     // logger.info(`Запрос на получение профиля пользователя с id: ${userId}`);
     const profile = await getUserById(userId); // Используем метод из 1С
-    // console.log('profile',profile)
+    console.log('profile',profile)
 
     res.json({
       firstname: profile.firstName,
       lastname: profile.lastName,
       email: profile.email,
       phone: profile.phone,
+      dateСreate:profile.dateСreate
     });
     // logger.info(`Профиль пользователя с id: ${userId} успешно получен`);
   } catch (error) {
