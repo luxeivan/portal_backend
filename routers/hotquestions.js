@@ -25,14 +25,41 @@ router.get("/", async (req, res) => {
 
     const questionsArray = hotQuestions.data.value;
 
-    // console.log("Проверяем что тут приходит", questionsArray);
+    console.log("Проверяем что тут приходит", questionsArray);
 
-    const formattedQuestions = questionsArray.map((item) => ({
+    const formattedQuestions1 = questionsArray.map((item) => ({
       question: item.question,
       answer: item.answer,
+      IsFolder: item.IsFolder,
+      Parent_Key: item.Parent_Key,
+      Ref_Key: item.Ref_Key,
     }));
-
-    console.log("Проверяем что тут приходит", formattedQuestions);
+    const formattedQuestions = []
+    formattedQuestions.push({
+      IsFolder: true,
+      Description: "",
+      Ref_Key: "00000000-0000-0000-0000-000000000000",
+      children: []
+    })
+    questionsArray.filter(item => item.IsFolder).forEach((item) => {
+      formattedQuestions.push({
+        IsFolder: true,
+        Description: item.Description,
+        Ref_Key: item.Ref_Key,
+        children: []
+      })
+    }
+    )
+    questionsArray.filter(item => !item.IsFolder).forEach(item => {     
+        formattedQuestions[formattedQuestions.findIndex(elem => elem.Ref_Key === item.Parent_Key)].children.push({
+          question: item.question,
+          answer: item.answer,
+          IsFolder: item.IsFolder,
+          Parent_Key: item.Parent_Key,
+          Ref_Key: item.Ref_Key,
+        })      
+    });
+    // console.log("Проверяем что тут приходит", formattedQuestions);
 
     res.status(200).json(formattedQuestions);
   } catch (error) {
