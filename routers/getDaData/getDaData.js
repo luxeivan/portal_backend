@@ -70,10 +70,11 @@ getDaData.get(
         .status(400)
         .json({ status: "error", message: "Пустое поле поиска или тип" });
     }
+console.log(req.query);
 
-    const { type, query: searchQuery } = req.query;
+    const { type, query: searchQuery,locations } = req.query;
     const url = getDaDataUrl(type);
-    const { from, to, parts, locations } = getBoundsAndParts(type);
+    const { from, to, parts } = getBoundsAndParts(type);
 
     if (!url) {
       return res
@@ -102,6 +103,8 @@ getDaData.get(
 
     try {
       const result = await axios.post(url, body, options);
+      console.log(result);
+      
       res.json({ status: "ok", data: result.data.suggestions });
     } catch (error) {
       console.error("Ошибка запроса к DaData:", error);
