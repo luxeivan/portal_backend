@@ -25,7 +25,7 @@ router.get("/", async (req, res) => {
 
     const questionsArray = hotQuestions.data.value;
 
-    console.log("Проверяем что тут приходит", questionsArray);
+    // console.log("Проверяем что тут приходит", questionsArray);
 
     const formattedQuestions1 = questionsArray.map((item) => ({
       question: item.question,
