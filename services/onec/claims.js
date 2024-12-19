@@ -4,6 +4,7 @@ const services = require('./services')
 require('dotenv').config()
 
 const server1c = process.env.SERVER_1C
+const server1cHttpService = process.env.SERVER_1C_HTTP_SERVICE
 const server1c_auth = process.env.SERVER_1C_AUTHORIZATION
 const headers = {
     "Authorization": server1c_auth
@@ -386,6 +387,19 @@ const claimsOneC = {
         return newClaim.data
 
         return { status: "Проверка ОК" }
+    },
+    createNewClaim1: async (data, userId) => {
+        const newClaim = await axios.post(`${server1cHttpService}/newClaimProject/${userId}/${data.serviceId}/${data.versionId}`, {
+            ...data,
+        }, {
+            headers
+        })
+        if (!newClaim.data) {
+            return false
+        }
+        console.log(newClaim.data);
+
+        return newClaim.data
     },
 
 }
