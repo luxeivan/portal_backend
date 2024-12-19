@@ -5,6 +5,7 @@ const {
   createNewClaim,
   getClaims,
   getClaimItem,
+  createNewClaim1,
 } = require("../../services/onec/claims");
 const logger = require("../../logger");
 
@@ -50,7 +51,7 @@ router.post("/", async (req, res) => {
   );
 
   try {
-    const newClaim = await createNewClaim(data, userId);
+    const newClaim = await createNewClaim1(data, userId);
     logger.info(`Заявка успешно создана для пользователя с ID: ${userId}`);
     res.json(newClaim);
   } catch (error) {
