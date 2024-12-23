@@ -389,17 +389,23 @@ const claimsOneC = {
         return { status: "Проверка ОК" }
     },
     createNewClaim1: async (data, userId) => {
-        const newClaim = await axios.post(`${server1cHttpService}/newClaimProject/${userId}/${data.serviceId}/${data.versionId}`, {
-            ...data,
-        }, {
-            headers
-        })
-        if (!newClaim.data) {
+        try {
+            const newClaim = await axios.post(`${server1cHttpService}/newClaimProject/${userId}/${data.serviceId}/${data.versionId}`, {
+                ...data,
+            }, {
+                headers
+            })
+            if (!newClaim.data) {
+                return false
+            }
+            console.log(newClaim.data);
+
+            return newClaim.data
+        } catch (error) {
+            console.log(error)
+            throw error
             return false
         }
-        console.log(newClaim.data);
-
-        return newClaim.data
     },
 
 }
