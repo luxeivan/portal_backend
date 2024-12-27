@@ -13,6 +13,22 @@ const headers = {
 const claimsOneC = {
     getClaims: async (userId) => {
         try {
+            const response = await axios.get(`${server1cHttpService}/servisesData/${userId}`, {
+                headers
+            })
+            if (!response.data) {
+                return false
+            }
+            console.log("getClaims",response.data)
+            return response.data
+
+        } catch (error) {
+            console.log(error)
+            return error
+        }
+    },
+    getClaims1: async (userId) => {
+        try {
             const response = await axios.get(`${server1c}/InformationRegister_connectionsOfElements?$format=json&$select=*&$expand=element2/Document_claimsProject/template&$filter=cast(element1,'Catalog_profile') eq guid'${userId}' and element2_Type eq 'StandardODATA.Document_claimsProject'`, {
                 headers
             })
