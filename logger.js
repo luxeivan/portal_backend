@@ -23,15 +23,6 @@ const saveLogToDatabase = async (level, message, timestamp, stack) => {
   }
 };
 
-// const saveLogToDatabase = async (level, message, timestamp, stack) => {
-//   try {
-//     const correctedTimestamp = moment(timestamp).tz(timezone).toDate();
-//     await Log.create({ level, message, timestamp: correctedTimestamp, stack });
-//     console.log("Log saved to the database");
-//   } catch (error) {
-//     console.error("Failed to save log to the database", error);
-//   }
-// };
 
 const dailyRotateFileTransport = new transports.DailyRotateFile({
   filename: "logs/error-%DATE%.log",
@@ -41,12 +32,12 @@ const dailyRotateFileTransport = new transports.DailyRotateFile({
   maxFiles: "30d",
   level: "error",
 });
-// console.log('timezone',moment().tz(timezone).format())
+
 const logger = createLogger({
   level: "info",
   format: format.combine(
     format((info) => {
-      info.timestamp = moment().tz(timezone).format(); // Устанавливаем корректное время
+      info.timestamp = moment().tz(timezone).format(); 
       return info;
     })(),
     format.errors({ stack: true }),
