@@ -11,22 +11,27 @@ const campaign_id = '989295860'
 const sendCodeToPhone = async (phone) => {
     const authMegafon = process.env.AUTH_MEGAFON_SMS
     var pincode = Math.floor(1000 + Math.random() * 9000);
-    const response = await axios.post('https://a2p-api.megalabs.ru/sms/v1/sms', {
-        from: "M-OBLENERGO",
-        to: Number(phone),
-        message: `Код: ${pincode}`,
-    }, {
-        headers: {
-            "Content-Type": "application/json",
-            "Authorization": authMegafon
-        },
-    })
-    console.log(response.data)
-    if (response.data.result.status.code === 0) {
-        return pincode
-    } else {
+    try {
+        const response = await axios.post('https://a2p-api.megalabs.ru/sms/v1/sms', {
+            from: "M-OBLENERGO",
+            to: Number(phone),
+            message: `Код: ${pincode}`,
+        }, {
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": authMegafon
+            },
+        })
+        if (response.data.result.status.code === 0) {
+            return pincode
+        } else {
+            throw new Error('Не удалось отправить код')
+        }
+    } catch (error) {
         throw new Error('Не удалось отправить код')
+
     }
+    // console.log(response.data)
 }
 
 module.exports = sendCodeToPhone;
