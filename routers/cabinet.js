@@ -16,6 +16,7 @@ const documentsRouter = require("./cabinet/documents");
 const claims = require("./cabinet/claims");
 const getDaData = require('../routers/getDaData/getDaData');
 const getPrice = require('../routers/cabinet/getPrice');
+const pay = require("./cabinet/pay");
 // ... и так далее для всех остальных файлов в папке cabinet ...
 
 router.use("/subjects", subjectsRouter);
@@ -33,6 +34,7 @@ router.use("/send-sms", sendSms);
 router.use("/documents", documentsRouter);
 router.use("/claims", claims);
 router.use("/getDaData", getDaData);
+router.use("/pay", pay);
 // ... и так далее для всех остальных импортированных роутеров ...
 
 module.exports = router;
