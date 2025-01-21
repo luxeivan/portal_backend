@@ -17,10 +17,29 @@ const documentsStore = {};
 
 const SERVER_1C = process.env.SERVER_1C;
 const server1c_auth = process.env.SERVER_1C_AUTHORIZATION;
+
+// Адрес, по которому будем оповещать бота
+// (если бот и бэкенд на одном сервере, указывайте http://127.0.0.1:3001/notifyError)
+const botNotifyUrl =
+  process.env.BOT_NOTIFY_URL || "http://127.0.0.1:3001/notifyError";
+
 const headers = {
   Authorization: server1c_auth,
   "Content-Type": "application/json",
 };
+
+async function notifyBot(message, errorDetails = {}) {
+  if (!botNotifyUrl) return;
+
+  try {
+    await axios.post(botNotifyUrl, {
+      message,
+      error: errorDetails,
+    });
+  } catch (notifyErr) {
+    console.error("Не смогли оповестить бота:", notifyErr.message);
+  }
+}
 
 // Новый маршрут для получения категорий документов из 1С
 router.get("/categories", async function (req, res) {
@@ -41,13 +60,33 @@ router.get("/categories", async function (req, res) {
     });
   } catch (error) {
     console.error("Ошибка при получении категорий документов из 1С:", error);
+
+    const errorDetails = {
+      config: {
+        url: error?.config?.url,
+        method: error?.config?.method,
+      },
+      response: {
+        status: error?.response?.status,
+        statusText: error?.response?.statusText,
+        data: error?.response?.data,
+      },
+      code: error?.code,
+      message: error?.message,
+    };
+
+    // Оповещение бота
+    await notifyBot(
+      `Ошибка при получении категорий документов из 1С: ${error.message}`,
+      errorDetails
+    );
+
     res.status(500).json({
       status: "error",
       message: "Ошибка при получении категорий документов",
     });
   }
 });
-
 
 router.post("/", async function (req, res) {
   try {
@@ -122,6 +161,27 @@ router.get("/", async function (req, res) {
     });
   } catch (error) {
     console.error(`Ошибка при получении документов из 1С: ${error.message}`);
+
+    const errorDetails = {
+      config: {
+        url: error?.config?.url,
+        method: error?.config?.method,
+      },
+      response: {
+        status: error?.response?.status,
+        statusText: error?.response?.statusText,
+        data: error?.response?.data,
+      },
+      code: error?.code,
+      message: error?.message,
+    };
+
+    // Оповещение бота
+    await notifyBot(
+      `Ошибка при получении документов из 1С: ${error.message}`,
+      errorDetails
+    );
+
     return res.status(500).json({
       status: "error",
       message: "Ошибка при получении документов",
@@ -136,7 +196,6 @@ router.get("/by-category", async function (req, res) {
   try {
     const requestUrl = `${SERVER_1C}/InformationRegister_connectionsOfElements/SliceLast(,Condition='element2 eq cast(guid'${userId}', 'Catalog_profile')')?$format=json&$expand=element1&$filter=usage eq true and element1/category_Key eq guid'${categoryKey}'`;
 
-    
     // const requestUrl = `${SERVER_1C}/InformationRegister_connectionsOfElements?$format=json&$expand=element1&$filter=usage eq true and element2_Key eq guid'${userId}' and element1/VidFayla_Key eq guid'${categoryKey}'`;
     const response = await axios.get(requestUrl, { headers });
     const connections = response.data.value;
@@ -145,11 +204,36 @@ router.get("/by-category", async function (req, res) {
       return res.json({ status: "ok", documents: [] });
     }
 
-    const documents = connections.map((connection) => connection.element1_Expanded);
+    const documents = connections.map(
+      (connection) => connection.element1_Expanded
+    );
     return res.json({ status: "ok", documents });
   } catch (error) {
     console.error(`Ошибка при получении документов из 1С: ${error.message}`);
-    return res.status(500).json({ status: "error", message: "Ошибка при получении документов" });
+
+    const errorDetails = {
+      config: {
+        url: error?.config?.url,
+        method: error?.config?.method,
+      },
+      response: {
+        status: error?.response?.status,
+        statusText: error?.response?.statusText,
+        data: error?.response?.data,
+      },
+      code: error?.code,
+      message: error?.message,
+    };
+
+    // Оповещение бота
+    await notifyBot(
+      `Ошибка при получении документов по категориям из 1С: ${error.message}`,
+      errorDetails
+    );
+
+    return res
+      .status(500)
+      .json({ status: "error", message: "Ошибка при получении документов" });
   }
 });
 
