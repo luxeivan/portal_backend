@@ -253,30 +253,30 @@ router.post(
  *       500:
  *         description: Внутренняя ошибка сервера
  */
-router.post("/test", async function (req, res) {
-  try {
-    if (!req.body.email) {
-      logger.error("Ошибка: не указан email в теле");
-      return res.status(400).json("не указан email в теле");
-    }
+// router.post("/test", async function (req, res) {
+//   try {
+//     if (!req.body.email) {
+//       logger.error("Ошибка: не указан email в теле");
+//       return res.status(400).json("не указан email в теле");
+//     }
 
-    const user = await getUserByEmail(req.body.email);
-    if (user) {
-      res.json(user);
-    } else {
-      const errorMessage = `пользователь с email: ${req.body.email} не найден`;
-      logger.error(errorMessage);
-      res.status(404).json(user);
-    }
-  } catch (error) {
-    logger.error(
-      `Внутренняя ошибка сервера при проверке пользователя: ${error.message}`
-    );
-    res
-      .status(500)
-      .json({ status: "error", message: "Внутренняя ошибка сервера" });
-  }
-});
+//     const user = await getUserByEmail(req.body.email);
+//     if (user) {
+//       res.json(user);
+//     } else {
+//       const errorMessage = `пользователь с email: ${req.body.email} не найден`;
+//       logger.error(errorMessage);
+//       res.status(404).json(user);
+//     }
+//   } catch (error) {
+//     logger.error(
+//       `Внутренняя ошибка сервера при проверке пользователя: ${error.message}`
+//     );
+//     res
+//       .status(500)
+//       .json({ status: "error", message: "Внутренняя ошибка сервера" });
+//   }
+// });
 
 /**
  * @swagger
