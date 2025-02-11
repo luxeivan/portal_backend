@@ -24,7 +24,7 @@ const code = generateRandomCode()
   });
 
   let result = await transporter.sendMail({
-    from: 'luxeivan@yandex.ru',
+    from: smtpLogin,
     to,
     subject: 'Код для подтверждения почты',
     text: '',
