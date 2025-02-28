@@ -17,12 +17,13 @@ const getDaDataUrl = (type) => {
       return `${DADATA_BASE_URL}/findById/party`;
     case "БИК":
       return `${DADATA_BASE_URL}/findById/bank`;
-    case "Страна":
-    case "Регион":
-    case "Город":
-    case "Район":
-    case "Улица":
-    case "АдресПолный":
+    case "country":
+    case "region":
+    case "area":
+    case "city":
+    case "settlement":
+    case "street":
+    case "fullAddress":
       return `${DADATA_BASE_URL}/suggest/address`;
     default:
       return null;
@@ -38,21 +39,27 @@ const getBoundsAndParts = (type) => {
       return { parts: ["NAME"] };
     case "Отчество":
       return { parts: ["PATRONYMIC"] };
-    case "Страна":
+    case "country":
       return {
         from: "country",
         to: "country",
-        locations: [{ country_iso_code: "*" }],
+        locations: [
+          {
+            country_iso_code: "*"
+          }
+        ]
       };
-    case "Регион":
+    case "region":
       return { from: "region", to: "region" };
-    case "Город":
-      return { from: "city", to: "city" };
-    case "Район":
+    case "area":
       return { from: "area", to: "area" };
-    case "Улица":
+    case "city":
+      return { from: "city", to: "city" };
+    case "settlement":
+      return { from: "settlement", to: "settlement" };
+    case "street":
       return { from: "street", to: "street" };
-    case "АдресПолный":
+    case "fullAddress":
       return [];
     default:
       return {};
@@ -70,9 +77,16 @@ getDaData.get(
         .status(400)
         .json({ status: "error", message: "Пустое поле поиска или тип" });
     }
-console.log(req.query);
+    // console.log(req.query);
 
-    const { type, query: searchQuery,locations } = req.query;
+    const {
+      type,
+      query: searchQuery,
+      locations = [
+        {
+          "country_iso_code": "*"
+        }
+      ] } = req.query;
     const url = getDaDataUrl(type);
     const { from, to, parts } = getBoundsAndParts(type);
 
@@ -95,16 +109,16 @@ console.log(req.query);
       ...(parts && { parts }),
       ...(from &&
         to && {
-          from_bound: { value: from },
-          to_bound: { value: to },
-        }),
+        from_bound: { value: from },
+        to_bound: { value: to },
+      }),
       ...(locations && { locations }),
     };
-
+    console.log(body)
     try {
       const result = await axios.post(url, body, options);
-      console.log(result);
-      
+      // console.log(result);
+
       res.json({ status: "ok", data: result.data.suggestions });
     } catch (error) {
       console.error("Ошибка запроса к DaData:", error);
