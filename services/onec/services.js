@@ -27,6 +27,7 @@ const servicesOneC = {
       return response.data;
     } catch (error) {}
   },
+  
 
   getServicesByKey: async (key = "00000000-0000-0000-0000-000000000000") => {
     try {
@@ -121,7 +122,7 @@ const servicesOneC = {
           }),
         withFields
           ? axios
-              .get(`${server1cHttpService}/portalFilds/services/${key}'`, {
+              .get(`${server1cHttpService}/portalFields/services/${key}'`, {
                 headers,
               })
               .catch((err) => {

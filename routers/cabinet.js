@@ -14,6 +14,7 @@ const getFmsUnit = require("./cabinet/getFmsUnit");
 const sendSms = require("./cabinet/sendSms");
 const documentsRouter = require("./cabinet/documents");
 const claims = require("./cabinet/claims");
+const personalAccounts = require("./cabinet/getPersonalAccounts");
 const getDaData = require('../routers/getDaData/getDaData');
 const getPrice = require('../routers/cabinet/getPrice');
 const pay = require("./cabinet/pay");
@@ -33,6 +34,7 @@ router.use("/get-fms", getFmsUnit);
 router.use("/send-sms", sendSms);
 router.use("/documents", documentsRouter);
 router.use("/claims", claims);
+router.use("/personalAccounts", personalAccounts);
 router.use("/getDaData", getDaData);
 router.use("/pay", pay);
 // ... и так далее для всех остальных импортированных роутеров ...
