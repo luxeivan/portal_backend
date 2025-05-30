@@ -17,7 +17,7 @@ const claimsOneC = {
   getClaims: async (userId) => {
     try {
       const response = await axios.get(
-        `${server1cHttpService}/servisesData/${userId}`,
+        `${server1cHttpService}/profile/${userId}/сlaims`,
         {
           headers,
         }
