@@ -285,11 +285,11 @@ const servicesOneC = {
 
       // -------------Если надо получать поля услуги-------------------------------------------
       if (withFields) {
-        serviceItem.fields = resp[1].data.fields;
-        serviceItem.styles = resp[1].data.styles;
-        serviceItem.links = resp[1].data.links;
-        serviceItem.externalService = resp[1].data.externalService;
-        serviceItem.versionId = resp[1].data.versionId;
+        serviceItem.fields = resp[1].data.data.fields;
+        serviceItem.styles = resp[1].data.data.styles;
+        serviceItem.links = resp[1].data.data.links;
+        serviceItem.externalService = resp[1].data.data.externalService;
+        serviceItem.versionId = resp[1].data.data.versionId;
         // await Promise.all(resp[1].data.value.map(item => {
 
         //   return new Promise(async (resolve, reject) => {
