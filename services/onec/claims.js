@@ -17,7 +17,7 @@ const claimsOneC = {
   getClaims: async (userId) => {
     try {
       const response = await axios.get(
-        `${server1cHttpService}/servisesData/${userId}`,
+        `${server1cHttpService}/profile/${userId}/сlaims`,
         {
           headers,
         }
@@ -99,7 +99,8 @@ const claimsOneC = {
   getClaimItem: async (userId, Ref_key) => {
     try {
       const response = await axios.get(
-        `${server1c}/InformationRegister_connectionsOfElements?$format=json&$select=*&$expand=element2/Document_claimsProject/template&$filter=cast(element1,'Catalog_profile') eq guid'${userId}' and cast(element2,'Document_claimsProject') eq guid'${Ref_key}'`,
+        `${server1cHttpService}/сlaims/${Ref_key}`,
+        // `${server1c}/InformationRegister_connectionsOfElements?$format=json&$select=*&$expand=element2/Document_claimsProject/template&$filter=cast(element1,'Catalog_profile') eq guid'${userId}' and cast(element2,'Document_claimsProject') eq guid'${Ref_key}'`,
         {
           headers,
         }
@@ -107,8 +108,8 @@ const claimsOneC = {
       if (!response.data) {
         return false;
       }
-      // console.log(response.data)
-      return response.data.value[0].element2_Expanded;
+      console.log(response.data)
+      return response.data;
     } catch (error) {
       console.log(error);
       if (botNotifyUrl) {

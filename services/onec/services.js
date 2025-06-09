@@ -27,6 +27,7 @@ const servicesOneC = {
       return response.data;
     } catch (error) {}
   },
+  
 
   getServicesByKey: async (key = "00000000-0000-0000-0000-000000000000") => {
     try {
@@ -121,7 +122,7 @@ const servicesOneC = {
           }),
         withFields
           ? axios
-              .get(`${server1cHttpService}/portalFilds/services/${key}'`, {
+              .get(`${server1cHttpService}/portalFields/services/${key}'`, {
                 headers,
               })
               .catch((err) => {
@@ -284,11 +285,11 @@ const servicesOneC = {
 
       // -------------Если надо получать поля услуги-------------------------------------------
       if (withFields) {
-        serviceItem.fields = resp[1].data.fields;
-        serviceItem.styles = resp[1].data.styles;
-        serviceItem.links = resp[1].data.links;
-        serviceItem.externalService = resp[1].data.externalService;
-        serviceItem.versionId = resp[1].data.versionId;
+        serviceItem.fields = resp[1].data.data.fields;
+        serviceItem.styles = resp[1].data.data.styles;
+        serviceItem.links = resp[1].data.data.links;
+        serviceItem.externalService = resp[1].data.data.externalService;
+        serviceItem.versionId = resp[1].data.data.versionId;
         // await Promise.all(resp[1].data.value.map(item => {
 
         //   return new Promise(async (resolve, reject) => {
