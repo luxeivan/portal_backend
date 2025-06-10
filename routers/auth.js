@@ -8,6 +8,61 @@ const logger = require("../logger");
 const bcrypt = require("bcrypt");
 
 const privateKey = process.env.JWT_SECRET;
+/**
+ * @swagger
+ * /api/auth/login:
+ *   post:
+ *     summary: Авторизация пользователя
+ *     description: Проверяет логин/пароль и отправляет код подтверждения на телефон
+ *     tags: [Auth]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - email
+ *               - password
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 format: email
+ *                 example: user@example.com
+ *               password:
+ *                 type: string
+ *                 minLength: 10
+ *                 example: StrongPassword123
+ *     responses:
+ *       200:
+ *         description: Код подтверждения отправлен
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                 message:
+ *                   type: string
+ *       400:
+ *         description: Ошибка валидации или отсутствуют данные
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                 errors:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *       418:
+ *         description: Неверные учетные данные
+ *       500:
+ *         description: Внутренняя ошибка сервера
+ */
 
 router.post(
   "/login",
@@ -81,7 +136,52 @@ router.post(
   }
 );
 
-
+/**
+ * @swagger
+ * /api/auth/logincode:
+ *   post:
+ *     summary: Подтверждение авторизации
+ *     description: Проверка кода подтверждения и выдача JWT токена
+ *     tags: [Auth]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - pincode
+ *             properties:
+ *               pincode:
+ *                 type: string
+ *                 minLength: 4
+ *                 maxLength: 11
+ *                 example: "1234"
+ *     responses:
+ *       200:
+ *         description: Успешная авторизация
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                 jwt:
+ *                   type: string
+ *                 userid:
+ *                   type: string
+ *                 email:
+ *                   type: string
+ *                 phone:
+ *                   type: string
+ *       400:
+ *         description: Неверный запрос или пользователь не найден
+ *       418:
+ *         description: Неверный код подтверждения
+ *       500:
+ *         description: Внутренняя ошибка сервера
+ */
 router.post(
   "/logincode",
   async (req, res, next) => {
@@ -157,6 +257,46 @@ router.post(
   }
 );
 
+/**
+ * @swagger
+ * /api/auth/checkjwt:
+ *   post:
+ *     summary: Проверка JWT токена
+ *     description: Валидация JWT токена и получение информации о пользователе
+ *     tags: [Auth]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - jwt
+ *             properties:
+ *               jwt:
+ *                 type: string
+ *                 example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+ *     responses:
+ *       200:
+ *         description: Токен валиден
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 id:
+ *                   type: string
+ *                 email:
+ *                   type: string
+ *                 phone:
+ *                   type: string
+ *       400:
+ *         description: Отсутствует токен
+ *       401:
+ *         description: Невалидный токен
+ *       500:
+ *         description: Внутренняя ошибка сервера
+ */
 router.post("/checkjwt", async function (req, res) {
   try {
     if (!req.body.jwt) {
