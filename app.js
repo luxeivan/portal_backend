@@ -11,10 +11,10 @@ const swaggerSetup = require("./swagger");
 
 const auth = require("./routers/auth");
 const registration = require("./routers/registration");
-const sendMail = require("./routers/sendmail");
+// const sendMail = require("./routers/sendmail");
 const cabinet = require("./routers/cabinet");
 const services = require("./routers/services");
-const formonec = require("./routers/formonec");
+// const formonec = require("./routers/formonec");
 const getDaData = require("./routers/getDaData/getDaData");
 const contactRouter = require("./routers/contact");
 const chatRouter = require("./routers/chatRouter");
@@ -104,16 +104,16 @@ app.use(
 app.use(helmet.referrerPolicy({ policy: "same-origin" }));
 
 // Маршруты вашего приложения
-app.get("/", (req, res) => {
-  res.send("Hello, World!");
-});
+// app.get("/", (req, res) => {
+//   res.send("Hello, World!");
+// });
 
 app.use("/api/auth", auth);
 app.use("/api/gigachat", gigaChatRouter);
 app.use("/api/registration", registration);
 app.use("/api/cabinet", checkAuth, cabinet);
 app.use("/api/services", services);
-app.use("/api/formonec", formonec);
+// app.use("/api/formonec", formonec);
 app.use("/api/getDaData", getDaData);
 app.use("/api/contacts", contactRouter);
 app.use("/api/chat", chatRouter);

@@ -7,20 +7,6 @@ const {
 } = require("../../services/onec/personalAccounts");
 const logger = require("../../logger");
 
-/**
- * @swagger
- * /api/cabinet/personalAccounts:
- *   get:
- *     summary: Получение всех личных кабинетов пользователя
- *     description: Возвращает список всех личных кабинетов текущего пользователя.
- *     tags:
- *       - PersonalAccounts
- *     responses:
- *       200:
- *         description: Успешное получение списка личных кабинетов
- *       500:
- *         description: Ошибка при получении личных кабинетов
- */
 router.get("/", async (req, res) => {
   const userId = req.userId;
   // logger.info(
@@ -43,27 +29,6 @@ router.get("/", async (req, res) => {
   }
 });
 
-/**
- * @swagger
- * /api/cabinet/personalAccounts/{key}:
- *   get:
- *     summary: Получение личных кабинетов по ключу
- *     description: Возвращает информацию о конкретном личном кабинете по его ключу.
- *     tags:
- *       - Claims
- *     parameters:
- *       - in: path
- *         name: key
- *         required: true
- *         schema:
- *           type: string
- *         description: Ключ личного кабинета
- *     responses:
- *       200:
- *         description: Личный кабинет успешно получен
- *       500:
- *         description: Ошибка при получении личного кабинета
- */
 router.get("/:key", async (req, res) => {
   const userId = req.userId;
   const key = req.params.key;
@@ -83,20 +48,6 @@ router.get("/:key", async (req, res) => {
       error: error.message,
     });
   }
-  /**
- * @swagger
- * /api/cabinet/personalAccounts/сlaims:
- *   get:
- *     summary: Получение всех заявок по личному кабинету
- *     description: Возвращает список всех личных кабинетов текущего пользователя.
- *     tags:
- *       - PersonalAccounts
- *     responses:
- *       200:
- *         description: Успешное получение заявок по личному кабинету
- *       500:
- *         description: Ошибка при получении заявок по личному кабинету
- */
   router.get("/:key/claims", async (req, res) => {
     const userId = req.userId;
     const key = req.params.key;

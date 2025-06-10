@@ -9,44 +9,6 @@ const bcrypt = require("bcrypt");
 
 const privateKey = process.env.JWT_SECRET;
 
-/**
- * @swagger
- * tags:
- *   - name: Auth
- *     description: Маршруты для аутентификации пользователей
- */
-
-/**
- * @swagger
- * /api/auth/login:
- *   post:
- *     summary: Логин пользователя
- *     description: Проверка логина и пароля, отправка пин-кода на телефон
- *     tags: [Auth]
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             required:
- *               - email
- *               - password
- *             properties:
- *               email:
- *                 type: string
- *                 format: email
- *               password:
- *                 type: string
- *                 minLength: 10
- *     responses:
- *       200:
- *         description: Ожидается пин код
- *       400:
- *         description: Ошибка валидации
- *       500:
- *         description: Внутренняя ошибка сервера
- */
 router.post(
   "/login",
   async (req, res, next) => {
@@ -119,36 +81,7 @@ router.post(
   }
 );
 
-/**
- * @swagger
- * /api/auth/logincode:
- *   post:
- *     summary: Проверка пин-кода
- *     description: Проверка введенного пин-кода и выдача JWT токена при успешной проверке
- *     tags: [Auth]
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             required:
- *               - pincode
- *             properties:
- *               pincode:
- *                 type: string
- *                 minLength: 4
- *                 maxLength: 11
- *     responses:
- *       200:
- *         description: Успешная проверка пин-кода, выдача JWT токена
- *       400:
- *         description: Ошибка валидации
- *       401:
- *         description: Неверный пин-код
- *       500:
- *         description: Внутренняя ошибка сервера
- */
+
 router.post(
   "/logincode",
   async (req, res, next) => {
@@ -224,88 +157,6 @@ router.post(
   }
 );
 
-/**
- * @swagger
- * /api/auth/test:
- *   post:
- *     summary: Тестовый маршрут
- *     description: Тестовый маршрут для проверки пользователя по email
- *     tags: [Auth]
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             required:
- *               - email
- *             properties:
- *               email:
- *                 type: string
- *                 format: email
- *     responses:
- *       200:
- *         description: Успешный ответ
- *       400:
- *         description: Ошибка запроса
- *       404:
- *         description: Пользователь не найден
- *       500:
- *         description: Внутренняя ошибка сервера
- */
-// router.post("/test", async function (req, res) {
-//   try {
-//     if (!req.body.email) {
-//       logger.error("Ошибка: не указан email в теле");
-//       return res.status(400).json("не указан email в теле");
-//     }
-
-//     const user = await getUserByEmail(req.body.email);
-//     if (user) {
-//       res.json(user);
-//     } else {
-//       const errorMessage = `пользователь с email: ${req.body.email} не найден`;
-//       logger.error(errorMessage);
-//       res.status(404).json(user);
-//     }
-//   } catch (error) {
-//     logger.error(
-//       `Внутренняя ошибка сервера при проверке пользователя: ${error.message}`
-//     );
-//     res
-//       .status(500)
-//       .json({ status: "error", message: "Внутренняя ошибка сервера" });
-//   }
-// });
-
-/**
- * @swagger
- * /api/auth/checkjwt:
- *   post:
- *     summary: Проверка JWT токена
- *     description: Проверка JWT токена и возврат информации о пользователе
- *     tags: [Auth]
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             required:
- *               - jwt
- *             properties:
- *               jwt:
- *                 type: string
- *     responses:
- *       200:
- *         description: Успешная проверка JWT
- *       400:
- *         description: Ошибка запроса
- *       401:
- *         description: Неавторизован
- *       500:
- *         description: Внутренняя ошибка сервера
- */
 router.post("/checkjwt", async function (req, res) {
   try {
     if (!req.body.jwt) {
