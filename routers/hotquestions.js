@@ -17,6 +17,67 @@ const headers = {
   Authorization: server1c_auth,
 };
 
+/**
+ * @swagger
+ * tags:
+ *   - name: HotQuestions
+ *     description: Получение частых вопросов и ответов
+ *
+ * /api/hotQuestions:
+ *   get:
+ *     summary: Получить список горячих вопросов и ответов
+ *     tags: [HotQuestions]
+ *     responses:
+ *       200:
+ *         description: Успешное получение вопросов и ответов
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   IsFolder:
+ *                     type: boolean
+ *                     example: true
+ *                   Description:
+ *                     type: string
+ *                     example: ""
+ *                   Ref_Key:
+ *                     type: string
+ *                     example: "00000000-0000-0000-0000-000000000000"
+ *                   children:
+ *                     type: array
+ *                     items:
+ *                       type: object
+ *                       properties:
+ *                         question:
+ *                           type: string
+ *                           example: "Как изменить тариф?"
+ *                         answer:
+ *                           type: string
+ *                           example: "Вы можете изменить тариф в личном кабинете."
+ *                         IsFolder:
+ *                           type: boolean
+ *                           example: false
+ *                         Parent_Key:
+ *                           type: string
+ *                           example: "12345678-1234-1234-1234-123456789012"
+ *                         Ref_Key:
+ *                           type: string
+ *                           example: "87654321-4321-4321-4321-210987654321"
+ *       500:
+ *         description: Ошибка при получении данных из 1С
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Ошибка при получении данных о 'Горячих ответах' из 1С"
+ */
+
 //Роутер на получение вопросов/ответов
 router.get("/", async (req, res) => {
   try {

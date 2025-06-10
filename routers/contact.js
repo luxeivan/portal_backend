@@ -17,6 +17,52 @@ const headers = {
   Authorization: server1c_auth,
 };
 
+/**
+ * @swagger
+ * tags:
+ *   - name: Contact
+ *     description: Контактная информация из 1С
+ *
+ * /api/contacts:
+ *   get:
+ *     summary: Получить контактную информацию с фотографиями
+ *     tags: [Contact]
+ *     responses:
+ *       200:
+ *         description: Успешное получение контактной информации
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   object:
+ *                     type: string
+ *                     example: "e93f2105-bffe-11ee-907a-00505601574a"
+ *                   photos:
+ *                     type: array
+ *                     items:
+ *                       type: object
+ *                       properties:
+ *                         ПутьКФайлу:
+ *                           type: string
+ *                           example: "images/contact/123.jpg"
+ *                         ПолныйПутьWindows:
+ *                           type: string
+ *                           example: "//server/shared/images/contact/123.jpg"
+ *       500:
+ *         description: Ошибка при получении данных из 1С
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Ошибка при получении данных из 1C"
+ */
+
 router.get("/", async (req, res) => {
   try {
     // 1) Запрашиваем контактную инфу
