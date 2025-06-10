@@ -16,43 +16,6 @@ const privateKey = process.env.JWT_SECRET;
 const attempts = 3; //Количество попыток
 const timeAttempts = 5; //Время попыток
 
-/**
- * @swagger
- * tags:
- *   - name: Registration
- *     description: Маршруты для регистрации и подтверждения пользователей
- */
-
-/**
- * @swagger
- * /api/registration/phone:
- *   post:
- *     summary: Прием телефона и звонок с кодом
- *     description: Отправляет код подтверждения на указанный номер телефона.
- *     tags:
- *       - Registration
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             required:
- *               - phone
- *             properties:
- *               phone:
- *                 type: string
- *                 description: Номер телефона для отправки кода подтверждения
- *     responses:
- *       200:
- *         description: Код подтверждения успешно отправлен
- *       400:
- *         description: Отсутствует поле 'phone' или телефон уже подтвержден
- *       429:
- *         description: Запросы на подтверждение отправляются слишком часто
- *       500:
- *         description: Ошибка при отправке кода
- */
 router.post("/phone", async (req, res) => {
   try {
     if (!req.body.phone) {
@@ -95,34 +58,6 @@ router.post("/phone", async (req, res) => {
   }
 });
 
-/**
- * @swagger
- * /api/registration/phonecode:
- *   post:
- *     summary: Проверка кода из звонка
- *     description: Проверяет введенный пользователем код и подтверждает номер телефона.
- *     tags:
- *       - Registration
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             required:
- *               - phoneCode
- *             properties:
- *               phoneCode:
- *                 type: string
- *                 description: Код подтверждения, полученный по телефону
- *     responses:
- *       200:
- *         description: Номер телефона успешно подтвержден
- *       400:
- *         description: Отсутствует поле 'phoneCode', телефон уже подтвержден, или закончились попытки
- *       500:
- *         description: Ошибка при проверке кода подтверждения
- */
 router.post("/phonecode", async (req, res) => {
   try {
     if (!req.body.phoneCode) {
@@ -169,36 +104,6 @@ router.post("/phonecode", async (req, res) => {
   }
 });
 
-/**
- * @swagger
- * /api/registration/email:
- *   post:
- *     summary: Прием email и отправка письма с кодом на почту
- *     description: Отправляет код подтверждения на указанный email.
- *     tags:
- *       - Registration
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             required:
- *               - email
- *             properties:
- *               email:
- *                 type: string
- *                 description: Email для отправки кода подтверждения
- *     responses:
- *       200:
- *         description: Код подтверждения успешно отправлен на email
- *       400:
- *         description: Отсутствует поле 'email' или email уже подтвержден
- *       429:
- *         description: Запросы на подтверждение отправляются слишком часто
- *       500:
- *         description: Ошибка при отправке кода
- */
 router.post("/email", async (req, res) => {
   try {
     logger.info(
@@ -252,34 +157,6 @@ router.post("/email", async (req, res) => {
   }
 });
 
-/**
- * @swagger
- * /api/registration/emailcode:
- *   post:
- *     summary: Проверка кода из письма
- *     description: Проверяет введенный пользователем код и подтверждает email.
- *     tags:
- *       - Registration
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             required:
- *               - emailCode
- *             properties:
- *               emailCode:
- *                 type: string
- *                 description: Код подтверждения, полученный по email
- *     responses:
- *       200:
- *         description: Email успешно подтвержден
- *       400:
- *         description: Отсутствует поле 'emailCode', email уже подтвержден, или закончились попытки
- *       500:
- *         description: Ошибка при проверке кода подтверждения
- */
 router.post("/emailcode", async (req, res) => {
   try {
     logger.info(
@@ -326,34 +203,6 @@ router.post("/emailcode", async (req, res) => {
   }
 });
 
-/**
- * @swagger
- * /api/registration/newuser:
- *   post:
- *     summary: Создание нового пользователя
- *     description: Проверяет подтверждение почты и телефона, получает пароль от пользователя и записывает нового пользователя в базу.
- *     tags:
- *       - Registration
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             required:
- *               - password
- *             properties:
- *               password:
- *                 type: string
- *                 description: Пароль пользователя
- *     responses:
- *       200:
- *         description: Пользователь успешно создан или обновлен
- *       400:
- *         description: Отсутствует поле 'password' или не вся информация подтверждена
- *       500:
- *         description: Внутренняя ошибка сервера при создании или обновлении пользователя
- */
 router.post("/newuser", async (req, res) => {
   try {
     logger.info(
@@ -434,20 +283,6 @@ router.post("/newuser", async (req, res) => {
   }
 });
 
-/**
- * @swagger
- * /api/registration/clearinfo:
- *   post:
- *     summary: Сброс сессии по запросу от клиента
- *     description: Очищает информацию и завершает сессию пользователя.
- *     tags:
- *       - Registration
- *     responses:
- *       200:
- *         description: Сессия успешно завершена
- *       500:
- *         description: Внутренняя ошибка сервера при завершении сессии
- */
 router.post("/clearinfo", async (req, res) => {
   try {
     // logger.info("Получен запрос на очистку информации и завершение сессии");

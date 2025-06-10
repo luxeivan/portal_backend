@@ -92,9 +92,6 @@ router.get("/allusers", async (req, res) => {
   }
 });
 
-// router.get("/allusers", async (req, res) => {
-//   // console.log(getAllUsers())
-//   res.json(await getAllUsers())
-// })
+
 
 module.exports = router;

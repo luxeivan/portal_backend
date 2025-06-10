@@ -9,40 +9,7 @@ const {
 } = require("../../services/onec/claims");
 const logger = require("../../logger");
 
-/**
- * @swagger
- * tags:
- *   - name: Claims
- *     description: Маршруты для работы с заявками пользователей в личном кабинете
- */
 
-/**
- * @swagger
- * /api/cabinet/claims:
- *   post:
- *     summary: Создание новой заявки
- *     description: Создает новую заявку для текущего пользователя.
- *     tags:
- *       - Claims
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               title:
- *                 type: string
- *                 description: Название заявки
- *               description:
- *                 type: string
- *                 description: Описание заявки
- *     responses:
- *       200:
- *         description: Заявка успешно создана
- *       500:
- *         description: Ошибка при создании заявки
- */
 router.post("/", async (req, res) => {
   const userId = req.userId;
   const data = req.body;
@@ -67,20 +34,7 @@ router.post("/", async (req, res) => {
   }
 });
 
-/**
- * @swagger
- * /api/cabinet/claims:
- *   get:
- *     summary: Получение всех заявок пользователя
- *     description: Возвращает список всех заявок текущего пользователя.
- *     tags:
- *       - Claims
- *     responses:
- *       200:
- *         description: Успешное получение списка заявок
- *       500:
- *         description: Ошибка при получении заявок
- */
+
 router.get("/", async (req, res) => {
   const userId = req.userId;
   // logger.info(
@@ -103,27 +57,7 @@ router.get("/", async (req, res) => {
   }
 });
 
-/**
- * @swagger
- * /api/cabinet/claims/{key}:
- *   get:
- *     summary: Получение заявки по ключу
- *     description: Возвращает информацию о конкретной заявке по её ключу.
- *     tags:
- *       - Claims
- *     parameters:
- *       - in: path
- *         name: key
- *         required: true
- *         schema:
- *           type: string
- *         description: Ключ заявки
- *     responses:
- *       200:
- *         description: Заявка успешно получена
- *       500:
- *         description: Ошибка при получении заявки
- */
+
 router.get("/:key", async (req, res) => {
   const userId = req.userId;
   const key = req.params.key;
