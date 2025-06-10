@@ -16,6 +16,98 @@ const privateKey = process.env.JWT_SECRET;
 const attempts = 3; //Количество попыток
 const timeAttempts = 5; //Время попыток
 
+/**
+ * @swagger
+ * /api/registration/phone:
+ *   post:
+ *     summary: Отправка кода подтверждения на телефон
+ *     description: |
+ *       Отправляет SMS с кодом подтверждения на указанный номер телефона.
+ *       Ограничивает частоту запросов - 1 запрос в 60 секунд.
+ *       Требует подтверждения телефона для завершения регистрации.
+ *     tags: [Registration]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - phone
+ *             properties:
+ *               phone:
+ *                 type: string
+ *                 description: Номер телефона в формате +7XXXXXXXXXX
+ *                 example: "+79161234567"
+ *     responses:
+ *       200:
+ *         description: Успешная отправка кода
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: "ok"
+ *                 phoneCount:
+ *                   type: integer
+ *                   description: Количество оставшихся попыток ввода кода
+ *                   example: 3
+ *       400:
+ *         description: Ошибка валидации
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: "error"
+ *                 message:
+ *                   type: string
+ *                   example: "нет нужной информации"
+ *       403:
+ *         description: Действие недоступно
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: "unavailable"
+ *                 message:
+ *                   type: string
+ *                   example: "нельзя часто отправлять запросы на подтверждение телефона"
+ *       409:
+ *         description: Телефон уже подтвержден
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: "error"
+ *                 message:
+ *                   type: string
+ *                   example: "телефон уже подтвержден"
+ *       500:
+ *         description: Ошибка сервера
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: "error"
+ *                 message:
+ *                   type: string
+ *                   example: "ошибка отправки кода"
+ */
+
 router.post("/phone", async (req, res) => {
   try {
     if (!req.body.phone) {
@@ -57,6 +149,102 @@ router.post("/phone", async (req, res) => {
       .json({ status: "error", message: "ошибка отправки кода" });
   }
 });
+
+/**
+ * @swagger
+ * /api/registration/phonecode:
+ *   post:
+ *     summary: Проверка кода подтверждения телефона
+ *     description: |
+ *       Проверяет код, отправленный на телефон пользователя.
+ *       Если код верный, помечает телефон как подтвержденный.
+ *       При неверном коде уменьшает количество оставшихся попыток.
+ *     tags: [Registration]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - phoneCode
+ *             properties:
+ *               phoneCode:
+ *                 type: string
+ *                 description: Код подтверждения из SMS
+ *                 example: "1234"
+ *     responses:
+ *       200:
+ *         description: Телефон успешно подтвержден
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: "ok"
+ *                 message:
+ *                   type: string
+ *                   example: "телефон подтвержден"
+ *       400:
+ *         description: Ошибка в запросе
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: "error"
+ *                 message:
+ *                   type: string
+ *                   example: "нет нужной информации"
+ *       403:
+ *         description: Телефон уже подтвержден
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: "error"
+ *                 message:
+ *                   type: string
+ *                   example: "телефон уже подтвержден"
+ *       410:
+ *         description: Закончились попытки ввода кода
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: "error"
+ *                 message:
+ *                   type: string
+ *                   example: "закончились попытки подтверждения телефона"
+ *       418:
+ *         description: Неверный код подтверждения
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: "error"
+ *                 message:
+ *                   type: string
+ *                   example: "неверный код"
+ *                 phoneCount:
+ *                   type: integer
+ *                   example: 2
+ *       500:
+ *         description: Внутренняя ошибка сервера
+ */
 
 router.post("/phonecode", async (req, res) => {
   try {
@@ -103,6 +291,99 @@ router.post("/phonecode", async (req, res) => {
     });
   }
 });
+
+/**
+ * @swagger
+ * /api/registration/email:
+ *   post:
+ *     summary: Отправка кода подтверждения на email
+ *     description: |
+ *       Отправляет код подтверждения на указанный email.
+ *       Требует предварительного подтверждения телефона.
+ *       Ограничивает частоту запросов.
+ *     tags: [Registration]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - email
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 format: email
+ *                 example: "user@example.com"
+ *     responses:
+ *       200:
+ *         description: Код отправлен
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: "ok"
+ *                 emailcount:
+ *                   type: integer
+ *                   example: 3
+ *       400:
+ *         description: Ошибка в запросе
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: "error"
+ *                 message:
+ *                   type: string
+ *                   example: "нет нужной информации"
+ *       403:
+ *         description: Email уже подтвержден
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: "error"
+ *                 message:
+ *                   type: string
+ *                   example: "email уже подтвержден"
+ *       409:
+ *         description: Телефон не подтвержден
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: "error"
+ *                 message:
+ *                   type: string
+ *                   example: "вначале нужно подтвердить телефон"
+ *       429:
+ *         description: Слишком частые запросы
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: "unavailable"
+ *                 message:
+ *                   type: string
+ *                   example: "нельзя часто отправлять запросы на подтверждение email"
+ *       500:
+ *         description: Ошибка отправки кода
+ */
 
 router.post("/email", async (req, res) => {
   try {
@@ -157,6 +438,103 @@ router.post("/email", async (req, res) => {
   }
 });
 
+
+/**
+ * @swagger
+ * /api/registration/emailcode:
+ *   post:
+ *     summary: Проверка кода подтверждения email
+ *     description: |
+ *       Проверяет код, отправленный на email пользователя.
+ *       Если код верный, помечает email как подтвержденный.
+ *       При неверном коде уменьшает количество оставшихся попыток.
+ *     tags: [Registration]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - emailCode
+ *             properties:
+ *               emailCode:
+ *                 type: string
+ *                 description: Код подтверждения из email
+ *                 example: "ABCD12"
+ *     responses:
+ *       200:
+ *         description: Email успешно подтвержден
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: "ok"
+ *                 message:
+ *                   type: string
+ *                   example: "email подтвержден"
+ *       400:
+ *         description: Ошибка в запросе
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: "error"
+ *                 message:
+ *                   type: string
+ *                   example: "нет нужной информации"
+ *       403:
+ *         description: Email уже подтвержден
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: "error"
+ *                 message:
+ *                   type: string
+ *                   example: "email уже подтвержден"
+ *       410:
+ *         description: Закончились попытки ввода кода
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: "error"
+ *                 message:
+ *                   type: string
+ *                   example: "закончились попытки подтверждения email"
+ *       418:
+ *         description: Неверный код подтверждения
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: "error"
+ *                 message:
+ *                   type: string
+ *                   example: "неверный код"
+ *                 emailCount:
+ *                   type: integer
+ *                   example: 2
+ *       500:
+ *         description: Внутренняя ошибка сервера
+ */
+
 router.post("/emailcode", async (req, res) => {
   try {
     logger.info(
@@ -202,6 +580,89 @@ router.post("/emailcode", async (req, res) => {
     });
   }
 });
+
+
+/**
+ * @swagger
+ * /api/registration/newuser:
+ *   post:
+ *     summary: Создание нового пользователя
+ *     description: |
+ *       Создает нового пользователя в системе или обновляет существующего.
+ *       Требует подтвержденных телефона и email.
+ *       Возвращает JWT токен для аутентификации.
+ *     tags: [Registration]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - password
+ *             properties:
+ *               password:
+ *                 type: string
+ *                 minLength: 10
+ *                 description: Пароль пользователя
+ *                 example: "StrongPassword123"
+ *     responses:
+ *       200:
+ *         description: Пользователь создан/обновлен
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: "ok"
+ *                 jwt:
+ *                   type: string
+ *                   description: JWT токен для аутентификации
+ *       400:
+ *         description: Отсутствует пароль
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: "error"
+ *                 message:
+ *                   type: string
+ *                   example: "нет нужной информации"
+ *       403:
+ *         description: Не все данные подтверждены
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: "error"
+ *                 message:
+ *                   type: string
+ *                   example: "не вся информация подтверждена"
+ *       500:
+ *         description: Ошибка создания/обновления пользователя
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: "error"
+ *                 message:
+ *                   type: string
+ *                   example: "ошибка создания пользователя"
+ *                 error:
+ *                   type: string
+ *                   example: "Detailed error message"
+ */
 
 router.post("/newuser", async (req, res) => {
   try {
@@ -282,6 +743,42 @@ router.post("/newuser", async (req, res) => {
     });
   }
 });
+
+/**
+ * @swagger
+ * /api/registration/clearinfo:
+ *   post:
+ *     summary: Очистка сессии регистрации
+ *     description: Уничтожает текущую сессию, отменяя все предыдущие шаги регистрации.
+ *     tags: [Registration]
+ *     responses:
+ *       200:
+ *         description: Сессия успешно очищена
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: "ok"
+ *                 message:
+ *                   type: string
+ *                   example: "отменены все предыдущие действия"
+ *       500:
+ *         description: Ошибка при очистке сессии
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: "error"
+ *                 message:
+ *                   type: string
+ *                   example: "Ошибка при завершении сессии"
+ */
 
 router.post("/clearinfo", async (req, res) => {
   try {
