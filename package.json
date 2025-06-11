@@ -36,7 +36,6 @@
     "strapi-sdk-js": "^2.3.3",
     "swagger-jsdoc": "^6.2.8",
     "swagger-ui-express": "^5.0.1",
-    "swagger-ui-plugin-hierarchical-tags": "^1.0.4",
     "telegraf": "^4.16.3",
     "uuid": "^10.0.0",
     "winston": "^3.13.0",
