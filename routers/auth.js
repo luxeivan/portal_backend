@@ -8,22 +8,23 @@ const logger = require("../logger");
 const bcrypt = require("bcrypt");
 
 const privateKey = process.env.JWT_SECRET;
+
 /**
  * @swagger
  * /api/auth/login:
  *   post:
- *     summary: Авторизация пользователя
- *     description: Проверяет логин/пароль и отправляет код подтверждения на телефон
- *     tags: [Auth]
+ *     summary: Авторизация (шаг 1 — логин/пароль)
+ *     description: |
+ *       При успешной валидации отправляется SMS-код подтверждения на номер,
+ *       закреплённый за пользователем.
+ *     tags: ["🌐 Auth"]
  *     requestBody:
  *       required: true
  *       content:
  *         application/json:
  *           schema:
  *             type: object
- *             required:
- *               - email
- *               - password
+ *             required: [email, password]
  *             properties:
  *               email:
  *                 type: string
@@ -35,31 +36,18 @@ const privateKey = process.env.JWT_SECRET;
  *                 example: StrongPassword123
  *     responses:
  *       200:
- *         description: Код подтверждения отправлен
+ *         description: SMS-код отправлен
  *         content:
  *           application/json:
  *             schema:
  *               type: object
  *               properties:
- *                 status:
- *                   type: string
- *                 message:
- *                   type: string
+ *                 status:  { type: string, example: ok }
+ *                 message: { type: string, example: Ожидается пин код }
  *       400:
- *         description: Ошибка валидации или отсутствуют данные
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 status:
- *                   type: string
- *                 errors:
- *                   type: array
- *                   items:
- *                     type: object
+ *         description: Ошибка валидации / поля не переданы
  *       418:
- *         description: Неверные учетные данные
+ *         description: Неверные учётные данные
  *       500:
  *         description: Внутренняя ошибка сервера
  */
@@ -140,17 +128,16 @@ router.post(
  * @swagger
  * /api/auth/logincode:
  *   post:
- *     summary: Подтверждение авторизации
- *     description: Проверка кода подтверждения и выдача JWT токена
- *     tags: [Auth]
+ *     summary: Авторизация (шаг 2 — SMS-код)
+ *     description: Возвращает JWT при корректном PIN-коде.
+ *     tags: ["🌐 Auth"]
  *     requestBody:
  *       required: true
  *       content:
  *         application/json:
  *           schema:
  *             type: object
- *             required:
- *               - pincode
+ *             required: [pincode]
  *             properties:
  *               pincode:
  *                 type: string
@@ -165,23 +152,19 @@ router.post(
  *             schema:
  *               type: object
  *               properties:
- *                 status:
- *                   type: string
- *                 jwt:
- *                   type: string
- *                 userid:
- *                   type: string
- *                 email:
- *                   type: string
- *                 phone:
- *                   type: string
+ *                 status: { type: string, example: ok }
+ *                 jwt:    { type: string, example: eyJh… }
+ *                 userid: { type: string, example: 8a6c… }
+ *                 email:  { type: string, example: user@example.com }
+ *                 phone:  { type: string, example: "+7 916 123-45-67" }
  *       400:
- *         description: Неверный запрос или пользователь не найден
+ *         description: Пин-код не передан или пользователь не найден
  *       418:
- *         description: Неверный код подтверждения
+ *         description: Неверный пин-код
  *       500:
  *         description: Внутренняя ошибка сервера
  */
+
 router.post(
   "/logincode",
   async (req, res, next) => {
@@ -261,21 +244,19 @@ router.post(
  * @swagger
  * /api/auth/checkjwt:
  *   post:
- *     summary: Проверка JWT токена
- *     description: Валидация JWT токена и получение информации о пользователе
- *     tags: [Auth]
+ *     summary: Проверить валидность JWT
+ *     tags: ["🌐 Auth"]
  *     requestBody:
  *       required: true
  *       content:
  *         application/json:
  *           schema:
  *             type: object
- *             required:
- *               - jwt
+ *             required: [jwt]
  *             properties:
  *               jwt:
  *                 type: string
- *                 example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+ *                 example: eyJhbgOiJ9…
  *     responses:
  *       200:
  *         description: Токен валиден
@@ -284,19 +265,17 @@ router.post(
  *             schema:
  *               type: object
  *               properties:
- *                 id:
- *                   type: string
- *                 email:
- *                   type: string
- *                 phone:
- *                   type: string
+ *                 id:    { type: string, example: 8a6c… }
+ *                 email: { type: string, example: user@example.com }
+ *                 phone: { type: string, example: "+7 916 123-45-67" }
  *       400:
- *         description: Отсутствует токен
+ *         description: JWT не передан
  *       401:
- *         description: Невалидный токен
+ *         description: Токен невалиден / просрочен
  *       500:
  *         description: Внутренняя ошибка сервера
  */
+
 router.post("/checkjwt", async function (req, res) {
   try {
     if (!req.body.jwt) {
