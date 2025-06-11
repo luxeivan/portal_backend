@@ -6,6 +6,22 @@ const {
 } = require("../services/onec/services");
 const logger = require("../logger");
 
+/**
+ * @swagger
+ * /api/services:
+ *   get:
+ *     summary: Список всех услуг
+ *     tags: ["🌐 Services"]
+ *     responses:
+ *       200:
+ *         description: Услуги найдены
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items: { type: object }
+ *       500: { description: Ошибка при получении услуг }
+ */
 
 router.get("/", async (req, res) => {
   // logger.info("Получен запрос на получение списка услуг");
@@ -28,6 +44,23 @@ router.get("/", async (req, res) => {
     });
   }
 });
+
+/**
+ * @swagger
+ * /api/services/{key}:
+ *   get:
+ *     summary: Услуги по ключу
+ *     tags: ["🌐 Services"]
+ *     parameters:
+ *       - in: path
+ *         name: key
+ *         required: true
+ *         schema: { type: string }
+ *         description: GUID или символьный ключ услуги
+ *     responses:
+ *       200: { description: Услуга найдена }
+ *       500: { description: Ошибка при получении услуги }
+ */
 
 router.get("/:key", async (req, res) => {
   // logger.info(`Получен запрос на получение услуги с ключом: ${req.params.key}`);
@@ -52,6 +85,27 @@ router.get("/:key", async (req, res) => {
     );
   }
 });
+
+/**
+ * @swagger
+ * /api/services/item/{key}:
+ *   get:
+ *     summary: Детали конкретной услуги
+ *     tags: ["🌐 Services"]
+ *     parameters:
+ *       - in: path
+ *         name: key
+ *         required: true
+ *         schema: { type: string }
+ *       - in: query
+ *         name: withFields
+ *         schema:
+ *           type: boolean
+ *         description: Вернуть расширенные поля (true / false)
+ *     responses:
+ *       200: { description: Элемент услуги найден }
+ *       500: { description: Ошибка при получении элемента услуги }
+ */
 
 router.get("/item/:key", async (req, res) => {
   // logger.info(

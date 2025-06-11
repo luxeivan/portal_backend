@@ -9,6 +9,31 @@ const {
 } = require("../../services/onec/claims");
 const logger = require("../../logger");
 
+/**
+ * @swagger
+ * /api/cabinet/claims:
+ *   post:
+ *     summary: Создать новую заявку
+ *     tags: ["🔒 Claims"]
+ *     security: [ bearerAuth: [] ]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             description: Произвольный JSON с полями заявки
+ *             example:
+ *               serviceKey: "CONNECTION"
+ *               description: "Хочу подключиться к сети"
+ *               files: [ "a1b2c3d4-e5f6-7890" ]
+ *     responses:
+ *       200:
+ *         description: Заявка создана
+ *       500:
+ *         description: Ошибка при создании заявки
+ */
+
 
 router.post("/", async (req, res) => {
   const userId = req.userId;
@@ -35,6 +60,25 @@ router.post("/", async (req, res) => {
 });
 
 
+/**
+ * @swagger
+ * /api/cabinet/claims:
+ *   get:
+ *     summary: Список заявок пользователя
+ *     tags: ["🔒 Claims"]
+ *     security: [ bearerAuth: [] ]
+ *     responses:
+ *       200:
+ *         description: Массив заявок
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items: { type: object }
+ *       500:
+ *         description: Ошибка при получении заявок
+ */
+
 router.get("/", async (req, res) => {
   const userId = req.userId;
   // logger.info(
@@ -56,6 +100,24 @@ router.get("/", async (req, res) => {
     });
   }
 });
+
+/**
+ * @swagger
+ * /api/cabinet/claims/{key}:
+ *   get:
+ *     summary: Детали конкретной заявки
+ *     tags: ["🔒 Claims"]
+ *     security: [ bearerAuth: [] ]
+ *     parameters:
+ *       - in: path
+ *         name: key
+ *         required: true
+ *         schema: { type: string }
+ *         description: GUID заявки
+ *     responses:
+ *       200: { description: Заявка найдена }
+ *       500: { description: Ошибка при получении заявки }
+ */
 
 
 router.get("/:key", async (req, res) => {
