@@ -19,17 +19,17 @@ const headers = {
 
 /**
  * @swagger
- * tags:
- *   - name: Contact
- *     description: Контактная информация из 1С
- *
  * /api/contacts:
  *   get:
- *     summary: Получить контактную информацию с фотографиями
- *     tags: [Contact]
+ *     summary: Получить контактную информацию с привязанными фото
+ *     description: |
+ *       Возвращает список объектов из регистра
+ *       **InformationRegister_portalContactInformation** и прикреплённые
+ *       фотографии из **Catalog_РайоныЭлектрическихСетейПрисоединенныеФайлы**.
+ *     tags: ["🌐 Contact"]
  *     responses:
  *       200:
- *         description: Успешное получение контактной информации
+ *         description: Контакты найдены
  *         content:
  *           application/json:
  *             schema:
@@ -39,7 +39,11 @@ const headers = {
  *                 properties:
  *                   object:
  *                     type: string
+ *                     description: GUID записи контакта
  *                     example: "e93f2105-bffe-11ee-907a-00505601574a"
+ *                   description:
+ *                     type: string
+ *                     example: "Центральные электросети"
  *                   photos:
  *                     type: array
  *                     items:
@@ -47,20 +51,12 @@ const headers = {
  *                       properties:
  *                         ПутьКФайлу:
  *                           type: string
- *                           example: "images/contact/123.jpg"
+ *                           example: "images/contacts/123.jpg"
  *                         ПолныйПутьWindows:
  *                           type: string
- *                           example: "//server/shared/images/contact/123.jpg"
+ *                           example: "\\\\srv\\share\\images\\contacts\\123.jpg"
  *       500:
- *         description: Ошибка при получении данных из 1С
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: "Ошибка при получении данных из 1C"
+ *         description: Ошибка при запросе к 1С
  */
 
 router.get("/", async (req, res) => {

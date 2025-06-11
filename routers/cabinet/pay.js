@@ -5,59 +5,44 @@ const pay = express.Router();
 const logger = require("../../logger");
 const { requestPay } = require("../../services/servicesPay");
 
+
+
 /**
  * @swagger
  * /api/cabinet/pay:
  *   post:
  *     summary: Инициация оплаты через ВТБ
- *     tags: [Payments]
+ *     tags: ["🔒 Payments"]
  *     requestBody:
  *       required: true
  *       content:
  *         application/json:
  *           schema:
  *             type: object
+ *             required: [zakaz, amount]
  *             properties:
  *               zakaz:
  *                 type: string
+ *                 description: Номер заказа/счёта
  *                 example: "123456789"
  *               amount:
  *                 type: number
+ *                 description: Сумма в рублях
  *                 example: 1500.00
  *     responses:
  *       200:
- *         description: Успешное создание платежа
+ *         description: Ссылка на платёжную форму ВТБ
  *         content:
  *           application/json:
  *             schema:
  *               type: object
  *               properties:
- *                 status:
- *                   type: string
- *                   example: "ok"
- *                 formUrl:
- *                   type: string
- *                   example: "https://payment.vtb.ru/payform?orderId=abc123"
+ *                 status: { type: string, example: ok }
+ *                 formUrl:{ type: string, example: https://3dsec... }
  *       400:
- *         description: Неверные параметры запроса
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 status:
- *                   type: string
- *                   example: "error"
+ *         description: zakaz или amount не переданы
  *       500:
- *         description: Ошибка при создании платежа
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 status:
- *                   type: string
- *                   example: "error"
+ *         description: Ошибка внутри сервиса VTB
  */
 
 pay.post("/", async (req, res) => {

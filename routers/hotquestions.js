@@ -17,19 +17,19 @@ const headers = {
   Authorization: server1c_auth,
 };
 
+
 /**
  * @swagger
- * tags:
- *   - name: HotQuestions
- *     description: Получение частых вопросов и ответов
- *
  * /api/hotQuestions:
  *   get:
- *     summary: Получить список горячих вопросов и ответов
- *     tags: [HotQuestions]
+ *     summary: Получить «горячие» вопросы и ответы
+ *     description: |
+ *       Читает каталог *Catalog_quickAnswers* в 1С и
+ *       формирует вложенную структуру (папки / дочерние элементы).
+ *     tags: ["🌐 HotQuestions"]
  *     responses:
  *       200:
- *         description: Успешное получение вопросов и ответов
+ *         description: Список вопросов/ответов
  *         content:
  *           application/json:
  *             schema:
@@ -37,48 +37,21 @@ const headers = {
  *               items:
  *                 type: object
  *                 properties:
- *                   IsFolder:
- *                     type: boolean
- *                     example: true
- *                   Description:
- *                     type: string
- *                     example: ""
- *                   Ref_Key:
- *                     type: string
- *                     example: "00000000-0000-0000-0000-000000000000"
+ *                   IsFolder:  { type: boolean }
+ *                   Description: { type: string }
+ *                   Ref_Key: { type: string }
  *                   children:
  *                     type: array
  *                     items:
  *                       type: object
  *                       properties:
- *                         question:
- *                           type: string
- *                           example: "Как изменить тариф?"
- *                         answer:
- *                           type: string
- *                           example: "Вы можете изменить тариф в личном кабинете."
- *                         IsFolder:
- *                           type: boolean
- *                           example: false
- *                         Parent_Key:
- *                           type: string
- *                           example: "12345678-1234-1234-1234-123456789012"
- *                         Ref_Key:
- *                           type: string
- *                           example: "87654321-4321-4321-4321-210987654321"
+ *                         question: { type: string }
+ *                         answer:   { type: string }
  *       500:
- *         description: Ошибка при получении данных из 1С
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: "Ошибка при получении данных о 'Горячих ответах' из 1С"
+ *         description: Ошибка при запросе к 1С
  */
 
-//Роутер на получение вопросов/ответов
+
 router.get("/", async (req, res) => {
   try {
     //Запрашиваем инфу
