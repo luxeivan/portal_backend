@@ -14,6 +14,31 @@ const url =
 
 const token = process.env.DADATA_TOKEN;
 
+/**
+ * @swagger
+ * /api/cabinet/get-fias:
+ *   get:
+ *     summary: Поиск адреса (ФИАС)
+ *     tags: ["🌐 DaData"]
+ *     parameters:
+ *       - in: query
+ *         name: searchString
+ *         required: true
+ *         schema: { type: string }
+ *     responses:
+ *       200:
+ *         description: Подсказки адресов
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status: { type: string, example: ok }
+ *                 data:   { type: array,  items: { type: object } }
+ *       400: { description: Пустое поле поиска }
+ *       500: { description: Ошибка обращения к DaData }
+ */
+
 getFias.get(
   "/",
   query("searchString").notEmpty(),
