@@ -5,8 +5,6 @@ const pay = express.Router();
 const logger = require("../../logger");
 const { requestPay } = require("../../services/servicesPay");
 
-
-
 /**
  * @swagger
  * /api/cabinet/pay:
@@ -23,11 +21,9 @@ const { requestPay } = require("../../services/servicesPay");
  *             properties:
  *               zakaz:
  *                 type: string
- *                 description: Номер заказа/счёта
  *                 example: "123456789"
  *               amount:
  *                 type: number
- *                 description: Сумма в рублях
  *                 example: 1500.00
  *     responses:
  *       200:
@@ -37,8 +33,8 @@ const { requestPay } = require("../../services/servicesPay");
  *             schema:
  *               type: object
  *               properties:
- *                 status: { type: string, example: ok }
- *                 formUrl:{ type: string, example: https://3dsec... }
+ *                 status:  { type: string, example: ok }
+ *                 formUrl: { type: string, example: "https://3dsec.example.com/payform?orderId=abc123" }
  *       400:
  *         description: zakaz или amount не переданы
  *       500:

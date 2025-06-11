@@ -1,49 +1,68 @@
 const swaggerJsdoc = require("swagger-jsdoc");
-const swaggerUi    = require("swagger-ui-express");
+const swaggerUi = require("swagger-ui-express");
 
-/* ───────────── Заголовок ───────────── */
-const API_TITLE       = "МосОблЭнерго API";
+/* ───────────── Заголовок / описание ───────────── */
+const API_TITLE = "МосОблЭнерго API";
 const API_DESCRIPTION = `
 * 🔒 **Приватные** — требуют JWT  
-* 🌐 **Публичные** — доступны без авторизации
+* 🌐 **Публичные** — доступны без авторизации  
 
-Кнопка **Execute** предназначена для тестового окружения (dev).`;
+#### Как авторизоваться
+1. В разделе **🌐 Auth → /api/auth/login** выполните шаги авторизации  
+   (email + пароль, затем SMS-код).  
+2. В ответе придёт поле \`jwt\`. Скопируйте его.  
+3. Нажмите зелёную кнопку **Authorize** вверху справа.  
+4. В форме *bearerAuth* **вставьте токен целиком** (без слова *Bearer*).  
+5. Нажмите **Authorize** → затем **Close**.  
+   Теперь все 🔒 эндпоинты будут выполняться от имени пользователя.
+
+Кнопка **Execute** предназначена для тестового окружения (dev).  
+`;
 
 /* ───────────── OpenAPI ───────────── */
 const options = {
   definition: {
     openapi: "3.0.0",
-    info: { title: API_TITLE, version: "2.3.2", description: API_DESCRIPTION },
+    info: {
+      title: API_TITLE,
+      version: "2.3.3",
+      description: API_DESCRIPTION,
+    },
 
     components: {
       securitySchemes: {
-        bearerAuth: { type: "http", scheme: "bearer", bearerFormat: "JWT" }
-      }
+        bearerAuth: {
+          type: "http",
+          scheme: "bearer",
+          bearerFormat: "JWT",
+          description: "Вставляйте **только** сам токен, без слова “Bearer”.",
+        },
+      },
     },
 
     tags: [
-      { name: "🔒 Profile",          description: "Профиль пользователя" },
-      { name: "🔒 Files",            description: "Загрузка и получение файлов" },
-      { name: "🔒 Documents",        description: "Документы пользователя" },
-      { name: "🔒 Claims",           description: "Заявки / обращения" },
+      { name: "🔒 Profile", description: "Профиль пользователя" },
+      { name: "🔒 Files", description: "Загрузка и получение файлов" },
+      { name: "🔒 Documents", description: "Документы пользователя" },
+      { name: "🔒 Claims", description: "Заявки / обращения" },
       { name: "🔒 PersonalAccounts", description: "Лицевые счета" },
-      { name: "🔒 Payments",         description: "Платёжные операции" },
+      { name: "🔒 Payments", description: "Платёжные операции" },
 
-      { name: "🌐 Auth",         description: "Авторизация" },
+      { name: "🌐 Auth", description: "Авторизация" },
       { name: "🌐 Registration", description: "Регистрация" },
-      { name: "🌐 Services",     description: "Справочник услуг" },
-      { name: "🌐 DaData",       description: "Интеграция DaData" },
+      { name: "🌐 Services", description: "Справочник услуг" },
+      { name: "🌐 DaData", description: "Интеграция DaData" },
       { name: "🌐 HotQuestions", description: "Частые вопросы" },
-      { name: "🌐 Contact",      description: "Контактная информация" },
-      { name: "🌐 GigaChat",     description: "GigaChat API" }
-    ]
+      { name: "🌐 Contact", description: "Контактная информация" },
+      { name: "🌐 GigaChat", description: "GigaChat API" },
+    ],
   },
 
   apis: [
     "./routers/*.js",
     "./routers/getDaData/*.js",
-    "./routers/cabinet/**/*.js"
-  ]
+    "./routers/cabinet/**/*.js",
+  ],
 };
 
 const specs = swaggerJsdoc(options);
@@ -52,17 +71,16 @@ const specs = swaggerJsdoc(options);
 const uiOptions = {
   customSiteTitle: API_TITLE,
 
-  /* Скрываем кнопку Authorize и верхний пустой блок */
+  /* убираем только пустой топ-отступ, Authorize оставляем */
   customCss: `
-    .auth-wrapper     { display:none !important; }
-    .topbar           { padding: 0 !important;   }
+    .topbar { padding: 0 !important; }
   `,
 
   swaggerOptions: {
     docExpansion: "list",
     persistAuthorization: true,
-    displayRequestDuration: true
-  }
+    displayRequestDuration: true,
+  },
 };
 
 module.exports = (app) => {

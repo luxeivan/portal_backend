@@ -30,8 +30,8 @@ const { registerOrderSber } = require("../../services/servicesPaySber");
  *             schema:
  *               type: object
  *               properties:
- *                 status: { type: string, example: ok }
- *                 formUrl:{ type: string, example: https://securepayments.sberbank.ru/... }
+ *                 status:  { type: string, example: ok }
+ *                 formUrl: { type: string, example: "https://securepayments.sberbank.ru/paymentform?orderId=xyz789" }
  *       400:
  *         description: zakaz или amount не переданы
  *       500:
