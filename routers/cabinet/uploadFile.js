@@ -9,6 +9,7 @@ const moment = require("moment");
 require("dotenv").config();
 
 const SERVER_1C = process.env.SERVER_1C;
+const SERVER_1C_HTTP_SERVICE = process.env.SERVER_1C_HTTP_SERVICE;
 const server1c_auth = process.env.SERVER_1C_AUTHORIZATION;
 const headers = {
   Authorization: server1c_auth,
@@ -182,10 +183,20 @@ router.post("/", async function (req, res) {
     }
 
     const pdfBytes = await pdfDoc.save();
+    const pdfAsBase64 = await pdfDoc.saveAsBase64();
     const pdfFilename = `combined_document_${uuid}.pdf`;
     const pdfPath = `${dirName}/${pdfFilename}`;
 
-    console.log("Созданный PDF сохраняется по пути:", pdfPath);
+    // console.log("Созданный PDF сохраняется по пути:", pdfPath);
+
+
+    const resSaveFile = await axios.post(`${SERVER_1C_HTTP_SERVICE}/profile/${userId}/file`, {
+      base64: pdfAsBase64,
+      ext: "pdf"
+    }, { headers })
+    // console.log("res", res.data)
+
+
     await fs.promises.writeFile(pdfPath, pdfBytes);
     logger.info(
       `Объединенный PDF успешно создан: ${pdfFilename}. UUID: ${uuid}`
@@ -202,37 +213,45 @@ router.post("/", async function (req, res) {
     }
 
     // Отправка файла в 1С
-    let fileRefKey;
+    // let fileRefKey;
     try {
-      const fileData = fs.readFileSync(pdfPath);
-      const base64File = fileData.toString("base64");
+      // const fileData = fs.readFileSync(pdfPath);
+      // const base64File = fileData.toString("base64");
 
-      const currentDate = new Date();
-      const filePathIn1C = `${userId}/${pdfFilename}`;
+      // const currentDate = new Date();
+      // const filePathIn1C = `${userId}/${pdfFilename}`;
 
-      console.log("Файл отправляется в 1С по пути:", filePathIn1C);
+      // console.log("Файл отправляется в 1С по пути:", filePathIn1C);
 
-      const payload = {
-        Description: req.body.documentName,
-        ВладелецФайла_Key: userId,
-        Автор_Key: user_Key,
-        ДатаМодификацииУниверсальная: currentDate.toISOString(),
-        ДатаСоздания: currentDate.toISOString(),
-        ПутьКФайлу: filePathIn1C,
-        Размер: fileData.length.toString(),
-        Расширение: "pdf",
-        ТипХраненияФайла: "ВТомахНаДиске",
-        Том_Key: mainVolume_Key,
-        ВидФайла_Key: categoryKey,
-      };
+      const resSaveDocsProfile = await axios.post(`${SERVER_1C_HTTP_SERVICE}/profile/${userId}/docs`, {
+        fileId: resSaveFile?.data?.data?.fileId,
+        name: req.body.documentName,
+        typeFileId: categoryKey
+      }, { headers })
+      console.log("resSaveDocsProfile", resSaveDocsProfile.data)
 
-      const uploadResponse = await axios.post(
-        `${SERVER_1C}/Catalog_profileПрисоединенныеФайлы?$format=json`,
-        payload,
-        { headers }
-      );
-      console.log("Файл успешно загружен в 1С:", uploadResponse.data);
-      fileRefKey = uploadResponse.data.Ref_Key; // Получаем Ref_Key загруженного файла
+      // const payload = {
+      //   Description: req.body.documentName,
+      //   ВладелецФайла_Key: userId,
+      //   Автор_Key: user_Key,
+      //   ДатаМодификацииУниверсальная: currentDate.toISOString(),
+      //   ДатаСоздания: currentDate.toISOString(),
+      //   ПутьКФайлу: filePathIn1C,
+      //   Размер: fileData.length.toString(),
+      //   Расширение: "pdf",
+      //   ТипХраненияФайла: "ВТомахНаДиске",
+      //   Том_Key: mainVolume_Key,
+      //   ВидФайла_Key: categoryKey,
+      // };
+
+
+      //   const uploadResponse = await axios.post(
+      //     `${SERVER_1C}/Catalog_profileПрисоединенныеФайлы?$format=json`,
+      //     payload,
+      //     { headers }
+      //   );
+      //   console.log("Файл успешно загружен в 1С:", uploadResponse.data);
+      //   fileRefKey = uploadResponse.data.Ref_Key; // Получаем Ref_Key загруженного файла
     } catch (error) {
       console.error(
         "Ошибка при отправке файла в 1С:",
@@ -245,36 +264,36 @@ router.post("/", async function (req, res) {
     }
 
     // Создание связи в InformationRegister_connectionsOfElements
-    try {
-      const connectionPayload = {
-        Period: moment().format(),
-        usage: true,
-        element1: fileRefKey,
-        element1_Type: "StandardODATA.Catalog_profileПрисоединенныеФайлы",
-        element2: userId,
-        element2_Type: "StandardODATA.Catalog_profile",
-        reason: "Добавление документа в профиль пользователя",
-      };
+    // try {
+    //   const connectionPayload = {
+    //     Period: moment().format(),
+    //     usage: true,
+    //     element1: fileRefKey,
+    //     element1_Type: "StandardODATA.Catalog_profileПрисоединенныеФайлы",
+    //     element2: userId,
+    //     element2_Type: "StandardODATA.Catalog_profile",
+    //     reason: "Добавление документа в профиль пользователя",
+    //   };
 
-      const connectionResponse = await axios.post(
-        `${SERVER_1C}/InformationRegister_connectionsOfElements?$format=json`,
-        connectionPayload,
-        { headers }
-      );
-      console.log(
-        "Связь успешно создана в InformationRegister_connectionsOfElements:",
-        connectionResponse.data
-      );
-    } catch (error) {
-      console.error(
-        "Ошибка при создании связи в InformationRegister_connectionsOfElements:",
-        error.response ? error.response.data : error.message
-      );
-      return res.status(500).json({
-        status: "error",
-        message: "Ошибка при создании связи документа с профилем",
-      });
-    }
+    //   const connectionResponse = await axios.post(
+    //     `${SERVER_1C}/InformationRegister_connectionsOfElements?$format=json`,
+    //     connectionPayload,
+    //     { headers }
+    //   );
+    //   console.log(
+    //     "Связь успешно создана в InformationRegister_connectionsOfElements:",
+    //     connectionResponse.data
+    //   );
+    // } catch (error) {
+    //   console.error(
+    //     "Ошибка при создании связи в InformationRegister_connectionsOfElements:",
+    //     error.response ? error.response.data : error.message
+    //   );
+    //   return res.status(500).json({
+    //     status: "error",
+    //     message: "Ошибка при создании связи документа с профилем",
+    //   });
+    // }
 
     return res.json({ status: "ok", message: "Файл успешно загружен" });
   } catch (error) {
