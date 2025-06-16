@@ -8,44 +8,19 @@ const logger = require("../logger");
 
 /**
  * @swagger
- * tags:
- *   - name: Services
- *     description: Маршруты для получения информации об услугах и их элементах
- */
-
-/**
- * @swagger
  * /api/services:
  *   get:
- *     summary: Получение списка услуг
- *     description: Возвращает список всех доступных услуг.
- *     tags:
- *       - Services
+ *     summary: Список всех услуг
+ *     tags: ["🌐 Services"]
  *     responses:
  *       200:
- *         description: Успешное получение списка услуг
+ *         description: Услуги найдены
  *         content:
  *           application/json:
  *             schema:
  *               type: array
- *               items:
- *                 type: object
- *       500:
- *         description: Ошибка при получении списка услуг
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 status:
- *                   type: string
- *                   example: error
- *                 message:
- *                   type: string
- *                   example: "Ошибка при получении услуг"
- *                 error:
- *                   type: string
- *                   example: "Описание ошибки"
+ *               items: { type: object }
+ *       500: { description: Ошибка при получении услуг }
  */
 
 router.get("/", async (req, res) => {
@@ -54,7 +29,7 @@ router.get("/", async (req, res) => {
   try {
     const services = await getServicesByKey();
     // logger.info("Услуги успешно получены");
-    console.log('services', services)
+    console.log("services", services);
     if (services) {
       res.json(services);
     } else {
@@ -74,40 +49,17 @@ router.get("/", async (req, res) => {
  * @swagger
  * /api/services/{key}:
  *   get:
- *     summary: Получение услуги по ключу
- *     description: Возвращает данные услуги на основе предоставленного ключа.
- *     tags:
- *       - Services
+ *     summary: Услуги по ключу
+ *     tags: ["🌐 Services"]
  *     parameters:
  *       - in: path
  *         name: key
  *         required: true
- *         schema:
- *           type: string
- *         description: Ключ для получения услуги
+ *         schema: { type: string }
+ *         description: GUID или символьный ключ услуги
  *     responses:
- *       200:
- *         description: Успешное получение услуги
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *       500:
- *         description: Ошибка при получении услуги
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 status:
- *                   type: string
- *                   example: error
- *                 message:
- *                   type: string
- *                   example: "Ошибка при получении услуги"
- *                 error:
- *                   type: string
- *                   example: "Описание ошибки"
+ *       200: { description: Услуга найдена }
+ *       500: { description: Ошибка при получении услуги }
  */
 
 router.get("/:key", async (req, res) => {
@@ -138,40 +90,21 @@ router.get("/:key", async (req, res) => {
  * @swagger
  * /api/services/item/{key}:
  *   get:
- *     summary: Получение элемента услуги по ключу
- *     description: Возвращает данные элемента услуги на основе предоставленного ключа.
- *     tags:
- *       - Services
+ *     summary: Детали конкретной услуги
+ *     tags: ["🌐 Services"]
  *     parameters:
  *       - in: path
  *         name: key
  *         required: true
+ *         schema: { type: string }
+ *       - in: query
+ *         name: withFields
  *         schema:
- *           type: string
- *         description: Ключ для получения элемента услуги
+ *           type: boolean
+ *         description: Вернуть расширенные поля (true / false)
  *     responses:
- *       200:
- *         description: Успешное получение элемента услуги
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *       500:
- *         description: Ошибка при получении элемента услуги
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 status:
- *                   type: string
- *                   example: error
- *                 message:
- *                   type: string
- *                   example: "Ошибка при получении элемента услуги"
- *                 error:
- *                   type: string
- *                   example: "Описание ошибки"
+ *       200: { description: Элемент услуги найден }
+ *       500: { description: Ошибка при получении элемента услуги }
  */
 
 router.get("/item/:key", async (req, res) => {
@@ -182,8 +115,8 @@ router.get("/item/:key", async (req, res) => {
   try {
     const key = req.params.key;
     let withFields = req.query.withFields;
-    if (withFields === "false") withFields = false
-    if (withFields === "true") withFields = true
+    if (withFields === "false") withFields = false;
+    if (withFields === "true") withFields = true;
 
     // console.log('withFields: ', withFields)
     const services = await getServiceItemByKey(key, withFields);
@@ -191,7 +124,9 @@ router.get("/item/:key", async (req, res) => {
     // console.log('services: ', services)
     res.json(services);
   } catch (error) {
-    logger.error(`Ошибка при получении элемента услуги с ключом ${req.params.key}: ${error.message}`);
+    logger.error(
+      `Ошибка при получении элемента услуги с ключом ${req.params.key}: ${error.message}`
+    );
     res.status(500).json({
       status: "error",
       message: "Ошибка при получении элемента услуги",

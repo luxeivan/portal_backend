@@ -17,6 +17,48 @@ const headers = {
   Authorization: server1c_auth,
 };
 
+/**
+ * @swagger
+ * /api/contacts:
+ *   get:
+ *     summary: Получить контактную информацию с привязанными фото
+ *     description: |
+ *       Возвращает список объектов из регистра
+ *       **InformationRegister_portalContactInformation** и прикреплённые
+ *       фотографии из **Catalog_РайоныЭлектрическихСетейПрисоединенныеФайлы**.
+ *     tags: ["🌐 Contact"]
+ *     responses:
+ *       200:
+ *         description: Контакты найдены
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   object:
+ *                     type: string
+ *                     description: GUID записи контакта
+ *                     example: "e93f2105-bffe-11ee-907a-00505601574a"
+ *                   description:
+ *                     type: string
+ *                     example: "Центральные электросети"
+ *                   photos:
+ *                     type: array
+ *                     items:
+ *                       type: object
+ *                       properties:
+ *                         ПутьКФайлу:
+ *                           type: string
+ *                           example: "images/contacts/123.jpg"
+ *                         ПолныйПутьWindows:
+ *                           type: string
+ *                           example: "\\\\srv\\share\\images\\contacts\\123.jpg"
+ *       500:
+ *         description: Ошибка при запросе к 1С
+ */
+
 router.get("/", async (req, res) => {
   try {
     // 1) Запрашиваем контактную инфу

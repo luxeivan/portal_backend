@@ -19,6 +19,48 @@ const pathFileStorage =
   process.env.PATH_FILESTORAGE ||
   "/Users/yanutstas/Desktop/Project/portal_backend/files";
 
+/**
+ * @swagger
+ * /api/cabinet/upload-file:
+ *   post:
+ *     summary: Загрузить файлы и прикрепить к профилю
+ *     description: >
+ *       🔒 Требуется JWT.
+ *       Принимает изображения (JPEG/PNG) и PDF, объединяет их
+ *       в один PDF и сохраняет в 1С.
+ *     tags: ["🔒 Files"]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             required: [files, categoryKey, documentName]
+ *             properties:
+ *               files:
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *                   format: binary
+ *               categoryKey:
+ *                 type: string
+ *                 description: GUID категории в 1С
+ *               documentName:
+ *                 type: string
+ *                 description: Отображаемое имя документа
+ *     responses:
+ *       200:
+ *         description: Файл успешно загружен
+ *       400:
+ *         description: Нет файлов / неверный формат
+ *       401:
+ *         description: JWT невалиден
+ *       500:
+ *         description: Ошибка сервера или 1С
+ */
+
 router.post("/", async function (req, res) {
   const uuid = uuidv4();
   const userId = req.userId;

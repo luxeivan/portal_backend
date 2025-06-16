@@ -11,42 +11,47 @@ const privateKey = process.env.JWT_SECRET;
 
 /**
  * @swagger
- * tags:
- *   - name: Auth
- *     description: Маршруты для аутентификации пользователей
- */
-
-/**
- * @swagger
  * /api/auth/login:
  *   post:
- *     summary: Логин пользователя
- *     description: Проверка логина и пароля, отправка пин-кода на телефон
- *     tags: [Auth]
+ *     summary: Авторизация (шаг 1 — логин/пароль)
+ *     description: |
+ *       При успешной валидации отправляется SMS-код подтверждения на номер,
+ *       закреплённый за пользователем.
+ *     tags: ["🌐 Auth"]
  *     requestBody:
  *       required: true
  *       content:
  *         application/json:
  *           schema:
  *             type: object
- *             required:
- *               - email
- *               - password
+ *             required: [email, password]
  *             properties:
  *               email:
  *                 type: string
  *                 format: email
+ *                 example: user@example.com
  *               password:
  *                 type: string
  *                 minLength: 10
+ *                 example: StrongPassword123
  *     responses:
  *       200:
- *         description: Ожидается пин код
+ *         description: SMS-код отправлен
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:  { type: string, example: ok }
+ *                 message: { type: string, example: Ожидается пин код }
  *       400:
- *         description: Ошибка валидации
+ *         description: Ошибка валидации / поля не переданы
+ *       418:
+ *         description: Неверные учётные данные
  *       500:
  *         description: Внутренняя ошибка сервера
  */
+
 router.post(
   "/login",
   async (req, res, next) => {
@@ -123,32 +128,43 @@ router.post(
  * @swagger
  * /api/auth/logincode:
  *   post:
- *     summary: Проверка пин-кода
- *     description: Проверка введенного пин-кода и выдача JWT токена при успешной проверке
- *     tags: [Auth]
+ *     summary: Авторизация (шаг 2 — SMS-код)
+ *     description: Возвращает JWT при корректном PIN-коде.
+ *     tags: ["🌐 Auth"]
  *     requestBody:
  *       required: true
  *       content:
  *         application/json:
  *           schema:
  *             type: object
- *             required:
- *               - pincode
+ *             required: [pincode]
  *             properties:
  *               pincode:
  *                 type: string
  *                 minLength: 4
  *                 maxLength: 11
+ *                 example: "1234"
  *     responses:
  *       200:
- *         description: Успешная проверка пин-кода, выдача JWT токена
+ *         description: Успешная авторизация
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status: { type: string, example: ok }
+ *                 jwt:    { type: string, example: eyJh… }
+ *                 userid: { type: string, example: 8a6c… }
+ *                 email:  { type: string, example: user@example.com }
+ *                 phone:  { type: string, example: "+7 916 123-45-67" }
  *       400:
- *         description: Ошибка валидации
- *       401:
+ *         description: Пин-код не передан или пользователь не найден
+ *       418:
  *         description: Неверный пин-код
  *       500:
  *         description: Внутренняя ошибка сервера
  */
+
 router.post(
   "/logincode",
   async (req, res, next) => {
@@ -226,86 +242,40 @@ router.post(
 
 /**
  * @swagger
- * /api/auth/test:
- *   post:
- *     summary: Тестовый маршрут
- *     description: Тестовый маршрут для проверки пользователя по email
- *     tags: [Auth]
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             required:
- *               - email
- *             properties:
- *               email:
- *                 type: string
- *                 format: email
- *     responses:
- *       200:
- *         description: Успешный ответ
- *       400:
- *         description: Ошибка запроса
- *       404:
- *         description: Пользователь не найден
- *       500:
- *         description: Внутренняя ошибка сервера
- */
-// router.post("/test", async function (req, res) {
-//   try {
-//     if (!req.body.email) {
-//       logger.error("Ошибка: не указан email в теле");
-//       return res.status(400).json("не указан email в теле");
-//     }
-
-//     const user = await getUserByEmail(req.body.email);
-//     if (user) {
-//       res.json(user);
-//     } else {
-//       const errorMessage = `пользователь с email: ${req.body.email} не найден`;
-//       logger.error(errorMessage);
-//       res.status(404).json(user);
-//     }
-//   } catch (error) {
-//     logger.error(
-//       `Внутренняя ошибка сервера при проверке пользователя: ${error.message}`
-//     );
-//     res
-//       .status(500)
-//       .json({ status: "error", message: "Внутренняя ошибка сервера" });
-//   }
-// });
-
-/**
- * @swagger
  * /api/auth/checkjwt:
  *   post:
- *     summary: Проверка JWT токена
- *     description: Проверка JWT токена и возврат информации о пользователе
- *     tags: [Auth]
+ *     summary: Проверить валидность JWT
+ *     tags: ["🌐 Auth"]
  *     requestBody:
  *       required: true
  *       content:
  *         application/json:
  *           schema:
  *             type: object
- *             required:
- *               - jwt
+ *             required: [jwt]
  *             properties:
  *               jwt:
  *                 type: string
+ *                 example: eyJhbgOiJ9…
  *     responses:
  *       200:
- *         description: Успешная проверка JWT
+ *         description: Токен валиден
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 id:    { type: string, example: 8a6c… }
+ *                 email: { type: string, example: user@example.com }
+ *                 phone: { type: string, example: "+7 916 123-45-67" }
  *       400:
- *         description: Ошибка запроса
+ *         description: JWT не передан
  *       401:
- *         description: Неавторизован
+ *         description: Токен невалиден / просрочен
  *       500:
  *         description: Внутренняя ошибка сервера
  */
+
 router.post("/checkjwt", async function (req, res) {
   try {
     if (!req.body.jwt) {

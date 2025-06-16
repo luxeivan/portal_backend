@@ -1,9 +1,9 @@
 const express = require("express");
 const router = express.Router();
 
-const subjectsRouter = require("./cabinet/subjects");
-const relationsRouter = require("./cabinet/relation");
-const objectsRouter = require("./cabinet/objects");
+// const subjectsRouter = require("./cabinet/subjects");
+// const relationsRouter = require("./cabinet/relation");
+// const objectsRouter = require("./cabinet/objects");
 const profileRouter = require("./cabinet/profile");
 const uploadFile = require("./cabinet/uploadFile");
 const getFile = require("./cabinet/getFile");
@@ -21,9 +21,9 @@ const pay = require("./cabinet/pay");
 const paySber = require("./cabinet/paySber");
 // ... и так далее для всех остальных файлов в папке cabinet ...
 
-router.use("/subjects", subjectsRouter);
-router.use("/relations", relationsRouter);
-router.use("/objects", objectsRouter);
+// router.use("/subjects", subjectsRouter);
+// router.use("/relations", relationsRouter);
+// router.use("/objects", objectsRouter);
 router.use("/profile", profileRouter);
 router.use("/upload-file", uploadFile);
 router.use("/get-file", getFile);

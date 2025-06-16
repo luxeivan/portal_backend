@@ -6,6 +6,31 @@ const url = "https://cleaner.dadata.ru/api/v1/clean/address";
 
 const token = process.env.DADATA_TOKEN;
 
+/**
+ * @swagger
+ * /api/cabinet/get-cadastral:
+ *   get:
+ *     summary: Очистка адреса + кадастровые данные
+ *     tags: ["🌐 DaData"]
+ *     parameters:
+ *       - in: query
+ *         name: addressObject
+ *         required: true
+ *         schema: { type: string }
+ *     responses:
+ *       200:
+ *         description: Данные получены
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status: { type: string, example: ok }
+ *                 data:   { type: array,  items: { type: object } }
+ *       400: { description: Пустое поле поиска }
+ *       500: { description: Ошибка обращения к DaData }
+ */
+
 getCadastral.get("/", query("addressObject").notEmpty(), async (req, res) => {
   // Проверка-------------------------
   const result = validationResult(req);
