@@ -12,6 +12,38 @@ const headers = {
   Authorization: server1c_auth,
 };
 
+/**
+ * @swagger
+ * /api/cabinet/get-file/by-id/{id}:
+ *   get:
+ *     summary: Скачать файл из 1С по GUID
+ *     tags: ["🔒 Files"]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: GUID записи Catalog_profileПрисоединенныеФайлы
+ *     responses:
+ *       200:
+ *         description: PDF-файл
+ *         content:
+ *           application/pdf:
+ *             schema:
+ *               type: string
+ *               format: binary
+ *       403:
+ *         description: Нет доступа к файлу
+ *       404:
+ *         description: Файл не найден
+ *       500:
+ *         description: Ошибка сервера или 1С
+ */
+
+
 // Маршрут для получения файла из 1С по ID
 router.get("/by-id/:id", async function (req, res) {
   const userId = req.userId;
@@ -77,6 +109,31 @@ router.get("/by-id/:id", async function (req, res) {
     });
   }
 });
+
+/**
+ * @swagger
+ * /api/cabinet/get-file/by-filename/{filename}:
+ *   get:
+ *     summary: Скачать файл из времён dev-хранилища по имени
+ *     tags: ["🔒 Files"]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: filename
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Имя файла вместе с расширением
+ *     responses:
+ *       200:
+ *         description: Файл найден и отправлен
+ *       404:
+ *         description: Файл не найден
+ *       500:
+ *         description: Внутренняя ошибка сервера
+ */
+
 
 // Маршрут для получения файла по имени из файловой системы
 router.get("/by-filename/:filename", async function (req, res) {

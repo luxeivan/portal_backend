@@ -41,6 +41,33 @@ async function notifyBot(message, errorDetails = {}) {
   }
 }
 
+/**
+ * @swagger
+ * /api/cabinet/documents/categories:
+ *   get:
+ *     summary: Справочник категорий документов
+ *     tags: ["🔒 Documents"]
+ *     security: [ bearerAuth: [] ]
+ *     responses:
+ *       200:
+ *         description: Категории найдены
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:    { type: string, example: ok }
+ *                 categories:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       Ref_Key:      { type: string }
+ *                       Description:  { type: string }
+ *                       maximumSize:  { type: integer }
+ *       500: { description: Ошибка при запросе к 1С }
+ */
+
 // Новый маршрут для получения категорий документов из 1С
 router.get("/categories", async function (req, res) {
   try {
@@ -88,6 +115,35 @@ router.get("/categories", async function (req, res) {
   }
 });
 
+/**
+ * @swagger
+ * /api/cabinet/documents:
+ *   post:
+ *     summary: Сохранить метаданные нового документа
+ *     tags: ["🔒 Documents"]
+ *     security: [ bearerAuth: [] ]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [documentName, files, category]
+ *             properties:
+ *               documentName: { type: string, example: Скан паспорта }
+ *               category:     { type: string, example: 6739b454-176f-11ef-94f0-… }
+ *               files:
+ *                 type: array
+ *                 items:
+ *                   type: object
+ *                   properties:
+ *                     name: { type: string, example: page1.jpg }
+ *     responses:
+ *       200: { description: Документ сохранён в стейте сессии }
+ *       400: { description: Нет нужных полей }
+ *       500: { description: Внутренняя ошибка сервера }
+ */
+
 router.post("/", async function (req, res) {
   try {
     const userId = req.userId;
@@ -131,6 +187,26 @@ router.post("/", async function (req, res) {
     });
   }
 });
+
+/**
+ * @swagger
+ * /api/cabinet/documents:
+ *   get:
+ *     summary: Получить список документов пользователя
+ *     tags: ["🔒 Documents"]
+ *     security: [ bearerAuth: [] ]
+ *     responses:
+ *       200:
+ *         description: Список документов
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:    { type: string, example: ok }
+ *                 documents: { type: array,  items: { type: object } }
+ *       500: { description: Ошибка при запросе к 1С }
+ */
 
 router.get("/", async function (req, res) {
   const userId = req.userId;
@@ -189,6 +265,23 @@ router.get("/", async function (req, res) {
   }
 });
 
+/**
+ * @swagger
+ * /api/cabinet/documents/by-category:
+ *   get:
+ *     summary: Документы по категории
+ *     tags: ["🔒 Documents"]
+ *     security: [ bearerAuth: [] ]
+ *     parameters:
+ *       - in: query
+ *         name: categoryKey
+ *         required: true
+ *         schema: { type: string }
+ *     responses:
+ *       200: { description: Документы найдены }
+ *       500: { description: Ошибка при запросе к 1С }
+ */
+
 router.get("/by-category", async function (req, res) {
   const userId = req.userId;
   const categoryKey = req.query.categoryKey;
@@ -237,6 +330,26 @@ router.get("/by-category", async function (req, res) {
   }
 });
 
+/**
+ * @swagger
+ * /api/cabinet/documents/getNameDocs:
+ *   get:
+ *     summary: Справочник «Наименования документов профиля»
+ *     tags: ["🔒 Documents"]
+ *     security: [ bearerAuth: [] ]
+ *     responses:
+ *       200:
+ *         description: Справочник получен
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:   { type: string, example: ok }
+ *                 nameDocs: { type: array,  items: { type: object } }
+ *       500: { description: Ошибка при запросе к 1С }
+ */
+
 router.get("/getNameDocs", async function (req, res) {
   logger.info("Получен запрос на получение наименований документов профиля");
 
@@ -268,6 +381,25 @@ router.get("/getNameDocs", async function (req, res) {
     });
   }
 });
+
+/**
+ * @swagger
+ * /api/cabinet/documents/{id}:
+ *   get:
+ *     summary: Получить конкретный документ
+ *     tags: ["🔒 Documents"]
+ *     security: [ bearerAuth: [] ]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema: { type: string }
+ *     responses:
+ *       200: { description: Документ найден }
+ *       400: { description: Документ не принадлежит пользователю }
+ *       404: { description: Документ не найден }
+ *       500: { description: Ошибка запроса к 1С }
+ */
 
 router.get("/:id", async function (req, res) {
   const userId = req.userId;
@@ -315,6 +447,36 @@ router.get("/:id", async function (req, res) {
     });
   }
 });
+
+/**
+ * @swagger
+ * /api/cabinet/documents/{id}:
+ *   put:
+ *     summary: Обновить данные документа
+ *     tags: ["🔒 Documents"]
+ *     security: [ bearerAuth: [] ]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema: { type: string }
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               documentName: { type: string }
+ *               files:
+ *                 type: array
+ *                 items: { type: object }
+ *               nameDoc_Key:  { type: string }
+ *     responses:
+ *       200: { description: Документ обновлён }
+ *       400: { description: Нет нужных полей или чужой документ }
+ *       500: { description: Ошибка обновления в 1С }
+ */
 
 router.put("/:id", async function (req, res) {
   const userId = req.userId;
@@ -390,6 +552,24 @@ router.put("/:id", async function (req, res) {
     });
   }
 });
+
+/**
+ * @swagger
+ * /api/cabinet/documents/{id}:
+ *   delete:
+ *     summary: Удалить документ из профиля
+ *     tags: ["🔒 Documents"]
+ *     security: [ bearerAuth: [] ]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema: { type: string }
+ *     responses:
+ *       200: { description: Документ удалён }
+ *       403: { description: Нет доступа к документу }
+ *       500: { description: Ошибка удаления в 1С }
+ */
 
 router.delete("/:id", async function (req, res) {
   const userId = req.userId;

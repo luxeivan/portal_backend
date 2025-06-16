@@ -11,38 +11,30 @@ const logger = require("../../logger");
 
 /**
  * @swagger
- * tags:
- *   - name: Claims
- *     description: Маршруты для работы с заявками пользователей в личном кабинете
- */
-
-/**
- * @swagger
  * /api/cabinet/claims:
  *   post:
- *     summary: Создание новой заявки
- *     description: Создает новую заявку для текущего пользователя.
- *     tags:
- *       - Claims
+ *     summary: Создать новую заявку
+ *     tags: ["🔒 Claims"]
+ *     security: [ bearerAuth: [] ]
  *     requestBody:
  *       required: true
  *       content:
  *         application/json:
  *           schema:
  *             type: object
- *             properties:
- *               title:
- *                 type: string
- *                 description: Название заявки
- *               description:
- *                 type: string
- *                 description: Описание заявки
+ *             description: Произвольный JSON с полями заявки
+ *             example:
+ *               serviceKey: "CONNECTION"
+ *               description: "Хочу подключиться к сети"
+ *               files: [ "a1b2c3d4-e5f6-7890" ]
  *     responses:
  *       200:
- *         description: Заявка успешно создана
+ *         description: Заявка создана
  *       500:
  *         description: Ошибка при создании заявки
  */
+
+
 router.post("/", async (req, res) => {
   const userId = req.userId;
   const data = req.body;
@@ -67,20 +59,26 @@ router.post("/", async (req, res) => {
   }
 });
 
+
 /**
  * @swagger
  * /api/cabinet/claims:
  *   get:
- *     summary: Получение всех заявок пользователя
- *     description: Возвращает список всех заявок текущего пользователя.
- *     tags:
- *       - Claims
+ *     summary: Список заявок пользователя
+ *     tags: ["🔒 Claims"]
+ *     security: [ bearerAuth: [] ]
  *     responses:
  *       200:
- *         description: Успешное получение списка заявок
+ *         description: Массив заявок
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items: { type: object }
  *       500:
  *         description: Ошибка при получении заявок
  */
+
 router.get("/", async (req, res) => {
   const userId = req.userId;
   // logger.info(
@@ -107,23 +105,21 @@ router.get("/", async (req, res) => {
  * @swagger
  * /api/cabinet/claims/{key}:
  *   get:
- *     summary: Получение заявки по ключу
- *     description: Возвращает информацию о конкретной заявке по её ключу.
- *     tags:
- *       - Claims
+ *     summary: Детали конкретной заявки
+ *     tags: ["🔒 Claims"]
+ *     security: [ bearerAuth: [] ]
  *     parameters:
  *       - in: path
  *         name: key
  *         required: true
- *         schema:
- *           type: string
- *         description: Ключ заявки
+ *         schema: { type: string }
+ *         description: GUID заявки
  *     responses:
- *       200:
- *         description: Заявка успешно получена
- *       500:
- *         description: Ошибка при получении заявки
+ *       200: { description: Заявка найдена }
+ *       500: { description: Ошибка при получении заявки }
  */
+
+
 router.get("/:key", async (req, res) => {
   const userId = req.userId;
   const key = req.params.key;

@@ -1,4 +1,3 @@
-
 const express = require("express");
 const router = express.Router();
 const {
@@ -9,20 +8,7 @@ const {
 const logger = require("../../logger");
 const { getPrice } = require("../../services/onec/otherServices");
 
-/**
- * @swagger
- * /api/cabinet/claims:
- *   get:
- *     summary: Получение всех заявок пользователя
- *     description: Возвращает список всех заявок текущего пользователя.
- *     tags:
- *       - Claims
- *     responses:
- *       200:
- *         description: Успешное получение списка заявок
- *       500:
- *         description: Ошибка при получении заявок
- */
+
 router.get("/:type/:nomenclature", async (req, res) => {
     const userId = req.userId;
     const nomenclature = req.params.nomenclature

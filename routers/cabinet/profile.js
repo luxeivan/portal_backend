@@ -4,6 +4,47 @@ const { getUserById, updateUser } = require("../../services/onec/users");
 const logger = require("../../logger");
 const { getAllUsers } = require("../../services/db/userService");
 
+/**
+ * @swagger
+ * /api/cabinet/profile:
+ *   get:
+ *     summary: Получить текущий профиль
+ *     description: >
+ *       🔒 Требуется JWT в заголовке
+ *       `Authorization: Bearer <token>`
+ *     tags: ["🔒 Profile"]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Профиль найден
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 firstname:
+ *                   type: string
+ *                   example: Иван
+ *                 lastname:
+ *                   type: string
+ *                   example: Иванов
+ *                 email:
+ *                   type: string
+ *                   example: user@example.com
+ *                 phone:
+ *                   type: string
+ *                   example: "+7 916 123-45-67"
+ *                 dateСreate:
+ *                   type: string
+ *                   format: date-time
+ *                   example: "2024-12-01T10:15:30Z"
+ *       401:
+ *         description: JWT отсутствует или невалиден
+ *       500:
+ *         description: Внутренняя ошибка сервера
+ */
+
 router.get("/", async (req, res) => {
   try {
     // Предполагается, что userId получен из токена
@@ -16,14 +57,14 @@ router.get("/", async (req, res) => {
 
     // logger.info(`Запрос на получение профиля пользователя с id: ${userId}`);
     const profile = await getUserById(userId); // Используем метод из 1С
-    console.log('profile',profile)
+    console.log("profile", profile);
 
     res.json({
       firstname: profile.firstName,
       lastname: profile.lastName,
       email: profile.email,
       phone: profile.phone,
-      dateСreate:profile.dateСreate
+      dateСreate: profile.dateСreate,
     });
     // logger.info(`Профиль пользователя с id: ${userId} успешно получен`);
   } catch (error) {
@@ -34,6 +75,40 @@ router.get("/", async (req, res) => {
     res.status(500).json({ message: "Внутренняя ошибка сервера" });
   }
 });
+
+/**
+ * @swagger
+ * /api/cabinet/profile/newpassword:
+ *   post:
+ *     summary: Сменить пароль
+ *     tags: ["🔒 Profile"]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - password
+ *             properties:
+ *               password:
+ *                 type: string
+ *                 minLength: 10
+ *                 example: S0m3Str0ngPa$$
+ *     responses:
+ *       200:
+ *         description: Пароль обновлён
+ *       400:
+ *         description: Пароль не передан
+ *       401:
+ *         description: JWT невалиден
+ *       500:
+ *         description: Внутренняя ошибка сервера
+ */
+
+
 router.post("/newpassword", async (req, res) => {
   const userId = req.userId;
   const password = req.body.password;
@@ -57,6 +132,38 @@ router.post("/newpassword", async (req, res) => {
     res.status(500).json({ message: "Внутренняя ошибка сервера" });
   }
 });
+
+/**
+ * @swagger
+ * /api/cabinet/profile/newphone:
+ *   post:
+ *     summary: Обновить номер телефона
+ *     tags: ["🔒 Profile"]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - phone
+ *             properties:
+ *               phone:
+ *                 type: string
+ *                 example: "+7 926 000-00-00"
+ *     responses:
+ *       200:
+ *         description: Телефон обновлён
+ *       400:
+ *         description: Телефон не передан
+ *       401:
+ *         description: JWT невалиден
+ *       500:
+ *         description: Внутренняя ошибка сервера
+ */
+
 router.post("/newphone", async (req, res) => {
   const userId = req.userId;
   const phone = req.body.phone;
@@ -81,6 +188,41 @@ router.post("/newphone", async (req, res) => {
   }
 });
 
+/**
+ * @swagger
+ * /api/cabinet/profile/allusers:
+ *   get:
+ *     summary: Список всех пользователей
+ *     description: >
+ *       Сервисный эндпоинт. Доступен только административным JWT.
+ *     tags: ["🔒 Profile"]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Массив профилей
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   id:
+ *                     type: string
+ *                     example: "8a6c…"
+ *                   email:
+ *                     type: string
+ *                     example: user@example.com
+ *                   phone:
+ *                     type: string
+ *                     example: "+7 900 123-45-67"
+ *       401:
+ *         description: Доступ запрещён / неверный JWT
+ *       500:
+ *         description: Внутренняя ошибка сервера
+ */
+
 router.get("/allusers", async (req, res) => {
   try {
     const users = await getAllUsers();
@@ -91,10 +233,5 @@ router.get("/allusers", async (req, res) => {
     res.status(500).json({ message: "Внутренняя ошибка сервера" });
   }
 });
-
-// router.get("/allusers", async (req, res) => {
-//   // console.log(getAllUsers())
-//   res.json(await getAllUsers())
-// })
 
 module.exports = router;

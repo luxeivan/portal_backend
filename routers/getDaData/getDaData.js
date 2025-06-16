@@ -45,9 +45,9 @@ const getBoundsAndParts = (type) => {
         to: "country",
         locations: [
           {
-            country_iso_code: "*"
-          }
-        ]
+            country_iso_code: "*",
+          },
+        ],
       };
     case "region":
       return { from: "region", to: "region" };
@@ -65,6 +65,44 @@ const getBoundsAndParts = (type) => {
       return {};
   }
 };
+
+/**
+ * @swagger
+ * /api/getDaData:
+ *   get:
+ *     summary: Поиск в DaData (универсальный)
+ *     tags: ["🌐 DaData"]
+ *     parameters:
+ *       - in: query
+ *         name: type
+ *         required: true
+ *         schema:
+ *           type: string
+ *           enum: [Фамилия, Имя, Отчество, ИНН, БИК, country, region, area, city, settlement, street, fullAddress]
+ *       - in: query
+ *         name: query
+ *         required: true
+ *         schema: { type: string }
+ *       - in: query
+ *         name: locations
+ *         required: false
+ *         schema: { type: string }
+ *         description: JSON-строка массива `locations` (см. DaData API)
+ *     responses:
+ *       200:
+ *         description: Результаты поиска
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status: { type: string, example: ok }
+ *                 data:
+ *                   type: array
+ *                   items: { type: object }
+ *       400: { description: Пустой запрос или неподдерживаемый тип }
+ *       500: { description: Ошибка запроса к DaData }
+ */
 
 getDaData.get(
   "/",
@@ -84,9 +122,10 @@ getDaData.get(
       query: searchQuery,
       locations = [
         {
-          "country_iso_code": "*"
-        }
-      ] } = req.query;
+          country_iso_code: "*",
+        },
+      ],
+    } = req.query;
     const url = getDaDataUrl(type);
     const { from, to, parts } = getBoundsAndParts(type);
 
@@ -109,12 +148,12 @@ getDaData.get(
       ...(parts && { parts }),
       ...(from &&
         to && {
-        from_bound: { value: from },
-        to_bound: { value: to },
-      }),
+          from_bound: { value: from },
+          to_bound: { value: to },
+        }),
       ...(locations && { locations }),
     };
-    console.log(body)
+    console.log(body);
     try {
       console.log(url, body, options);
       const result = await axios.post(url, body, options);

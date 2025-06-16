@@ -17,7 +17,41 @@ const headers = {
   Authorization: server1c_auth,
 };
 
-//Роутер на получение вопросов/ответов
+
+/**
+ * @swagger
+ * /api/hotQuestions:
+ *   get:
+ *     summary: Получить «горячие» вопросы и ответы
+ *     description: |
+ *       Читает каталог *Catalog_quickAnswers* в 1С и
+ *       формирует вложенную структуру (папки / дочерние элементы).
+ *     tags: ["🌐 HotQuestions"]
+ *     responses:
+ *       200:
+ *         description: Список вопросов/ответов
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   IsFolder:  { type: boolean }
+ *                   Description: { type: string }
+ *                   Ref_Key: { type: string }
+ *                   children:
+ *                     type: array
+ *                     items:
+ *                       type: object
+ *                       properties:
+ *                         question: { type: string }
+ *                         answer:   { type: string }
+ *       500:
+ *         description: Ошибка при запросе к 1С
+ */
+
+
 router.get("/", async (req, res) => {
   try {
     //Запрашиваем инфу
