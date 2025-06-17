@@ -16,6 +16,7 @@ const maxSizeFile = 10;
 const documentsStore = {};
 
 const SERVER_1C = process.env.SERVER_1C;
+const SERVER_1C_HTTP_SERVICE = process.env.SERVER_1C_HTTP_SERVICE;
 const server1c_auth = process.env.SERVER_1C_AUTHORIZATION;
 
 // Адрес, по которому будем оповещать бота
@@ -74,12 +75,12 @@ router.get("/categories", async function (req, res) {
     // Шаг 2: Получение категорий документов из 1С
     const response = await axios.get(
       // `${SERVER_1C}/Catalog_services_categoriesFiles/?$format=json&$select=**&$filter=Ref_Key eq guid'6739b454-176f-11ef-94f0-5ef3fcb042f8'&$expand=category`,
-      `${SERVER_1C}/Catalog_ВидыФайлов?$format=json&$select=Description,label,Ref_Key,maximumSize`,
+      `${SERVER_1C}/Catalog_ВидыФайлов?$format=json&$select=Description,label,Ref_Key,maximumSize&$filter=saveToProfile eq true`,
       { headers }
     );
 
     const categoriesData = response.data.value;
-    console.log("Получены категории документов из 1С:", categoriesData); // Выводим категории документов
+    // console.log("Получены категории документов из 1С:", categoriesData); // Выводим категории документов
 
     res.json({
       status: "ok",
@@ -213,12 +214,15 @@ router.get("/", async function (req, res) {
 
   try {
     //добавить + параметр в фильтр(Категории)
-    const requestUrl = `${SERVER_1C}/InformationRegister_connectionsOfElements/SliceLast(,Condition='element2 eq cast(guid'${userId}', 'Catalog_profile')')?$format=json&$expand=element1&$filter=usage eq true`;
+    // const requestUrl = `${SERVER_1C}/InformationRegister_connectionsOfElements/SliceLast(,Condition='element2 eq cast(guid'${userId}', 'Catalog_profile')')?$format=json&$expand=element1&$filter=usage eq true`;
+    const requestUrl = `${SERVER_1C_HTTP_SERVICE}/profile/${userId}/docs`;
     // const requestUrl = `${SERVER_1C}/InformationRegister_connectionsOfElements?$format=json&$filter=element2 eq cast(guid'${userId}', 'Catalog_profile') and usage eq true and element1_Type eq 'StandardODATA.Catalog_profileПрисоединенныеФайлы'&$expand=element1`;
 
     const response = await axios.get(requestUrl, { headers });
 
-    const connections = response.data.value;
+    const connections = response.data;
+    // console.log(response.data);
+    
 
     if (!connections || connections.length === 0) {
       return res.json({
@@ -227,13 +231,17 @@ router.get("/", async function (req, res) {
       });
     }
 
-    const documents = connections.map(
-      (connection) => connection.element1_Expanded
-    );
+    // const documents = connections.map(
+    //   (connection) => connection.element1_Expanded
+    // );
 
+    // return res.json({
+    //   status: "ok",
+    //   documents: documents,
+    // });
     return res.json({
       status: "ok",
-      documents: documents,
+      ...response.data,
     });
   } catch (error) {
     console.error(`Ошибка при получении документов из 1С: ${error.message}`);

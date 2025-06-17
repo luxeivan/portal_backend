@@ -63,12 +63,14 @@ const options = {
     "./routers/getDaData/*.js",
     "./routers/cabinet/**/*.js",
   ],
+
 };
 
 const specs = swaggerJsdoc(options);
 
 /* ───────────── Swagger-UI ───────────── */
 const uiOptions = {
+
   customSiteTitle: API_TITLE,
 
   /* убираем только пустой топ-отступ, Authorize оставляем */
@@ -82,9 +84,12 @@ const uiOptions = {
     displayRequestDuration: true,
   },
 };
-
 module.exports = (app) => {
   app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(specs, uiOptions));
+  app.get('/api-docs.json', (req, res) => {
+    res.setHeader('Content-Type', 'application/json');
+    res.send(specs);
+  });
 };
 
 // const swaggerJsdoc = require("swagger-jsdoc");
