@@ -14,7 +14,7 @@ const logger = require("../logger");
 const privateKey = process.env.JWT_SECRET;
 
 const attempts = 3; //Количество попыток
-const timeAttempts = 5; //Время попыток
+const timeAttempts = 60000; //Время попыток
 
 /**
  * @swagger
@@ -53,12 +53,20 @@ router.post("/phone", async (req, res) => {
   try {
     if (!req.body.phone) {
       logger.error("Отсутствует поле 'phone' в теле запроса");
-      return res.json({ status: "error", message: "нет нужной информации" });
+      return res.status(400).json({ status: "error", message: "нет нужной информации" });
     }
     if (req.session.phoneCheck) {
       logger.error("Номер телефона уже подтвержден");
-      return res.json({ status: "error", message: "телефон уже подтвержден" });
+      return res.status(400).json({ status: "error", message: "телефон уже подтвержден" });
     }
+    if (!req.session.emailCheck) {
+      logger.warn("Сначала необходимо подтвердить email");
+      return res.status(400).json({
+        status: "error",
+        message: "вначале нужно подтвердить email",
+      });
+    }
+
     if (req.session.phoneBlock) {
       logger.error("Запрос на подтверждение телефона отправлен слишком часто");
       return res.json({
@@ -69,7 +77,7 @@ router.post("/phone", async (req, res) => {
     req.session.phone = req.body.phone;
     req.session.phoneCheck = false;
     req.session.phoneCount = attempts;
-
+    console.log("смс отправлено")
     const code = await sendCodeToPhone(req.body.phone);
     logger.info(
       `Код подтверждения отправлен на номер телефона: ${req.body.phone}, код: ${code}`
@@ -130,16 +138,16 @@ router.post("/phonecode", async (req, res) => {
   try {
     if (!req.body.phoneCode) {
       logger.error("Отсутствует поле 'phoneCode' в теле запроса");
-      return res.json({ status: "error", message: "нет нужной информации" });
+      return res.status(400).json({ status: "error", message: "нет нужной информации" });
     }
     if (req.session.phoneCheck) {
       // logger.info("Номер телефона уже подтвержден");
-      return res.json({ status: "error", message: "телефон уже подтвержден" });
+      return res.status(400).json({ status: "error", message: "телефон уже подтвержден" });
     }
     if (req.session.phoneCount <= 0) {
       logger.warn("Закончились попытки подтверждения телефона");
       req.session.destroy();
-      return res.json({
+      return res.status(400).json({
         status: "error",
         message: "закончились попытки подтверждения телефона",
       });
@@ -208,28 +216,30 @@ router.post("/phonecode", async (req, res) => {
  */
 
 router.post("/email", async (req, res) => {
+  const originDomain = req.get('origin')
+  console.log("originDomain", originDomain)
+
+  const host = req.get('host')
+  console.log("host", host)
+
+  const userIP = req.socket.remoteAddress;
+  console.log("userIP", userIP)
   try {
     logger.info(
       `Получен запрос на подтверждение email: ${JSON.stringify(req.body)}`
     );
     if (!req.body.email) {
       logger.error("Отсутствует поле 'email' в теле запроса");
-      return res.json({ status: "error", message: "нет нужной информации" });
+      return res.status(400).json({ status: "error", message: "нет нужной информации" });
     }
     if (req.session.emailCheck) {
       // logger.info("Email уже подтвержден");
-      return res.json({ status: "error", message: "email уже подтвержден" });
+      return res.status(400).json({ status: "error", message: "email уже подтвержден" });
     }
-    if (!req.session.phoneCheck) {
-      logger.warn("Сначала необходимо подтвердить номер телефона");
-      return res.json({
-        status: "error",
-        message: "вначале нужно подтвердить телефон",
-      });
-    }
+
     if (req.session.emailBlock) {
       logger.warn("Слишком частые запросы на подтверждение email");
-      return res.json({
+      return res.status(400).json({
         status: "unavailable",
         message: "нельзя часто отправлять запросы на подтверждение email",
       });
