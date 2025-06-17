@@ -221,7 +221,7 @@ router.get("/", async function (req, res) {
     const response = await axios.get(requestUrl, { headers });
 
     const connections = response.data;
-    console.log(response.data);
+    // console.log(response.data);
     
 
     if (!connections || connections.length === 0) {
