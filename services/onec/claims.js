@@ -17,7 +17,7 @@ const claimsOneC = {
   getClaims: async (userId) => {
     try {
       const response = await axios.get(
-        `${server1cHttpService}/profile/${userId}/сlaims`,
+        `${server1cHttpService}/profile/${userId}/claims`,
         {
           headers,
         }
@@ -99,7 +99,7 @@ const claimsOneC = {
   getClaimItem: async (userId, Ref_key) => {
     try {
       const response = await axios.get(
-        `${server1cHttpService}/сlaims/${Ref_key}`,
+        `${server1cHttpService}/claims/${Ref_key}`,
         // `${server1c}/InformationRegister_connectionsOfElements?$format=json&$select=*&$expand=element2/Document_claimsProject/template&$filter=cast(element1,'Catalog_profile') eq guid'${userId}' and cast(element2,'Document_claimsProject') eq guid'${Ref_key}'`,
         {
           headers,

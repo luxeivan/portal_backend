@@ -209,6 +209,7 @@ router.post("/", async function (req, res) {
         await fs.promises.unlink(filePath);
       }
     } catch (err) {
+      
       logger.error(`Не удалось удалить файлы. Ошибка: ${err.message}`);
     }
 
@@ -297,6 +298,7 @@ router.post("/", async function (req, res) {
 
     return res.json({ status: "ok", message: "Файл успешно загружен" });
   } catch (error) {
+    console.log("error",error)
     logger.error(
       `Ошибка при обработке файлов. UUID: ${uuid}. Ошибка: ${error.message}`
     );
