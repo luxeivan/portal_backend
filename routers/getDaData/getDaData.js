@@ -153,9 +153,9 @@ getDaData.get(
         }),
       ...(locations && { locations }),
     };
-    console.log(body);
+    // console.log(body);
     try {
-      console.log(url, body, options);
+      // console.log(url, body, options);
       const result = await axios.post(url, body, options);
 
       res.json({ status: "ok", data: result.data.suggestions });
