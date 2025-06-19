@@ -71,24 +71,24 @@ router.post("/", async function (req, res) {
 
   // Получение настроек обмена из 1С
   let user_Key, mainVolume_Key;
-  try {
-    const exchangeSettingsResponse = await axios.get(
-      `${SERVER_1C}/InformationRegister_exchangeSettings/SliceLast()?$format=json`,
-      { headers }
-    );
-    const exchangeSettings = exchangeSettingsResponse.data.value[0];
-    console.log("Получены настройки обмена из 1С:", exchangeSettings);
-    user_Key = exchangeSettings.user_Key;
-    mainVolume_Key = exchangeSettings.mainVolume_Key;
-    console.log("user_Key:", user_Key);
-    console.log("mainVolume_Key:", mainVolume_Key);
-  } catch (error) {
-    console.error("Ошибка при получении настроек обмена из 1С:", error);
-    return res.status(500).json({
-      status: "error",
-      message: "Ошибка при получении настроек обмена",
-    });
-  }
+  // try {
+  //   const exchangeSettingsResponse = await axios.get(
+  //     `${SERVER_1C}/InformationRegister_exchangeSettings/SliceLast()?$format=json`,
+  //     { headers }
+  //   );
+  //   const exchangeSettings = exchangeSettingsResponse.data.value[0];
+  //   console.log("Получены настройки обмена из 1С:", exchangeSettings);
+  //   user_Key = exchangeSettings.user_Key;
+  //   mainVolume_Key = exchangeSettings.mainVolume_Key;
+  //   console.log("user_Key:", user_Key);
+  //   console.log("mainVolume_Key:", mainVolume_Key);
+  // } catch (error) {
+  //   console.error("Ошибка при получении настроек обмена из 1С:", error);
+  //   return res.status(500).json({
+  //     status: "error",
+  //     message: "Ошибка при получении настроек обмена",
+  //   });
+  // }
 
   if (!req.files || Object.keys(req.files).length === 0) {
     logger.warn(`Запрос на загрузку файлов не содержит файлов. UUID: ${uuid}`);
@@ -105,8 +105,9 @@ router.post("/", async function (req, res) {
   // Получение допустимых расширений и максимального размера из 1С
   let allowedExtensions = ["JPEG", "JPG", "PDF", "PNG"];
   let maxSizeFile = 10 * 1024 * 1024; // По умолчанию 10 МБ
-  const { categoryKey } = req.body;
-  console.log("Полученный categoryKey:", categoryKey);
+  const { categoryKey, saveToProfile } = req.body;
+   console.log("Полученный saveToProfile:", saveToProfile);
+  //  console.log("Полученный categoryKey:", categoryKey);
 
   // Проверка расширений и размера файлов
   let invalidFile = false;
@@ -182,10 +183,10 @@ router.post("/", async function (req, res) {
       }
     }
 
-    const pdfBytes = await pdfDoc.save();
+    // const pdfBytes = await pdfDoc.save();
     const pdfAsBase64 = await pdfDoc.saveAsBase64();
-    const pdfFilename = `combined_document_${uuid}.pdf`;
-    const pdfPath = `${dirName}/${pdfFilename}`;
+    // const pdfFilename = `combined_document_${uuid}.pdf`;
+    // const pdfPath = `${dirName}/${pdfFilename}`;
 
     // console.log("Созданный PDF сохраняется по пути:", pdfPath);
 
@@ -197,10 +198,10 @@ router.post("/", async function (req, res) {
     // console.log("res", res.data)
 
 
-    await fs.promises.writeFile(pdfPath, pdfBytes);
-    logger.info(
-      `Объединенный PDF успешно создан: ${pdfFilename}. UUID: ${uuid}`
-    );
+    // await fs.promises.writeFile(pdfPath, pdfBytes);
+    // logger.info(
+    //   `Объединенный PDF успешно создан: ${pdfFilename}. UUID: ${uuid}`
+    // );
 
     // Удаляем исходные файлы после объединения
     try {
@@ -209,7 +210,6 @@ router.post("/", async function (req, res) {
         await fs.promises.unlink(filePath);
       }
     } catch (err) {
-      
       logger.error(`Не удалось удалить файлы. Ошибка: ${err.message}`);
     }
 
@@ -224,12 +224,16 @@ router.post("/", async function (req, res) {
 
       // console.log("Файл отправляется в 1С по пути:", filePathIn1C);
 
-      const resSaveDocsProfile = await axios.post(`${SERVER_1C_HTTP_SERVICE}/profile/${userId}/docs`, {
-        fileId: resSaveFile?.data?.data?.fileId,
-        name: req.body.documentName,
-        typeFileId: categoryKey
-      }, { headers })
-      console.log("resSaveDocsProfile", resSaveDocsProfile.data)
+      if (saveToProfile) {
+        const resSaveDocsProfile = await axios.post(`${SERVER_1C_HTTP_SERVICE}/profile/${userId}/docs`, {
+          fileId: resSaveFile?.data?.data?.fileId,
+          name: req.body.documentName,
+          typeFileId: categoryKey
+        }, { headers })
+        console.log("resSaveDocsProfile", resSaveDocsProfile.data)
+      } else {
+        return res.json({ status: "ok", message: "Файл успешно загружен", fileId: resSaveFile?.data?.data?.fileId });
+      }
 
       // const payload = {
       //   Description: req.body.documentName,
@@ -253,6 +257,7 @@ router.post("/", async function (req, res) {
       //   );
       //   console.log("Файл успешно загружен в 1С:", uploadResponse.data);
       //   fileRefKey = uploadResponse.data.Ref_Key; // Получаем Ref_Key загруженного файла
+
     } catch (error) {
       console.error(
         "Ошибка при отправке файла в 1С:",
@@ -263,7 +268,6 @@ router.post("/", async function (req, res) {
         message: "Ошибка при загрузке файла в 1С",
       });
     }
-
     // Создание связи в InformationRegister_connectionsOfElements
     // try {
     //   const connectionPayload = {
@@ -298,7 +302,7 @@ router.post("/", async function (req, res) {
 
     return res.json({ status: "ok", message: "Файл успешно загружен" });
   } catch (error) {
-    console.log("error",error)
+    console.log("error", error)
     logger.error(
       `Ошибка при обработке файлов. UUID: ${uuid}. Ошибка: ${error.message}`
     );
