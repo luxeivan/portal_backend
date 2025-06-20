@@ -152,7 +152,7 @@ const claimsOneC = {
       if (!newClaim.data) {
         return false;
       }
-      console.log(newClaim.data);
+      console.log("newClaim.data", newClaim.data);
 
       return newClaim.data;
     } catch (error) {
@@ -567,7 +567,7 @@ const claimsOneC = {
 
   //   return { status: "Проверка ОК" };
   // },
-  
+
 };
 
 module.exports = claimsOneC;
