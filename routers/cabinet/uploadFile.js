@@ -114,11 +114,11 @@ router.post("/", async function (req, res) {
   for (const file of files) {
     const fileExtension = file.name.split(".").pop().toUpperCase();
     if (!allowedExtensions.includes(fileExtension)) {
-      invalidFile = true;
+      invalidFile = "Неподдерживаемое расширение файла";
       break;
     }
     if (file.size > maxSizeFile) {
-      invalidFile = true;
+      invalidFile = "Превышен размер файла";
       break;
     }
   }
@@ -129,7 +129,8 @@ router.post("/", async function (req, res) {
     );
     return res.status(400).json({
       status: "error",
-      message: "Файлы не соответствуют требованиям по размеру или типу",
+      // message: "Файлы не соответствуют требованиям по размеру или типу",
+      message: `${invalidFile}`
     });
   }
 
