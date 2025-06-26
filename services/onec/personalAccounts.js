@@ -99,7 +99,7 @@ const personalAccountsOneC = {
     getClaimsByPersonalAccount: async (userId,key) => {
         try {
             const response = await axios.get(
-                `${server1cHttpService}/personalAccounts/${key}/сlaims/`,
+                `${server1cHttpService}/profile/${userId}/personalAccounts/${key}/сlaims/`,
                 {
                     headers,
                 }
