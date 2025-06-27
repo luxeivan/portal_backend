@@ -98,8 +98,12 @@ const personalAccountsOneC = {
     },
     getClaimsByPersonalAccount: async (userId,key) => {
         try {
+            // console.log(`${server1cHttpService}/profile/${userId}/personalAccounts/${key}/сlaims/`);
+            
             const response = await axios.get(
-                `${server1cHttpService}/profile/${userId}/personalAccounts/${key}/сlaims/`,
+                // `${server1cHttpService}/personalAccounts/${key}/claims/`,
+                `${server1cHttpService}/profile/${userId}/personalAccounts/${key}/claims/`,
+                
                 {
                     headers,
                 }
