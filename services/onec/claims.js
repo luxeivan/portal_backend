@@ -25,7 +25,7 @@ const claimsOneC = {
       if (!response.data) {
         return false;
       }
-      console.log("getClaims", response.data);
+      // console.log("getClaims", response.data);
       return response.data;
     } catch (error) {
       if (botNotifyUrl) {
@@ -141,8 +141,8 @@ const claimsOneC = {
   createNewClaim1: async (data, userId) => {
     try {
       const newClaim = await axios.post(
-        // `${server1cHttpService}/profile/${userId}/claims`,
-        `${server1cHttpService}/newClaimProject/${userId}/${data.serviceId}/${data.versionId}`,
+        `${server1cHttpService}/profile/${userId}/claims`,
+        // `${server1cHttpService}/newClaimProject/${userId}/${data.serviceId}/${data.versionId}`,
         {
           ...data,
         },
