@@ -63,12 +63,13 @@ router.get("/", async (req, res) => {
  *     responses:
  *       200: { description: Счёт найден }
  *       500: { description: Ошибка при получении данных }
- */
+*/
 
 router.get("/:key", async (req, res) => {
   const userId = req.userId;
   const key = req.params.key;
   // logger.info(`Получен запрос на получение заявки с ключом: ${key}`);
+  // console.log("key");
 
   try {
     const personalAccount = await getPersonalAccountItem(userId, key);
@@ -114,6 +115,7 @@ router.get("/:key", async (req, res) => {
     // logger.info(
     //   `Получен запрос на получение личных кабинетов пользователя с ID: ${userId}`
     // );
+// console.log("claims");
 
     try {
       const сlaimsByPersonalAccount = await getClaimsByPersonalAccount(
