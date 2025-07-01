@@ -209,8 +209,8 @@ router.post(
         const userjwt = jwt.sign(
           {
             id: req.session.founduser.Ref_Key,
-            email: req.session.founduser.email,
-            phone: req.session.founduser.phone,
+            // email: req.session.founduser.email,
+            // phone: req.session.founduser.phone,
           },
           privateKey,
           { expiresIn: `${process.env.JWT_LIVE_HOURS}h` }
