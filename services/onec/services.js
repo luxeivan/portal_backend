@@ -31,41 +31,50 @@ const servicesOneC = {
 
   getServicesByKey: async (key = "00000000-0000-0000-0000-000000000000") => {
     try {
-      const response = await Promise.all([
-        axios
-          .get(
-            `${server1c}/Catalog_services?$format=json&$filter=DeletionMark eq false and usage eq true and Parent_Key eq guid'${key}' and (( year(beginDate) eq 0001 or (year(beginDate) le ${moment().year()} and month(beginDate) le ${
-              moment().month() + 1
-            } and day(beginDate) le ${moment().date()})) and ( year(endDate) eq 0001 or (year(endDate) ne 0001 and year(endDate) ge ${moment().year()} and month(endDate) ge ${moment().month()} and day(endDate) ge ${moment().date()})))`,
+      // const response = await Promise.all([
+      //   axios
+      //     .get(`${server1cHttpService}/services/folder/${key}`,
+      //       // `${server1c}/Catalog_services?$format=json&$filter=DeletionMark eq false and usage eq true and Parent_Key eq guid'${key}' and (( year(beginDate) eq 0001 or (year(beginDate) le ${moment().year()} and month(beginDate) le ${
+      //       //   moment().month() + 1
+      //       // } and day(beginDate) le ${moment().date()})) and ( year(endDate) eq 0001 or (year(endDate) ne 0001 and year(endDate) ge ${moment().year()} and month(endDate) ge ${moment().month()} and day(endDate) ge ${moment().date()})))`,
+      //       {
+      //         headers,
+      //       }
+      //     )
+      //     .catch((err) => {
+      //       throw new Error("Ошибка получения услуг");
+      //     }),
+      //   // axios
+      //   //   .get(`${server1c}/Catalog_tags?$format=json&$expand=color`, {
+      //   //     headers,
+      //   //   })
+      //   //   .catch((err) => {
+      //   //     throw new Error("Ошибка получения тэгов услуги");
+      //   //   }),
+      // ]);
+       const response = await axios
+          .get(`${server1cHttpService}/services/folder/${key}`,
+            // `${server1c}/Catalog_services?$format=json&$filter=DeletionMark eq false and usage eq true and Parent_Key eq guid'${key}' and (( year(beginDate) eq 0001 or (year(beginDate) le ${moment().year()} and month(beginDate) le ${
+            //   moment().month() + 1
+            // } and day(beginDate) le ${moment().date()})) and ( year(endDate) eq 0001 or (year(endDate) ne 0001 and year(endDate) ge ${moment().year()} and month(endDate) ge ${moment().month()} and day(endDate) ge ${moment().date()})))`,
             {
               headers,
             }
           )
-          .catch((err) => {
-            throw new Error("Ошибка получения услуг");
-          }),
-        axios
-          .get(`${server1c}/Catalog_tags?$format=json&$expand=color`, {
-            headers,
-          })
-          .catch((err) => {
-            throw new Error("Ошибка получения тэгов услуги");
-          }),
-      ]);
-      // console.log('response.data: ', response.data);
+      console.log('response.data: ', response.data);
 
-      if (!response[0].data) {
-        return false;
-      }
-      response[0].data.value = response[0].data.value.map((item) => {
-        item.tags = item.tags.map((item) => {
-          item.tag = response[1].data.value.find(
-            (tag) => item.tag_Key === tag.Ref_Key
-          );
-          return item;
-        });
-        return item;
-      });
+      // if (!response[0].data) {
+      //   return false;
+      // }
+      // response[0].data.value = response[0].data.value.map((item) => {
+      //   item.tags = item.tags.map((item) => {
+      //     item.tag = response[1].data.value.find(
+      //       (tag) => item.tag_Key === tag.Ref_Key
+      //     );
+      //     return item;
+      //   });
+      //   return item;
+      // });
       // await Promise.all(response.data.value.map(async item => {
       //   return new Promise(async (resolve, reject) => {
       //     if (item.picture_Key && item.picture_Key !== '00000000-0000-0000-0000-000000000000') item.picture = await servicesOneC.getPictureFile(item.picture_Key)
@@ -74,32 +83,32 @@ const servicesOneC = {
       // }))
       // console.log("response[1].data.value",response[1].data.value);
 
-      return response[0].data;
+      return response.data;
     } catch (error) {
       console.log("getServicesByKey: ", error.message);
-      if (botNotifyUrl) {
-        try {
-          const errorDetails = {
-            message: `Ошибка при получении данных из 1C: ${error.message}`,
-            error: {
-              config: {
-                url: error?.config?.url,
-                method: error?.config?.method,
-              },
-              response: {
-                status: error?.response?.status,
-                statusText: error?.response?.statusText,
-                data: error?.response?.data,
-              },
-              code: error?.code,
-              message: error?.message || error?.response?.data?.message,
-            },
-          };
-          await axios.post(botNotifyUrl, errorDetails);
-        } catch (notifyErr) {
-          console.error("Не смогли оповестить бота:", notifyErr);
-        }
-      }
+      // if (botNotifyUrl) {
+      //   try {
+      //     const errorDetails = {
+      //       message: `Ошибка при получении данных из 1C: ${error.message}`,
+      //       error: {
+      //         config: {
+      //           url: error?.config?.url,
+      //           method: error?.config?.method,
+      //         },
+      //         response: {
+      //           status: error?.response?.status,
+      //           statusText: error?.response?.statusText,
+      //           data: error?.response?.data,
+      //         },
+      //         code: error?.code,
+      //         message: error?.message || error?.response?.data?.message,
+      //       },
+      //     };
+      //     await axios.post(botNotifyUrl, errorDetails);
+      //   } catch (notifyErr) {
+      //     console.error("Не смогли оповестить бота:", notifyErr);
+      //   }
+      // }
       return false;
     }
   },
