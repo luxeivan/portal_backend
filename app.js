@@ -17,6 +17,7 @@ const services = require("./routers/services");
 // const formonec = require("./routers/formonec");
 const getDaData = require("./routers/getDaData/getDaData");
 const contactRouter = require("./routers/contact");
+const publicFile = require("./routers/publicFile");
 const chatRouter = require("./routers/chatRouter");
 const hotQuestionsRouter = require("./routers/hotquestions");
 
@@ -115,6 +116,7 @@ app.use("/api/cabinet", checkAuth, cabinet);
 app.use("/api/services", services);
 // app.use("/api/formonec", formonec);
 app.use("/api/getDaData", getDaData);
+app.use("/api/publicFile", publicFile);
 app.use("/api/contacts", contactRouter);
 app.use("/api/chat", chatRouter);
 app.use("/api/hotQuestions", hotQuestionsRouter);

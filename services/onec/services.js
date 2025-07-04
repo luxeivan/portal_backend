@@ -121,7 +121,8 @@ const servicesOneC = {
       const resp = await Promise.all([
         axios
           .get(
-            `${server1c}/Catalog_services?$format=json&$filter=DeletionMark eq false and usage eq true and Ref_Key eq guid'${key}'`,
+            // `${server1c}/Catalog_services?$format=json&$filter=DeletionMark eq false and usage eq true and Ref_Key eq guid'${key}'`,
+            `${server1cHttpService}/services/${key}`,
             {
               headers,
             }
@@ -144,31 +145,33 @@ const servicesOneC = {
         //     headers,
         //   }
         // ).catch(err => { throw new Error("Ошибка получения полей услуги") }) : false,
-        axios
-          .get(
-            `${server1c}/Catalog_services_tags?$format=json&$expand=tag/color&$filter=Ref_Key eq guid'${key}'`,
-            {
-              headers,
-            }
-          )
-          .catch((err) => {
-            throw new Error("Ошибка получения тэгов услуги");
-          }),
+        // axios
+        //   .get(
+        //     `${server1c}/Catalog_services_tags?$format=json&$expand=tag/color&$filter=Ref_Key eq guid'${key}'`,
+        //     {
+        //       headers,
+        //     }
+        //   )
+        //   .catch((err) => {
+        //     throw new Error("Ошибка получения тэгов услуги");
+        //   }),
       ]);
 
-      if (!resp[0].data || !resp[0].data.value) {
-        console.log("Что-то пошло не так при получении данных.");
+      if (!resp[0].data ) {
+        
+        // console.log("Что-то пошло не так при получении данных.");
         throw new Error("Что-то пошло не так при получении данных.");
       } else {
-        serviceItem = resp[0].data.value[0];
+        serviceItem = resp[0].data;
       }
-
-      if (resp[0].data.value.length === 0) {
+      
+      if (resp[0].data.length === 0) {
         console.log("Услуги с таким ключом не существует.");
         throw new Error("Услуги с таким ключом не существует.");
       }
+      console.log(resp[1].data?.data);
 
-      serviceItem.tags = resp[2].data.value;
+      // serviceItem.tags = resp[2].data.value;
       // } catch (error) {
       //   console.log('getServiceItemByKey: ', error.message);
       //   throw new Error("Что-то пошло не так при получении данных заявки.");
@@ -294,11 +297,11 @@ const servicesOneC = {
 
       // -------------Если надо получать поля услуги-------------------------------------------
       if (withFields) {
-        serviceItem.fields = resp[1].data.data.fields;
-        serviceItem.styles = resp[1].data.data.styles;
-        serviceItem.links = resp[1].data.data.links;
-        serviceItem.externalService = resp[1].data.data.externalService;
-        serviceItem.versionId = resp[1].data.data.versionId;
+        serviceItem.data.fields = resp[1].data.data.fields;
+        serviceItem.data.styles = resp[1].data.data.styles;
+        serviceItem.data.links = resp[1].data.data.links;
+        serviceItem.data.externalService = resp[1].data.data.externalService;
+        serviceItem.data.versionId = resp[1].data.data.versionId;
         // await Promise.all(resp[1].data.value.map(item => {
 
         //   return new Promise(async (resolve, reject) => {
