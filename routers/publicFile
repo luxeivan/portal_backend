@@ -1,0 +1,67 @@
+const express = require("express");
+const axios = require("axios");
+require("dotenv").config();
+
+const router = express.Router();
+
+// const SERVER_1C = process.env.SERVER_1C;
+const server1c_auth = process.env.SERVER_1C_AUTHORIZATION;
+const server1cHttpService = process.env.SERVER_1C_HTTP_SERVICE;
+// Заголовки для авторизации на 1С
+const headers = {
+    Authorization: server1c_auth,
+};
+/**
+ * @swagger
+ * /api/contacts:
+ *   get:
+ *     summary: Получение данных публичного файла
+ *     description: |
+ *       Возвращает файл в формате base64
+ *     tags: ["🌐 Contact"]
+ *     responses:
+ *       200:
+ *         description: Контакты найдены
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   object:
+ *                     type: string
+ *                     description: GUID записи контакта
+ *                     example: "e93f2105-bffe-11ee-907a-00505601574a"
+ *                   description:
+ *                     type: string
+ *                     example: "Центральные электросети"
+ *                   photos:
+ *                     type: array
+ *                     items:
+ *                       type: object
+ *                       properties:
+ *                         ПутьКФайлу:
+ *                           type: string
+ *                           example: "images/contacts/123.jpg"
+ *                         ПолныйПутьWindows:
+ *                           type: string
+ *                           example: "\\\\srv\\share\\images\\contacts\\123.jpg"
+ *       500:
+ *         description: Ошибка при запросе к 1С
+ */
+
+router.get("/:key", async (req, res) => {
+    const key = req.params.key;
+    try {
+        const response = await axios.get(`${server1cHttpService}/public/files/${key}`, { headers })
+        if (response.data) {
+           return res.json({ ...response.data })
+        }
+        return res.status(500).json({ status: "error", message: "Ошибка получения файла" })
+    } catch (error) {
+        console.log(error);        
+        res.status(500).json({ status: "error", message: "Ошибка получения файла" })
+    }
+})
+module.exports = router;
