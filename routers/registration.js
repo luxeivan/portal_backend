@@ -407,7 +407,11 @@ router.post("/newuser", async (req, res) => {
         logger.info(`Пользователь найден и обновлен: ${user.Email}`);
         req.session.destroy();
         const userjwt = jwt.sign(
-          { id: user.Ref_Key, email: user.Email, phone: user.Phone },
+          {
+            id: user.Ref_Key,
+            // email: user.Email, 
+            // phone: user.Phone 
+          },
           privateKey,
           { expiresIn: `${process.env.JWT_LIVE_HOURS}h` }
         );
@@ -430,7 +434,11 @@ router.post("/newuser", async (req, res) => {
         logger.info(`Создан новый пользователь: ${newuser.Email}`);
         req.session.destroy();
         const userjwt = jwt.sign(
-          { id: newuser.Ref_Key, email: newuser.Email, phone: newuser.Phone },
+          {
+            id: newuser.Ref_Key,
+            // email: newuser.Email, 
+            // phone: newuser.Phone 
+          },
           privateKey,
           { expiresIn: `${process.env.JWT_LIVE_HOURS}h` }
         );
