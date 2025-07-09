@@ -2,6 +2,7 @@ const express = require("express");
 const helmet = require("helmet");
 const cors = require("cors");
 const fs = require("fs");
+const path = require('path')
 const http = require("http");
 const https = require("https");
 require("dotenv").config();
@@ -108,6 +109,12 @@ app.use(helmet.referrerPolicy({ policy: "same-origin" }));
 // app.get("/", (req, res) => {
 //   res.send("Hello, World!");
 // });
+
+app.use('/uploads', (req, res, next) => {
+  res.set('Cross-Origin-Resource-Policy', 'cross-origine'); // Express желает получить печенья
+  // res.set('Give-Me', 'Cookies'); // Express желает получить печенья
+  next();
+}, express.static(path.join(__dirname, 'uploads')))
 
 app.use("/api/auth", auth);
 app.use("/api/gigachat", gigaChatRouter);
