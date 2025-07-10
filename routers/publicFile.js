@@ -72,8 +72,8 @@ const headers = {
 router.get("/:key/:ext", async (req, res) => {
     const key = req.params.key;
     const ext = req.params.ext;
-    const isFile = fs.existsSync(`./uploads/${key}.${ext}`)
-    console.log("isFile", isFile);
+    // const isFile = fs.existsSync(`./uploads/${key}.${ext}`)
+    // console.log("isFile", isFile);
 
     try {
         const response = await axios.get(`${server1cHttpService}/public/files/${key}`, { headers })
@@ -85,10 +85,10 @@ router.get("/:key/:ext", async (req, res) => {
             s.push(imgBuffer)
             s.push(null)
 
-            s.pipe(fs.createWriteStream(`./uploads/${response.data.data.id}.${response.data.data.ext}`));
+            s.pipe(fs.createWriteStream(`./uploads/${response.data.data.checksum}.${response.data.data.ext}`));
             // const fileBlob = atob(response.data.data.base64);
             // await fs.writeFile(`/uploads/${response.data.data.id}.${response.data.data.ext}`, fileBlob)
-            console.log(response.data)
+            // console.log(response.data)
             return res.json({ ...response.data })
         }
         return res.status(500).json({ status: "error", message: "Ошибка получения файла" })
