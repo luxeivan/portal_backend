@@ -5,6 +5,7 @@ require("dotenv").config();
 const router = express.Router();
 
 const SERVER_1C = process.env.SERVER_1C;
+const server1cHttpService = process.env.SERVER_1C_HTTP_SERVICE;
 const server1c_auth = process.env.SERVER_1C_AUTHORIZATION;
 
 // Адрес, по которому будем оповещать бота
@@ -63,7 +64,8 @@ router.get("/", async (req, res) => {
   try {
     // 1) Запрашиваем контактную инфу
     const contactInfoResponse = await axios.get(
-      `${SERVER_1C}/InformationRegister_portalContactInformation?$format=json&$orderby=lineNum`,
+      `${server1cHttpService}/contacts`,
+      // `${SERVER_1C}/InformationRegister_portalContactInformation?$format=json&$orderby=lineNum`,
       { headers }
     );
 
@@ -75,10 +77,10 @@ router.get("/", async (req, res) => {
     }
 
     // Проверяем формат
-    const contactInfo = contactInfoResponse.data?.value;
-    if (!Array.isArray(contactInfo)) {
-      throw new Error("Неверный формат данных от 1С (нет массива contactInfo)");
-    }
+    const contactInfo = contactInfoResponse.data?.data;
+    // if (!Array.isArray(contactInfo)) {
+    //   throw new Error("Неверный формат данных от 1С (нет массива contactInfo)");
+    // }
     if (contactInfo.length === 0) {
       throw new Error(
         "1С вернула пустой список контактов, что не соответствует ожиданиям"
