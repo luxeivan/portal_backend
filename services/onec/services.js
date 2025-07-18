@@ -22,10 +22,12 @@ const servicesOneC = {
         }
       );
       if (!response.data) {
-        return false;
       }
       return response.data;
-    } catch (error) {}
+    } catch (error) {
+      return false;
+
+    }
   },
   
 
