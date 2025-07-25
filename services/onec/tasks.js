@@ -31,6 +31,25 @@ const tasksOneC = {
 
         }
     },
+    getTaskById: async (userId, id) => {
+        try {
+            const response = await axios.get(
+                `${server1cHttpService}/profile/${userId}/tasks/${id}`,
+                {
+                    headers,
+                }
+            );
+            // console.log(response.data.data);
+
+            if (!response.data) {
+                return false;
+            }
+            return response.data.data;
+        } catch (error) {
+            return false;
+
+        }
+    },
     createNewTask: async (userId, data) => {
         try {
             const response = await axios.post(
@@ -43,7 +62,7 @@ const tasksOneC = {
                 }
             );
             console.log(response.data);
-            
+
             if (!response.data) {
                 return false;
             }

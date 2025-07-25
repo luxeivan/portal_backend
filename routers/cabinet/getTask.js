@@ -2,15 +2,35 @@ const express = require("express");
 const router = express.Router();
 
 
-const { getActionById, createNewTask } = require("../../services/onec/tasks");
+const { getActionById, createNewTask,getTaskById } = require("../../services/onec/tasks");
 
 
 router.get("/:id", async (req, res) => {
+    // const userId = req.userId;
+    const id = req.params.id
+
+    try {
+        const action = await getActionById(id)
+        if (!action) {
+            return res.json(false)
+        }
+        return res.json(action)
+    } catch (error) {
+
+        res.status(500).json({
+            status: "error",
+            message: "Ошибка при получении экшена",
+            error: error.message,
+        });
+    }
+});
+
+router.get("/task/:id", async (req, res) => {
     const userId = req.userId;
     const id = req.params.id
 
     try {
-        const task = await getActionById(id)
+        const task = await getTaskById(userId, id)
         if (!task) {
             return res.json(false)
         }
