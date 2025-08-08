@@ -12,10 +12,10 @@ const headers = {
 };
 
 const appealsOneC = {
-    getAppealsList: async (id) => {
+    getAppealsList: async () => {
         try {
             const response = await axios.get(
-                `${server1cHttpService}/portalFields/tasks/${id}`,
+                `${server1cHttpService}/appeals/folder/all`,
                 {
                     headers,
                 }
@@ -34,7 +34,7 @@ const appealsOneC = {
     getAppealsByClaims: async (userId, id) => {
         try {
             const response = await axios.get(
-                `${server1cHttpService}/profile/${userId}/tasks/${id}`,
+                `${server1cHttpService}/profile/${userId}/appeals/${id}`,
                 {
                     headers,
                 }
@@ -48,6 +48,24 @@ const appealsOneC = {
         } catch (error) {
             return false;
 
+        }
+    },
+    getAppeal: async (id) => {
+        try {
+            const response = await axios.get(
+                `${server1cHttpService}/portalFields/appeals/${id}`,
+                {
+                    headers,
+                }
+            );
+            // console.log(response.data);
+
+            if (!response.data) {
+                return false;
+            }
+            return response.data.data;
+        } catch (error) {
+            return false;
         }
     },
     createNewAppeals: async (userId, data) => {
