@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 
 
-const { getAppealsList, getAppeal } = require("../../services/onec/appeals");
+const { getAppealsList, getAppeal, createNewAppeal } = require("../../services/onec/appeals");
 
 
 router.get("/", async (req, res) => {
@@ -29,55 +29,55 @@ router.get("/:id", async (req, res) => {
     const id = req.params.id
 
     try {
-        const action = await getAppeal(id)
+        const appeal = await getAppeal(id)
         // console.log(action);
-        if (!action) {
+        if (!appeal) {
             return res.json(false)
         }
-        return res.json(action)
+        return res.json(appeal)
     } catch (error) {
 
         res.status(500).json({
             status: "error",
-            message: "Ошибка при получении экшена",
+            message: "Ошибка при получении формы обращения",
             error: error.message,
         });
     }
 });
 
-router.get("/task/:id", async (req, res) => {
-    const userId = req.userId;
-    const id = req.params.id
+// router.get("/task/:id", async (req, res) => {
+//     const userId = req.userId;
+//     const id = req.params.id
 
-    try {
-        const task = await getTaskById(userId, id)
-        if (!task) {
-            return res.json(false)
-        }
-        return res.json(task)
-    } catch (error) {
+//     try {
+//         const task = await getTaskById(userId, id)
+//         if (!task) {
+//             return res.json(false)
+//         }
+//         return res.json(task)
+//     } catch (error) {
 
-        res.status(500).json({
-            status: "error",
-            message: "Ошибка при получении задачи",
-            error: error.message,
-        });
-    }
-});
+//         res.status(500).json({
+//             status: "error",
+//             message: "Ошибка при получении задачи",
+//             error: error.message,
+//         });
+//     }
+// });
 router.post("/", async (req, res) => {
     const userId = req.userId;
     const data = req.body
     try {
-        const task = await createNewTask(userId, data)
-        if (!task) {
+        const newAppeal = await createNewAppeal(userId, data)
+        if (!newAppeal) {
             return res.json(false)
         }
-        return res.json(task)
+        return res.json(newAppeal)
     } catch (error) {
 
         res.status(500).json({
             status: "error",
-            message: "Ошибка при создании задачи",
+            message: "Ошибка при создании обращения",
             error: error.message,
         });
     }
