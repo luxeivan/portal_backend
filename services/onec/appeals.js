@@ -68,10 +68,10 @@ const appealsOneC = {
             return false;
         }
     },
-    createNewAppeals: async (userId, data) => {
+    createNewAppeal: async (userId, data) => {
         try {
             const response = await axios.post(
-                `${server1cHttpService}/profile/${userId}/claims/${data.claimId}/tasks`,
+                `${server1cHttpService}/profile/${userId}/appeals`,
                 {
                     ...data
                 },
@@ -80,6 +80,7 @@ const appealsOneC = {
                 }
             );
             console.log(response.data);
+            console.log(`${server1cHttpService}/profile/${userId}/appeals`);
 
             if (!response.data) {
                 return false;
