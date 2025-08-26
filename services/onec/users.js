@@ -187,7 +187,7 @@ const usersonec = {
       const data = {};
       if (phone) data.phone = phone;
       if (password) data.password = await bcrypt.hash(password, saltRounds);
-      const response = await axios.patch(endpoint, data, { headers });
+      const response = await axios.put(endpoint, data, { headers });
       return response.data;
     } catch (error) {
       console.error("Ошибка в updateUser:", error.message);
