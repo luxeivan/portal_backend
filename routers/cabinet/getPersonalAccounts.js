@@ -64,6 +64,55 @@ router.get("/", async (req, res) => {
  *       200: { description: Счёт найден }
  *       500: { description: Ошибка при получении данных }
 */
+/**
+ * @swagger
+ * /api/cabinet/personalAccounts/{key}/claims:
+ *   get:
+ *     summary: Заявки, связанные с лицевым счётом
+ *     tags: ["🔒 PersonalAccounts"]
+ *     security: [ bearerAuth: [] ]
+ *     parameters:
+ *       - in: path
+ *         name: key
+ *         required: true
+ *         schema: { type: string }
+ *     responses:
+ *       200:
+ *         description: Заявки найдены
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items: { type: object }
+ *       500: { description: Ошибка при получении данных }
+ */
+
+router.get("/:key/claims", async (req, res) => {
+  const userId = req.userId;
+  const key = req.params.key;
+  // logger.info(
+  //   `Получен запрос на получение личных кабинетов пользователя с ID: ${userId}`
+  // );
+  // console.log("claims");
+
+  try {
+    const сlaimsByPersonalAccount = await getClaimsByPersonalAccount(
+      userId,
+      key
+    );
+    // logger.info(`Заявки успешно получены для пользователя с ID: ${userId}`);
+    res.json(сlaimsByPersonalAccount);
+  } catch (error) {
+    logger.error(
+      `Ошибка при получении заявок по личному кабинету с ID ${userId}: ${error.message}`
+    );
+    res.status(500).json({
+      status: "error",
+      message: "Ошибка при получении заявок по личному кабинету",
+      error: error.message,
+    });
+  }
+});
 
 router.get("/:key", async (req, res) => {
   const userId = req.userId;
@@ -85,56 +134,6 @@ router.get("/:key", async (req, res) => {
       error: error.message,
     });
   }
-
-  /**
-   * @swagger
-   * /api/cabinet/personalAccounts/{key}/claims:
-   *   get:
-   *     summary: Заявки, связанные с лицевым счётом
-   *     tags: ["🔒 PersonalAccounts"]
-   *     security: [ bearerAuth: [] ]
-   *     parameters:
-   *       - in: path
-   *         name: key
-   *         required: true
-   *         schema: { type: string }
-   *     responses:
-   *       200:
-   *         description: Заявки найдены
-   *         content:
-   *           application/json:
-   *             schema:
-   *               type: array
-   *               items: { type: object }
-   *       500: { description: Ошибка при получении данных }
-   */
-
-  router.get("/:key/claims", async (req, res) => {
-    const userId = req.userId;
-    const key = req.params.key;
-    // logger.info(
-    //   `Получен запрос на получение личных кабинетов пользователя с ID: ${userId}`
-    // );
-// console.log("claims");
-
-    try {
-      const сlaimsByPersonalAccount = await getClaimsByPersonalAccount(
-        userId,
-        key
-      );
-      // logger.info(`Заявки успешно получены для пользователя с ID: ${userId}`);
-      res.json(сlaimsByPersonalAccount);
-    } catch (error) {
-      logger.error(
-        `Ошибка при получении заявок по личному кабинету с ID ${userId}: ${error.message}`
-      );
-      res.status(500).json({
-        status: "error",
-        message: "Ошибка при получении заявок по личному кабинету",
-        error: error.message,
-      });
-    }
-  });
 });
 
 module.exports = router;
