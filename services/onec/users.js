@@ -4,6 +4,7 @@ const bcrypt = require("bcrypt");
 require("dotenv").config();
 
 const server1c = process.env.SERVER_1C;
+const server1chttp = process.env.SERVER_1C_HTTP_SERVICE;
 const server1c_auth = process.env.SERVER_1C_AUTHORIZATION;
 
 const botNotifyUrl =
@@ -17,17 +18,19 @@ const saltRounds = Number(process.env.PASSWORD_SALT_ROUNDS);
 
 const usersonec = {
   getUserByEmail: async (email) => {
-    const endpoint = `${server1c}/Catalog_profile?$format=json&$filter=email eq '${email}'`;
+    // const endpoint = `${server1c}/Catalog_profile?$format=json&$filter=email eq '${email}'`;
+    const endpoint = `${server1chttp}/profile?email=${email}`;
+    console.log("endpoint",endpoint);
+    
     try {
       const response = await axios.get(endpoint, { headers });
       if (
         !response.data ||
-        !response.data.value ||
-        response.data.value.length === 0
+        !response.data.data
       ) {
         throw new Error("Пользователь с указанным email не найден.");
       }
-      return response.data.value[0];
+      return response.data.data;
     } catch (error) {
       console.error("Ошибка в getUserByEmail:", error.message);
       if (botNotifyUrl) {
@@ -58,13 +61,15 @@ const usersonec = {
   },
 
   checkUserByEmail: async (email) => {
-    const endpoint = `${server1c}/Catalog_profile?$format=json&$filter=email eq '${email}'`;
+    // const endpoint = `${server1c}/Catalog_profile?$format=json&$filter=email eq '${email}'`;
+    const endpoint = `${server1chttp}/profile?email=${email}`;
     try {
       const response = await axios.get(endpoint, { headers });
-      if (!response.data?.value?.[0]) {
+      if (!response.data?.data) {
         return false;
       }
-      return response.data.value[0].Ref_Key;
+      // console.log(response.data);
+      return response.data.data.Ref_Key;
     } catch (error) {
       console.error("Ошибка в checkUserByEmail:", error.message);
       await notifyBotAboutError(error, endpoint);
@@ -96,13 +101,14 @@ const usersonec = {
   },
 
   getUserById: async (key) => {
-    const endpoint = `${server1c}/Catalog_profile(guid'${key}')?$format=json`;
+    // const endpoint = `${server1c}/Catalog_profile(guid'${key}')?$format=json`;
+    const endpoint = `${server1chttp}/profile/${key}`;
     try {
       const response = await axios.get(endpoint, { headers });
       if (!response.data) {
         throw new Error("Пустой ответ от 1С при запросе профиля.");
-      }
-      return response.data;
+      }      
+      return response.data.data;
     } catch (error) {
       console.error("Ошибка в getUserById:", error.message);
       await notifyBotAboutError(error, endpoint);
@@ -134,7 +140,8 @@ const usersonec = {
   },
 
   createNewUser: async (email, phone, password) => {
-    const endpoint = `${server1c}/Catalog_profile?$format=json`;
+    // const endpoint = `${server1c}/Catalog_profile?$format=json`;
+    const endpoint = `${server1chttp}/profile`;
     try {
       const hashPassword = await bcrypt.hash(password, saltRounds);
       const response = await axios.post(
@@ -174,7 +181,8 @@ const usersonec = {
   },
 
   updateUser: async (key, phone, password) => {
-    const endpoint = `${server1c}/Catalog_profile(guid'${key}')?$format=json`;
+    // const endpoint = `${server1c}/Catalog_profile(guid'${key}')?$format=json`;
+    const endpoint = `${server1chttp}/profile/${key}`;
     try {
       const data = {};
       if (phone) data.phone = phone;
