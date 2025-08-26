@@ -435,7 +435,7 @@ router.post("/newuser", async (req, res) => {
         req.session.destroy();
         const userjwt = jwt.sign(
           {
-            id: newuser.Ref_Key,
+            id: newuser.data.Ref_Key,
             // email: newuser.Email, 
             // phone: newuser.Phone 
           },
