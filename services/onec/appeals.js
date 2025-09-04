@@ -79,8 +79,6 @@ const appealsOneC = {
                     headers,
                 }
             );
-            console.log(response.data);
-            console.log(`${server1cHttpService}/profile/${userId}/appeals`);
 
             if (!response.data) {
                 return false;
@@ -92,6 +90,26 @@ const appealsOneC = {
 
         }
 
+    },
+    readAnswerOfAppeal: async (userId, id) => {
+        // console.log("id",id);
+        
+        try {
+            const response = await axios.get(
+                `${server1cHttpService}/profile/${userId}/appeals/${id}/readAnswer`,
+                {
+                    headers,
+                }
+            );
+
+            if (!response.data) {
+                return false;
+            }
+            return true;
+        } catch (error) {
+            console.log(error);
+            return false;
+        }
     }
 }
 

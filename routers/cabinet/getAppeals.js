@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 
 
-const { getAppealsList, getAppeal, createNewAppeal } = require("../../services/onec/appeals");
+const { getAppealsList, getAppeal, createNewAppeal, readAnswerOfAppeal } = require("../../services/onec/appeals");
 
 
 router.get("/", async (req, res) => {
@@ -78,6 +78,26 @@ router.post("/", async (req, res) => {
         res.status(500).json({
             status: "error",
             message: "Ошибка при создании обращения",
+            error: error.message,
+        });
+    }
+})
+
+//Прочитать ответ на обращение
+router.post("/read", async (req, res) => {
+    const userId = req.userId;
+    const id = req.body.id
+    console.log("id", id);
+    try {
+        const readAnswer = await readAnswerOfAppeal(userId, id)
+        if (!readAnswer) {
+            return res.json(false)
+        }
+        return res.json(true)
+    } catch (error) {
+        res.status(500).json({
+            status: "error",
+            message: "Ошибка при прочтении ответа",
             error: error.message,
         });
     }
