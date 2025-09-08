@@ -93,6 +93,10 @@ router.post(
       const founduser = await getUserByEmail(req.body.email.toLowerCase());
       // console.log("founduser", founduser);
 
+      if (founduser && (founduser.block || founduser.blocked)) {
+        return res.status(423).json({ status: "block", message: "Пользователь заблокирован" })
+      }
+
       if (
         founduser &&
         (await bcrypt.compare(req.body.password, founduser.password))
@@ -112,7 +116,7 @@ router.post(
         }
       } else {
         return res
-          .status(418)
+          .status(403)
           .json({ status: "error", message: "Логин или пароль неверные" });
       }
     } catch (error) {
