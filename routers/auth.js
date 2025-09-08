@@ -8,6 +8,7 @@ const logger = require("../logger");
 const bcrypt = require("bcrypt");
 
 const privateKey = process.env.JWT_SECRET;
+const devLocal = process.env.DEV_LOCAL;
 
 /**
  * @swagger
@@ -102,17 +103,24 @@ router.post(
         (await bcrypt.compare(req.body.password, founduser.password))
       ) {
         req.session.founduser = founduser;
-        try {
-          req.session.pincode = await sendCodeToPhone(founduser.phone);
+        if (devLocal != 1) {
+          try {
+            req.session.pincode = await sendCodeToPhone(founduser.phone);
+            return res.json({ status: "ok", message: "Ожидается пин код" });
+          } catch (error) {
+            logger.error(
+              "Ошибка при отправке кода на телефон: %s",
+              error.message
+            );
+            return res
+              .status(500)
+              .json({ status: "error", message: "Не удалось отправить смс" });
+          }
+        } else {
+          console.log("founduser", req.session.founduser);
+
+          req.session.pincode = 1111
           return res.json({ status: "ok", message: "Ожидается пин код" });
-        } catch (error) {
-          logger.error(
-            "Ошибка при отправке кода на телефон: %s",
-            error.message
-          );
-          return res
-            .status(500)
-            .json({ status: "error", message: "Не удалось совершить звонок" });
         }
       } else {
         return res
@@ -203,6 +211,8 @@ router.post(
           .status(400)
           .json({ status: "error", message: "нет нужной информации" });
       }
+      console.log("founduser1",req.session.founduser);
+      
       if (!req.session.founduser) {
         logger.error("Ошибка: Не найден пользователь");
         return res
