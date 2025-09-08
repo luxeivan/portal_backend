@@ -28,7 +28,8 @@ const usersonec = {
         !response.data ||
         !response.data.data
       ) {
-        throw new Error("Пользователь с указанным email не найден.");
+        // throw new Error("Пользователь с указанным email не найден.");
+        return false
       }
       return response.data.data;
     } catch (error) {
