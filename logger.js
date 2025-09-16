@@ -5,27 +5,43 @@ const Log = require("./services/db/models/Log");
 
 const timezone = "Europe/Moscow";
 
+// ОПРЕДЕЛЯЕМ ТЕКУЩЕЕ ОКРУЖЕНИЕ (берём из .env)
+const portalEnv = (
+  process.env.PORTAL_ENV ||
+  process.env.VITE_BACK_VERSION ||
+  process.env.NODE_ENV ||
+  "local"
+).toLowerCase();
+
 const logFormat = format.printf(({ level, message, timestamp, stack }) => {
-  const formattedTimestamp = moment(timestamp)
-    .tz(timezone)
-    .format("HH:mm DD.MM.YYYY");
-  return `${formattedTimestamp} ${level}: ${stack || message}`;
+  const ts = moment(timestamp).tz(timezone).format("HH:mm DD.MM.YYYY");
+  // Добавляем префикс окружения в каждую строку лога
+  return `${ts} [${portalEnv}] ${level}: ${stack || message}`;
 });
 
-// Функция для записи логов в базу данных с корректировкой времени
-const saveLogToDatabase = async (level, message, timestamp, stack) => {
+// Запись лога в БД (включая env)
+const saveLogToDatabase = async (
+  level,
+  message,
+  timestamp,
+  stack,
+  env = portalEnv
+) => {
   try {
-    const utcTimestamp = moment.utc(timestamp).format("YYYY-MM-DD HH:mm:ss"); // Преобразуем в UTC формат для базы данных
-    await Log.create({ level, message, timestamp: utcTimestamp, stack });
+    // сохраняем в БД в UTC
+    const utcTimestamp = moment
+      .tz(timestamp, timezone)
+      .utc()
+      .format("YYYY-MM-DD HH:mm:ss");
+    await Log.create({ level, message, timestamp: utcTimestamp, stack, env });
     console.log("Log saved to the database");
   } catch (error) {
     console.error("Failed to save log to the database", error);
   }
 };
 
-
 const dailyRotateFileTransport = new transports.DailyRotateFile({
-  filename: "logs/error-%DATE%.log",
+  filename: `logs/${portalEnv}-error-%DATE%.log`, // разные файлы для разных сред
   datePattern: "YYYY-MM-DD",
   zippedArchive: true,
   maxSize: "20m",
@@ -37,39 +53,31 @@ const logger = createLogger({
   level: "info",
   format: format.combine(
     format((info) => {
-      info.timestamp = moment().tz(timezone).format(); 
+      info.timestamp = moment().tz(timezone).format();
       return info;
     })(),
     format.errors({ stack: true }),
     format.splat(),
     logFormat
   ),
-  defaultMeta: { service: "user-service" },
+  defaultMeta: { service: "user-service", env: portalEnv },
   transports: [
-    new transports.File({ filename: "logs/combined.log" }),
+    new transports.File({ filename: `logs/${portalEnv}-combined.log` }),
     dailyRotateFileTransport,
   ],
 });
 
-// Добавляем логи в консоль при разработке
+// В DEV — дублируем в консоль
 if (process.env.NODE_ENV !== "production") {
-  logger.add(
-    new transports.Console({
-      format: format.simple(),
-    })
-  );
+  logger.add(new transports.Console({ format: format.simple() }));
 }
 
-// Логируем в базу данных с защитой от ошибок подключения к БД
+// При каждом лог-сообщении пишем запись в БД
 logger.on("data", (log) => {
   const { level, message, timestamp, stack } = log;
-  try {
-    saveLogToDatabase(level, message, timestamp, stack);
-  } catch (error) {
-    console.error(
-      "Ошибка записи в базу данных"
-    );
-  }
+  saveLogToDatabase(level, message, timestamp, stack, portalEnv).catch(
+    () => {}
+  );
 });
 
 module.exports = logger;
