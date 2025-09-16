@@ -45,8 +45,15 @@ const buildContext = (req, extra = {}) => ({
 });
 
 const buildStack = (ctx, error) => {
-  const ctxStr = `CTX=${JSON.stringify(ctx)}`;
+  const { env, msg_preview, answer_preview, ...safe } = ctx || {};
+  const ctxStr = `CTX=${JSON.stringify(safe)}`;
   return error?.stack ? `${error.stack}\n---\n${ctxStr}` : ctxStr;
+};
+
+const preview = (s, len = 500) => {
+  if (s == null) return "";
+  const str = String(s);
+  return str.length > len ? str.slice(0, len) + "…" : str;
 };
 
 // ---------- GigaChat OAuth ----------
@@ -129,11 +136,8 @@ const sendMessageToGigachat = async (message, logCtxBase = {}) => {
     };
 
     const started = Date.now();
-    logger.info("[GigaChat API] Отправляем запрос completions", {
-      stack: buildStack({
-        ...logCtxBase,
-        msg_len: String(message || "").length,
-      }),
+    logger.info(`[GigaChat API] Входящее сообщение: ${message}`, {
+      stack: buildStack({ ...logCtxBase, msg_len: String(message || "").length }),
     });
 
     const response = await axios.post(
@@ -152,12 +156,8 @@ const sendMessageToGigachat = async (message, logCtxBase = {}) => {
     const took = Date.now() - started;
     const botResponse = response.data?.choices?.[0]?.message?.content || "";
 
-    logger.info("[GigaChat API] Ответ получен", {
-      stack: buildStack({
-        ...logCtxBase,
-        took_ms: took,
-        answer_len: botResponse.length,
-      }),
+    logger.info(`[GigaChat API] Ответ модели сформирован: ${botResponse}`, {
+      stack: buildStack({ ...logCtxBase, answer_len: botResponse.length }),
     });
 
     return botResponse;
@@ -180,17 +180,17 @@ const sendMessageToGigachat = async (message, logCtxBase = {}) => {
 
 router.post("/", async (req, res) => {
   const requestId = uuidv4();
+  const userMessage = req.body?.message;
   const ctx = buildContext(req, {
     scope: "gigachat",
     step: "incoming",
     requestId,
   });
 
-  logger.info("[GigaChat API] Получен запрос от клиента", {
-    stack: buildStack(ctx),
+  logger.info(`[GigaChat API] Входящее сообщение: ${userMessage}`, {
+    stack: buildStack({ ...ctx, msg_len: String(userMessage || "").length }),
   });
 
-  const userMessage = req.body?.message;
   if (!userMessage) {
     logger.warn("[GigaChat API] Пустое сообщение от клиента", {
       stack: buildStack(ctx),
@@ -200,7 +200,7 @@ router.post("/", async (req, res) => {
 
   try {
     const answer = await sendMessageToGigachat(userMessage, ctx);
-    logger.info("[GigaChat API] Успешный ответ отправлен клиенту", {
+    logger.info(`[GigaChat API] Ответ модели сформирован: ${answer}`, {
       stack: buildStack({ ...ctx, answer_len: (answer || "").length }),
     });
     res.json({ response: answer });
