@@ -28,12 +28,11 @@ const saveLogToDatabase = async (
   env = portalEnv
 ) => {
   try {
-    // сохраняем в БД в UTC
-    const utcTimestamp = moment
+    // сохраняем в БД в МСК (без UTC-смещения)
+    const localTimestamp = moment
       .tz(timestamp, timezone)
-      .utc()
       .format("YYYY-MM-DD HH:mm:ss");
-    await Log.create({ level, message, timestamp: utcTimestamp, stack, env });
+    await Log.create({ level, message, timestamp: localTimestamp, stack, env });
     console.log("Log saved to the database");
   } catch (error) {
     console.error("Failed to save log to the database", error);
