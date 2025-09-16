@@ -9,6 +9,50 @@ const {
 } = require("../../services/onec/claims");
 const logger = require("../../logger");
 
+const { v4: uuidv4 } = require("uuid");
+const os = require("os");
+
+// ---------- helpers ----------
+const getIp = (req) => {
+  const xf = req.headers["x-forwarded-for"];
+  if (xf) return xf.split(",")[0].trim();
+  return req.socket?.remoteAddress || req.ip || null;
+};
+
+const buildCtx = (req, extra = {}) => ({
+  requestId: extra.requestId || uuidv4(),
+  ip: getIp(req),
+  url: req.originalUrl,
+  method: req.method,
+  referer: req.get("referer") || null,
+  userAgent: req.get("user-agent") || null,
+  acceptLanguage: req.get("accept-language") || null,
+  hostname: os.hostname(),
+  extra,
+});
+
+const buildStack = (ctx, error) => {
+  const { env, ...rest } = ctx || {};
+  const ctxStr = `CTX=${JSON.stringify(rest)}`;
+  return error?.stack ? `${error.stack}\n---\n${ctxStr}` : ctxStr;
+};
+
+const safeStringify = (obj) => {
+  try { return JSON.stringify(obj); }
+  catch {
+    let cache = new Set();
+    const res = JSON.stringify(obj, (k, v) => {
+      if (typeof v === "object" && v !== null) {
+        if (cache.has(v)) return "[Circular]";
+        cache.add(v);
+      }
+      return v;
+    });
+    cache = null;
+    return res;
+  }
+};
+
 /**
  * @swagger
  * /api/cabinet/claims:
@@ -37,24 +81,40 @@ const logger = require("../../logger");
 
 router.post("/", async (req, res) => {
   const userId = req.userId;
-  const data = req.body;
+  const data = req.body || {};
+  const requestId = uuidv4();
+  const ctx = buildCtx(req, { scope: "claims.create", requestId, userId });
+
   logger.info(
-    `Получен запрос на создание заявки от пользователя с ID: ${userId}`
+    `[Claims] Входящий запрос на создание заявки от пользователя: ${userId}. Данные: ${safeStringify(data)}`,
+    { stack: buildStack(ctx) }
   );
 
   try {
     const newClaim = await createNewClaim1(data, userId);
-    logger.info(`Заявка успешно создана для пользователя с ID: ${userId}`);
+
+    const claimData = newClaim?.data?.data || {};
+    const createdKey = claimData.Ref_key || claimData.Ref_Key || null;
+    const createdNumber = claimData.number || claimData.Number || null;
+
+    logger.info(
+      `[Claims] Заявка успешно создана для пользователя: ${userId}. ` +
+      (createdNumber ? `Номер: ${createdNumber}. ` : "") +
+      (createdKey ? `Ключ: ${createdKey}. ` : "") +
+      `Заявка содержит следующую информацию: ${safeStringify(data)}`,
+      { stack: buildStack({ ...ctx, createdKey, createdNumber }) }
+    );
+
     res.json(newClaim);
   } catch (error) {
-    // console.log(error);
     logger.error(
-      `Ошибка при создании заявки для пользователя с ID ${userId}: ${error.message}`
+      `[Claims] Ошибка при создании заявки для пользователя ${userId}: ${error.message}`,
+      { stack: buildStack(ctx, error) }
     );
     res.status(500).json({
       status: "error",
       message: "Ошибка при создании заявки",
-      error: error,
+      error: error.message,
     });
   }
 });
@@ -81,17 +141,20 @@ router.post("/", async (req, res) => {
 
 router.get("/", async (req, res) => {
   const userId = req.userId;
-  // logger.info(
-  //   `Получен запрос на получение заявок пользователя с ID: ${userId}`
-  // );
+  const requestId = uuidv4();
+  const ctx = buildCtx(req, { scope: "claims.list", requestId, userId });
 
   try {
     const claims = await getClaims(userId);
-    // logger.info(`Заявки успешно получены для пользователя с ID: ${userId}`);
+    logger.info(
+      `[Claims] Заявки пользователя ${userId} успешно получены`,
+      { stack: buildStack({ ...ctx, count: Array.isArray(claims) ? claims.length : null }) }
+    );
     res.json(claims);
   } catch (error) {
     logger.error(
-      `Ошибка при получении заявок для пользователя с ID ${userId}: ${error.message}`
+      `[Claims] Ошибка при получении заявок для пользователя ${userId}: ${error.message}`,
+      { stack: buildStack(ctx, error) }
     );
     res.status(500).json({
       status: "error",
@@ -123,15 +186,20 @@ router.get("/", async (req, res) => {
 router.get("/:key", async (req, res) => {
   const userId = req.userId;
   const key = req.params.key;
-  // logger.info(`Получен запрос на получение заявки с ключом: ${key}`);
+  const requestId = uuidv4();
+  const ctx = buildCtx(req, { scope: "claims.item", requestId, userId, key });
 
   try {
     const claim = await getClaimItem(userId, key);
-    // logger.info(`Заявка с ключом ${key} успешно получена`);
+    logger.info(
+      `[Claims] Заявка ${key} успешно получена для пользователя ${userId}`,
+      { stack: buildStack(ctx) }
+    );
     res.json(claim);
   } catch (error) {
     logger.error(
-      `Ошибка при получении заявки с ключом ${key}: ${error.message}`
+      `[Claims] Ошибка при получении заявки с ключом ${key}: ${error.message}`,
+      { stack: buildStack(ctx, error) }
     );
     res.status(500).json({
       status: "error",
