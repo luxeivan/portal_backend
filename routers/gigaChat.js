@@ -31,8 +31,15 @@ const buildCtx = (req, extra = {}) => ({
 });
 
 const buildStack = (ctx, error) => {
-  const ctxStr = `CTX=${JSON.stringify(ctx)}`;
+  const { env, msg_preview, answer_preview, ...safe } = ctx || {};
+  const ctxStr = `CTX=${JSON.stringify(safe)}`;
   return error?.stack ? `${error.stack}\n---\n${ctxStr}` : ctxStr;
+};
+
+const preview = (s, len = 500) => {
+  if (s == null) return "";
+  const str = String(s);
+  return str.length > len ? str.slice(0, len) + "…" : str;
 };
 
 /**
@@ -55,17 +62,17 @@ const buildStack = (ctx, error) => {
  *       500: { description: Ошибка взаимодействия с GigaChat }
  */
 gigaChatRouter.post("/", async (req, res) => {
-  const message = req.body?.message;
   const requestId = uuidv4();
+  const message = req.body?.message;
   const ctx = buildCtx(req, { scope: "gigachat-service", requestId });
 
-  logger.info("[GigaChat API] Входящее сообщение", {
+  logger.info(`[GigaChat API] Входящее сообщение: ${message}`, {
     stack: buildStack({ ...ctx, msg_len: String(message || "").length }),
   });
 
   try {
     const answer = await sendMessageToGigachat(message);
-    logger.info("[GigaChat API] Ответ модели сформирован", {
+    logger.info(`[GigaChat API] Ответ модели сформирован: ${answer}`, {
       stack: buildStack({ ...ctx, answer_len: (answer || "").length }),
     });
     res.json({ status: "ОК", answer });
