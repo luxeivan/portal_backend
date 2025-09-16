@@ -20,6 +20,12 @@ const Log = sequelize.define(
       type: DataTypes.TEXT,
       allowNull: true,
     },
+    // НОВОЕ: окружение (должно совпадать с типом колонки в MySQL)
+    env: {
+      type: DataTypes.ENUM("local", "test", "beta"),
+      allowNull: false,
+      defaultValue: "local",
+    },
   },
   {
     tableName: "logs",
