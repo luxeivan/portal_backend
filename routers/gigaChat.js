@@ -1,18 +1,45 @@
 const express = require("express");
 const { v4: uuidv4 } = require("uuid");
-const logger = require("../logger");
+const os = require("os");
 const sendMessageToGigachat = require("../services/gigaChat");
-const gigaChatRouter = express.Router();
+const logger = require("../logger");
 
+const gigaChatRouter = express.Router();
+const PORTAL_ENV =
+  process.env.PORTAL_ENV ||
+  process.env.BACK_ENV ||
+  process.env.NODE_ENV ||
+  "local";
+
+const getIp = (req) => {
+  const xf = req.headers["x-forwarded-for"];
+  if (xf) return xf.split(",")[0].trim();
+  return req.socket?.remoteAddress || req.ip || null;
+};
+
+const buildCtx = (req, extra = {}) => ({
+  env: PORTAL_ENV,
+  requestId: extra.requestId || uuidv4(),
+  ip: getIp(req),
+  url: req.originalUrl,
+  method: req.method,
+  referer: req.get("referer") || null,
+  userAgent: req.get("user-agent") || null,
+  acceptLanguage: req.get("accept-language") || null,
+  hostname: os.hostname(),
+  extra,
+});
+
+const buildStack = (ctx, error) => {
+  const ctxStr = `CTX=${JSON.stringify(ctx)}`;
+  return error?.stack ? `${error.stack}\n---\n${ctxStr}` : ctxStr;
+};
 
 /**
  * @swagger
  * /api/gigachat:
  *   post:
  *     summary: Отправить сообщение в GigaChat
- *     description: |
- *       Делегирует запрос внутреннему сервису `sendMessageToGigachat`
- *       и возвращает ответ модели.
  *     tags: ["🌐 GigaChat"]
  *     requestBody:
  *       required: true
@@ -22,33 +49,30 @@ const gigaChatRouter = express.Router();
  *             type: object
  *             required: [message]
  *             properties:
- *               message:
- *                 type: string
- *                 example: Привет, как дела?
+ *               message: { type: string, example: Привет, как дела? }
  *     responses:
- *       200:
- *         description: Успешный ответ от GigaChat
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 status: { type: string, example: ОК }
- *                 answer: { type: string, example: Всё отлично, спасибо! }
- *       500:
- *         description: Ошибка взаимодействия с GigaChat
+ *       200: { description: Успешный ответ от GigaChat }
+ *       500: { description: Ошибка взаимодействия с GigaChat }
  */
-
 gigaChatRouter.post("/", async (req, res) => {
-  const reqId = uuidv4();
-  const message = req.body.message;
-  logger.info("[GigaChat API] [%s] Принято сообщение пользователя. Превью: %s", reqId, (req.body?.message ?? "").toString().slice(0, 300) + ((req.body?.message || "").toString().length > 300 ? "…" : ""));
+  const message = req.body?.message;
+  const requestId = uuidv4();
+  const ctx = buildCtx(req, { scope: "gigachat-service", requestId });
+
+  logger.info("[GigaChat API] Входящее сообщение", {
+    stack: buildStack({ ...ctx, msg_len: String(message || "").length }),
+  });
+
   try {
-    const answer = await sendMessageToGigachat(message, reqId);
-    logger.info("[GigaChat API] [%s] Ответ модели сформирован. Длина=%s.", reqId, String(answer||"").length);
+    const answer = await sendMessageToGigachat(message);
+    logger.info("[GigaChat API] Ответ модели сформирован", {
+      stack: buildStack({ ...ctx, answer_len: (answer || "").length }),
+    });
     res.json({ status: "ОК", answer });
   } catch (error) {
-    logger.error("[GigaChat API] [%s] Ошибка обработки запроса: %s", reqId, error?.message);
+    logger.error("[GigaChat API] Ошибка обработки сообщения", {
+      stack: buildStack(ctx, error),
+    });
     res.json({ status: "error", error: error.message });
   }
 });
