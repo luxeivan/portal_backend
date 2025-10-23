@@ -74,7 +74,7 @@ const usersonec = {
       return response.data.data.Ref_Key;
     } catch (error) {
       console.error("Ошибка в checkUserByEmail:", error.message);
-      await notifyBotAboutError(error, endpoint);
+      // await notifyBotAboutError(error, endpoint);
       if (botNotifyUrl) {
         try {
           const errorDetails = {
@@ -113,7 +113,7 @@ const usersonec = {
       return response.data.data;
     } catch (error) {
       console.error("Ошибка в getUserById:", error.message);
-      await notifyBotAboutError(error, endpoint);
+      // await notifyBotAboutError(error, endpoint);
       if (botNotifyUrl) {
         try {
           const errorDetails = {
@@ -154,7 +154,7 @@ const usersonec = {
       return response.data;
     } catch (error) {
       console.error("Ошибка в createNewUser:", error.message);
-      await notifyBotAboutError(error, endpoint);
+      // await notifyBotAboutError(error, endpoint);
       if (botNotifyUrl) {
         try {
           const errorDetails = {
@@ -193,7 +193,7 @@ const usersonec = {
       return response.data;
     } catch (error) {
       console.error("Ошибка в updateUser:", error.message);
-      await notifyBotAboutError(error, endpoint);
+      // await notifyBotAboutError(error, endpoint);
       if (botNotifyUrl) {
         try {
           const errorDetails = {
