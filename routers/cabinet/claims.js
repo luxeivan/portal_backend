@@ -186,11 +186,12 @@ router.get("/", async (req, res) => {
 router.get("/:key", async (req, res) => {
   const userId = req.userId;
   const key = req.params.key;
+  const dataSet = req.query.dataSet
   const requestId = uuidv4();
   const ctx = buildCtx(req, { scope: "claims.item", requestId, userId, key });
 
   try {
-    const claim = await getClaimItem(userId, key);
+    const claim = await getClaimItem(userId, key, dataSet);
     logger.info(
       `[Claims] Заявка ${key} успешно получена для пользователя ${userId}`,
       { stack: buildStack(ctx) }
