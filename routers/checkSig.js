@@ -2,13 +2,14 @@
 const { exec } = require("child_process");
 const express = require("express");
 const fs = require("fs");
+const path = require("path");
 const router = express.Router();
 const url = "https://e-trust.gosuslugi.ru/app/scc/portal/api/v1/portal/ESV/verifyAndGetReports"
 router.post("/", async (req, res) => {
     const cms = req.files.cms
     const data = req.files.data
-    const cmsPath = __dirname + "/../files/" + cms.name
-    const dataPath = __dirname + "/../files/" + data.name
+    const cmsPath = path.join(__dirname, "..", "files", cms.name)
+    const dataPath = path.join(__dirname, "..", "files", data.name)
     cms.mv(cmsPath, (err) => {
         if (err) {
             return res.status(500).send(err);
@@ -46,11 +47,15 @@ router.post("/", async (req, res) => {
     // }
     const command = `curl -X POST ${url} -F "data=@${dataPath}" -F "cms=@${cmsPath}"`
     exec(command, (error, stdout, stderr) => {
-        if (error) { console.log(`error: ${error.message}`); return; }
-        if (stderr) { console.log(`stderr: ${stderr}`); return; }
-        console.log(`stdout: ${stdout}`);
+        if (error) {
+            console.log(`error: ${error.message}`); return res.json({ status: "error", message: error.message });
+        }
+        if (stderr) {
+            console.log(`stderr: ${stderr}`); return res.json({ status: "error", message: stderr });
+        }
+        // console.log(`stdout: ${stdout}`);
+        res.json({ status: "OK", data: stdout })
     });
-    res.json({ status: "OK", data: new File(fs.readFileSync(cmsPath), cms.name) })
 
 });
 
