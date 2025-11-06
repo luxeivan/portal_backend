@@ -8,8 +8,8 @@ const url = "https://e-trust.gosuslugi.ru/app/scc/portal/api/v1/portal/ESV/verif
 router.post("/", async (req, res) => {
     const cms = req.files.cms
     const data = req.files.data
-    const cmsPath = path.join(__dirname, "..", "files", cms.name)
-    const dataPath = path.join(__dirname, "..", "files", data.name)
+    const cmsPath = path.join(__dirname, "..", "files", Buffer.from(cms.name, "utf-8").toString())
+    const dataPath = path.join(__dirname, "..", "files", Buffer.from(data.name, "utf-8").toString())
     cms.mv(cmsPath, (err) => {
         if (err) {
             return res.status(500).send(err);
