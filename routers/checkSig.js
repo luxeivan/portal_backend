@@ -48,13 +48,13 @@ router.post("/", async (req, res) => {
     const command = `curl -X POST ${url} -F "data=@${dataPath}" -F "cms=@${cmsPath}"`
     console.log("command",command);
     
-    exec(command, (error, stdout, stderr) => {
+    exec(command, (error, stdout) => {
         if (error) {
             console.log(`error: ${error.message}`); return res.json({ status: "error", message: error.message });
         }
-        if (stderr) {
-            console.log(`stderr: ${stderr}`); return res.json({ status: "error", message: stderr });
-        }
+        // if (stderr) {
+        //     console.log(`stderr: ${stderr}`); return res.json({ status: "error", message: stderr });
+        // }
         // console.log(`stdout: ${stdout}`);
         res.json({ status: "OK", data: stdout })
     });
