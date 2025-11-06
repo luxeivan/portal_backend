@@ -46,6 +46,8 @@ router.post("/", async (req, res) => {
     //     console.log("error", error)
     // }
     const command = `curl -X POST ${url} -F "data=@${dataPath}" -F "cms=@${cmsPath}"`
+    console.log("command",command);
+    
     exec(command, (error, stdout, stderr) => {
         if (error) {
             console.log(`error: ${error.message}`); return res.json({ status: "error", message: error.message });
