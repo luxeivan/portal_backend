@@ -8,7 +8,10 @@ const router = express.Router();
 const url = "https://e-trust.gosuslugi.ru/app/scc/portal/api/v1/portal/ESV/verifyAndGetReports"
 
 const remFile = (path) => {
-    fs.unlink(path)
+    fs.unlink(path, (err) => {
+        if (err) throw err;
+        console.log(`${path} was deleted`);
+    })
 }
 
 router.post("/", async (req, res) => {
