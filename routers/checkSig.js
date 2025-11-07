@@ -1,15 +1,21 @@
 // const { default: axios } = require("axios");
 const { exec } = require("child_process");
 const express = require("express");
+const { v4 } = require("uuid");
 const fs = require("fs");
 const path = require("path");
 const router = express.Router();
 const url = "https://e-trust.gosuslugi.ru/app/scc/portal/api/v1/portal/ESV/verifyAndGetReports"
+
+const remFile = (path) => {
+    fs.unlink(path)
+}
+
 router.post("/", async (req, res) => {
     const cms = req.files.cms
     const data = req.files.data
-    const cmsPath = path.join(__dirname, "..", "files", Buffer.from(cms.name, "utf-8").toString())
-    const dataPath = path.join(__dirname, "..", "files", Buffer.from(data.name, "utf-8").toString())
+    const cmsPath = path.join(__dirname, "..", "files", v4())
+    const dataPath = path.join(__dirname, "..", "files", v4())
     cms.mv(cmsPath, (err) => {
         if (err) {
             return res.status(500).send(err);
@@ -22,6 +28,7 @@ router.post("/", async (req, res) => {
         }
         // return res.send({ status: "success", path: path });
     });
+
     // const data = req.body
     // console.log("body", body)
     // console.log("files", files)
@@ -46,16 +53,21 @@ router.post("/", async (req, res) => {
     //     console.log("error", error)
     // }
     const command = `curl -X POST ${url} -F "data=@${dataPath}" -F "cms=@${cmsPath}"`
-    console.log("command",command);
-    
+    console.log("command", command);
+
     exec(command, (error, stdout) => {
         if (error) {
-            console.log(`error: ${error.message}`); return res.json({ status: "error", message: error.message });
+            console.log(`error: ${error.message}`);
+            remFile(cmsPath)
+            remFile(dataPath)
+            return res.json({ status: "error", message: error.message });
         }
         // if (stderr) {
         //     console.log(`stderr: ${stderr}`); return res.json({ status: "error", message: stderr });
         // }
         // console.log(`stdout: ${stdout}`);
+        remFile(cmsPath)
+        remFile(dataPath)
         res.json({ status: "OK", data: stdout })
     });
 
