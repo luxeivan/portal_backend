@@ -49,6 +49,7 @@ const headers = {
 router.get("/by-id/:id", async function (req, res) {
   const userId = req.userId;
   const fileId = req.params.id;
+  const sig = req.query.sig;
 
   // console.log(
   //   `Получен запрос на получение файла по ID. userId: ${userId}, fileId: ${fileId}`
@@ -61,9 +62,11 @@ router.get("/by-id/:id", async function (req, res) {
       message: "нет авторизации",
     });
   }
+  let url = `${SERVER_1C_HTTP_SERVICE}/profile/${userId}/files/${fileId}`
+  if(sig=="1") url=`${SERVER_1C_HTTP_SERVICE}/profile/${userId}/files/signed/${fileId}`
   try {
     const connectionResponse = await axios.get(
-      `${SERVER_1C_HTTP_SERVICE}/profile/${userId}/files/${fileId}`,
+      url,
       { headers }
     );
     // console.log(connectionResponse.data);
