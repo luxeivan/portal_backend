@@ -103,10 +103,10 @@ router.post("/", async function (req, res) {
     : [req.files.files];
 
   // Получение допустимых расширений и максимального размера из 1С
-  let allowedExtensions = ["JPEG", "JPG", "PDF", "PNG"];
+  let allowedExtensions = ["JPEG", "JPG", "PDF", "PNG", "SIG", "P7S", "SIGN", "SGN"];
   let maxSizeFile = 10 * 1024 * 1024; // По умолчанию 10 МБ
   const { categoryKey, saveToProfile } = req.body;
-   console.log("Полученный saveToProfile:", saveToProfile);
+  console.log("Полученный saveToProfile:", saveToProfile);
   //  console.log("Полученный categoryKey:", categoryKey);
 
   // Проверка расширений и размера файлов
