@@ -14,6 +14,7 @@ const auth = require("./routers/auth");
 const registration = require("./routers/registration");
 // const sendMail = require("./routers/sendmail");
 const cabinet = require("./routers/cabinet");
+const version = require("./routers/version");
 const checkSig = require("./routers/checkSig");
 const services = require("./routers/services");
 // const formonec = require("./routers/formonec");
@@ -118,6 +119,7 @@ app.use('/uploads', (req, res, next) => {
 }, express.static(path.join(__dirname, 'uploads')))
 
 app.use("/api/auth", auth);
+app.use("/api/version", version);
 app.use("/api/checksig", checkSig);
 app.use("/api/gigachat", gigaChatRouter);
 app.use("/api/registration", registration);
