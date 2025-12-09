@@ -19,6 +19,7 @@ const getDaData = require('../routers/getDaData/getDaData');
 const getPrice = require('../routers/cabinet/getPrice');
 const pay = require("./cabinet/pay");
 const paySber = require("./cabinet/paySber");
+const checkSig = require("./cabinet/checkSig");
 const tasks = require("./cabinet/getTask");
 const appeals = require("./cabinet/getAppeals");
 // ... и так далее для всех остальных файлов в папке cabinet ...
@@ -44,6 +45,7 @@ router.use("/personalAccounts", personalAccounts);
 router.use("/getDaData", getDaData);
 router.use("/pay", pay);
 router.use("/pay-sber", paySber);
+router.use("/checkSig", checkSig);
 // ... и так далее для всех остальных импортированных роутеров ...
 
 module.exports = router;
