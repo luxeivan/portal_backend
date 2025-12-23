@@ -12,6 +12,7 @@ const {
 const logger = require("../logger");
 
 const privateKey = process.env.JWT_SECRET;
+const local = process.env.LOCAL;
 
 const attempts = 3; //Количество попыток
 const timeAttempts = 60000; //Время попыток
@@ -78,7 +79,10 @@ router.post("/phone", async (req, res) => {
     req.session.phoneCheck = false;
     req.session.phoneCount = attempts;
     console.log("смс отправлено")
-    const code = await sendCodeToPhone(req.body.phone);
+    const code = 1234
+    if (local !== "1") {
+      code = await sendCodeToPhone(req.body.phone);
+    }
     logger.info(
       `Код подтверждения отправлен на номер телефона: ${req.body.phone}, код: ${code}`
     );
@@ -93,6 +97,7 @@ router.post("/phone", async (req, res) => {
     return res.json({ status: "ok", phoneCount: req.session.phoneCount });
   } catch (error) {
     logger.error(`Ошибка при отправке кода подтверждения: ${error.message}`);
+    req.session.destroy();
     return res
       .status(500)
       .json({ status: "error", message: "ошибка отправки кода" });
@@ -222,8 +227,8 @@ router.post("/email", async (req, res) => {
   const host = req.get('host')
   console.log("host", host)
 
-  const userIP = req.socket.remoteAddress;
-  console.log("userIP", userIP)
+  // const userIP = req.socket.remoteAddress;
+  // console.log("userIP", userIP)
   try {
     logger.info(
       `Получен запрос на подтверждение email: ${JSON.stringify(req.body)}`
@@ -248,8 +253,11 @@ router.post("/email", async (req, res) => {
     req.session.email = req.body.email.toLowerCase();
     req.session.emailCheck = false;
     req.session.emailCount = attempts;
+    const code = 1234
+    if (local !== "1") {
+      code = await sendCodeToMail(req.body.phone);
+    }
 
-    const code = await sendCodeToMail(req.body.email);
     // logger.info(`Код подтверждения отправлен на email: ${req.body.email}`);
 
     req.session.emailBlock = true;
@@ -264,8 +272,16 @@ router.post("/email", async (req, res) => {
     logger.error(
       `Ошибка при отправке кода подтверждения на email: ${error.message}`
     );
+    req.session.destroy()
     return res
       .status(500)
+      // .clearCookie('connect.sid', {
+      //   httpOnly: true,
+      //   // maxAge: 100000,
+      //   // sameSite: "none",
+      //   // domain: process.env.DOMAIN,
+      //   // secure: true,
+      // })
       .json({ status: "error", message: "ошибка отправки кода" });
   }
 });
