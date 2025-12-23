@@ -12,12 +12,9 @@ const swaggerSetup = require("./swagger");
 
 const auth = require("./routers/auth");
 const registration = require("./routers/registration");
-// const sendMail = require("./routers/sendmail");
 const cabinet = require("./routers/cabinet");
 const version = require("./routers/version");
-// const checkSig = require("./routers/checkSig");
 const services = require("./routers/services");
-// const formonec = require("./routers/formonec");
 const getDaData = require("./routers/getDaData/getDaData");
 const contactRouter = require("./routers/contact");
 const publicFile = require("./routers/publicFile");
@@ -26,7 +23,6 @@ const hotQuestionsRouter = require("./routers/hotquestions");
 
 const session = require("express-session");
 
-// const bodyParser = require("body-parser");
 const fileUpload = require("express-fileupload");
 const FileStore = require("session-file-store")(session);
 
@@ -47,18 +43,23 @@ const options = {
 
 const app = express();
 
+app.set('trust proxy', 1); // чтобы secure-куки корректно работали за прокси/HTTPS; локально не мешает
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 app.use(cors({ credentials: true, origin: true }));
+
+const isLocal = String(local) === "1";
+
 app.use(
   session({
     cookie: {
       httpOnly: true,
-      maxAge: 100000,
-      sameSite: "none",
-      domain: process.env.DOMAIN,
-      secure: local !== "1" ? true : undefined
+      maxAge: 10 * 60 * 1000,
+      sameSite: isLocal ? "lax" : "none",
+      // secure: local !== "1" ? true : undefined,
+      secure: !isLocal, // prod=true (HTTPS), dev=false (HTTP)
     },
     store: new FileStore({ retries: 1 }),
     secret: secretSession,
@@ -82,10 +83,7 @@ const limiter = rateLimit({
   message: "Слишком много запросов с этого IP, пожалуйста, попробуйте позже.",
 });
 
-// Применяем rate limiter ко всем запросам
 app.use(limiter);
-
-// Использование всех модулей Helmet
 app.use(helmet());
 
 // Настройка Content Security Policy
@@ -114,19 +112,16 @@ app.use(helmet.referrerPolicy({ policy: "same-origin" }));
 // });
 
 app.use('/uploads', (req, res, next) => {
-  res.set('Cross-Origin-Resource-Policy', 'cross-origine'); // Express желает получить печенья
-  // res.set('Give-Me', 'Cookies'); // Express желает получить печенья
+  res.set('Cross-Origin-Resource-Policy', 'cross-origin');
   next();
 }, express.static(path.join(__dirname, 'uploads')))
 
 app.use("/api/auth", auth);
 app.use("/api/version", version);
-// app.use("/api/checksig", checkSig);
 app.use("/api/gigachat", gigaChatRouter);
 app.use("/api/registration", registration);
 app.use("/api/cabinet", checkAuth, cabinet);
 app.use("/api/services", services);
-// app.use("/api/formonec", formonec);
 app.use("/api/getDaData", getDaData);
 app.use("/api/publicFile", publicFile);
 app.use("/api/contacts", contactRouter);
