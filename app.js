@@ -35,6 +35,7 @@ const gigaChatRouter = require("./routers/gigaChat");
 
 const secretSession = process.env.SECRET_SESSION;
 const port = process.env.PORT;
+const local = process.env.LOCAL;
 const portSSL = process.env.PORT_SSL;
 const cert = process.env.CERT;
 const certKey = process.env.CERT_KEY;
@@ -57,7 +58,7 @@ app.use(
       maxAge: 100000,
       sameSite: "none",
       domain: process.env.DOMAIN,
-      secure: true,
+      secure: local !== "1" ? true : undefined
     },
     store: new FileStore({ retries: 1 }),
     secret: secretSession,
