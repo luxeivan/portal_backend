@@ -64,13 +64,13 @@ router.post("/phone", async (req, res) => {
       logger.warn("Сначала необходимо подтвердить email");
       return res.status(400).json({
         status: "error",
-        message: "вначале нужно подтвердить email",
+        message: "Сперва подтвердите email",
       });
     }
 
     if (req.session.phoneBlock) {
       logger.error("Запрос на подтверждение телефона отправлен слишком часто");
-      return res.json({
+      return res.status(429).json({
         status: "unavailable",
         message: "нельзя часто отправлять запросы на подтверждение телефона",
       });
@@ -79,7 +79,7 @@ router.post("/phone", async (req, res) => {
     req.session.phoneCheck = false;
     req.session.phoneCount = attempts;
     console.log("смс отправлено")
-    const code = 1234
+    let code = "1234"; // LOCAL=1 → фиксированный код; в проде перезапишем ниже
     if (local !== "1") {
       code = await sendCodeToPhone(req.body.phone);
     }
@@ -92,9 +92,15 @@ router.post("/phone", async (req, res) => {
       req.session.phoneBlock = false;
     }, timeAttempts);
 
-    req.session.phoneCode = code;
+    req.session.phoneCode = String(code); // cохраняем как строку для стабильного сравнения
 
-    return res.json({ status: "ok", phoneCount: req.session.phoneCount });
+    return req.session.save((err) => {
+      if (err) {
+        logger.error(`Ошибка сохранения сессии: ${err.message}`);
+        return res.status(500).json({ status: "error", message: "ошибка сохранения сессии" });
+      }
+      return res.json({ status: "ok", phoneCount: req.session.phoneCount });
+    });
   } catch (error) {
     logger.error(`Ошибка при отправке кода подтверждения: ${error.message}`);
     req.session.destroy();
@@ -244,7 +250,7 @@ router.post("/email", async (req, res) => {
 
     if (req.session.emailBlock) {
       logger.warn("Слишком частые запросы на подтверждение email");
-      return res.status(400).json({
+      return res.status(429).json({
         status: "unavailable",
         message: "нельзя часто отправлять запросы на подтверждение email",
       });
@@ -253,9 +259,9 @@ router.post("/email", async (req, res) => {
     req.session.email = req.body.email.toLowerCase();
     req.session.emailCheck = false;
     req.session.emailCount = attempts;
-    const code = 1234
+    let code = "1234"; // LOCAL=1 → фиксированный код; в проде перезапишем ниже
     if (local !== "1") {
-      code = await sendCodeToMail(req.body.phone);
+      code = await sendCodeToMail(req.body.email); // отправляем на email, а не на phone
     }
 
     // logger.info(`Код подтверждения отправлен на email: ${req.body.email}`);
@@ -265,9 +271,15 @@ router.post("/email", async (req, res) => {
       req.session.emailBlock = false;
     }, timeAttempts);
 
-    req.session.emailCode = code;
+    req.session.emailCode = String(code); // храним как строку
 
-    return res.json({ status: "ok", emailcount: req.session.emailCount });
+    return req.session.save((err) => {
+      if (err) {
+        logger.error(`Ошибка сохранения сессии: ${err.message}`);
+        return res.status(500).json({ status: "error", message: "ошибка сохранения сессии" });
+      }
+      return res.json({ status: "ok", emailcount: req.session.emailCount });
+    });
   } catch (error) {
     logger.error(
       `Ошибка при отправке кода подтверждения на email: ${error.message}`
