@@ -21,6 +21,8 @@ const publicFile = require("./routers/publicFile");
 const chatRouter = require("./routers/chatRouter");
 const hotQuestionsRouter = require("./routers/hotquestions");
 
+const clientLogs = require("./routers/clientLogs");
+
 const session = require("express-session");
 
 const fileUpload = require("express-fileupload");
@@ -127,6 +129,8 @@ app.use("/api/publicFile", publicFile);
 app.use("/api/contacts", contactRouter);
 app.use("/api/chat", chatRouter);
 app.use("/api/hotQuestions", hotQuestionsRouter);
+
+app.use("/api/client-logs", clientLogs);
 
 swaggerSetup(app);
 
