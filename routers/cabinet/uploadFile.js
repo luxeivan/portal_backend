@@ -18,7 +18,7 @@ const headers = {
 
 const pathFileStorage =
   process.env.PATH_FILESTORAGE ||
-  "/Users/yanutstas/Desktop/Project/portal_backend/files";
+  "/uploads/";
 
 /**
  * @swagger
