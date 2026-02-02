@@ -29,23 +29,3 @@ sequelize
   .catch((error) => {
     console.error("Ошибка синхронизации базы данных:", error);
   });
-
-// const sequelize = require("./config/database");
-// const { addUser } = require("./userService");
-// const Log = require("./models/Log");
-
-// sequelize
-//   .sync({ force: false })
-//   .then(async () => {
-//     console.log("База данных синхронизирована");
-
-//     await Log.create({
-//       level: "info",
-//       message: "Тестовый лог для проверки",
-//     });
-
-//     await addUser("Райан12223@example.com", "0987654321", "5678", 0);
-//   })
-//   .catch((error) => {
-//     console.error("Ошибка синхронизации базы данных:", error);
-//   });
