@@ -1,5 +1,5 @@
 const axios = require("axios");
-const moment = require("moment");
+// const moment = require("moment");
 require("dotenv").config();
 
 const server1c = process.env.SERVER_1C;
@@ -24,11 +24,11 @@ const otherServices = {
             );
             // console.log('response.data: ', response.data);
             if (response.data && response.data.value && response.data.value.length > 0) {
-                console.log(response.data.value[0]);
+                // console.log(response.data.value[0]);
 
                 return { price: response.data.value[0]?.Цена, currency: response.data.value[0]?.Валюта.Description };
             } else {
-                return null;
+                return false;
             }
         } catch (error) {
             console.log('getPrice: ', error.message);

@@ -19,7 +19,53 @@ const headers = {
 const pathFileStorage =
   process.env.PATH_FILESTORAGE ||
   "/uploads/";
+async function convertToPdf(dirName, files) {
+  // Создаем новый PDF-документ
+  const pdfDoc = await PDFDocument.create();
 
+  for (const file of files) {
+    const filePath = `${dirName}/${file.name}`;
+    const fileBuffer = await fs.promises.readFile(filePath);
+    // console.log("Файл для объединения загружен с пути:", filePath);
+
+    let pdfImage;
+    if (file.mimetype === "image/jpeg" || file.mimetype === "image/jpg") {
+      pdfImage = await pdfDoc.embedJpg(fileBuffer);
+      const page = pdfDoc.addPage([pdfImage.width, pdfImage.height]);
+      page.drawImage(pdfImage, {
+        x: 0,
+        y: 0,
+        width: pdfImage.width,
+        height: pdfImage.height,
+      });
+    } else if (file.mimetype === "image/png") {
+      pdfImage = await pdfDoc.embedPng(fileBuffer);
+      const page = pdfDoc.addPage([pdfImage.width, pdfImage.height]);
+      page.drawImage(pdfImage, {
+        x: 0,
+        y: 0,
+        width: pdfImage.width,
+        height: pdfImage.height,
+      });
+    } else if (file.mimetype === "application/pdf") {
+      const donorPdfDoc = await PDFDocument.load(fileBuffer);
+      const donorPages = await pdfDoc.copyPages(
+        donorPdfDoc,
+        donorPdfDoc.getPageIndices()
+      );
+      donorPages.forEach((page) => pdfDoc.addPage(page));
+    } else {
+      continue;
+    }
+  }
+
+  // const pdfBytes = await pdfDoc.save();
+  return await pdfDoc.saveAsBase64();
+  // const pdfFilename = `combined_document_${uuid}.pdf`;
+  // const pdfPath = `${dirName}/${pdfFilename}`;
+
+  // console.log("Созданный PDF сохраняется по пути:", pdfPath);
+}
 /**
  * @swagger
  * /api/cabinet/upload-file:
@@ -139,51 +185,7 @@ router.post("/", async function (req, res) {
 
 
     } else {
-      // Создаем новый PDF-документ
-      const pdfDoc = await PDFDocument.create();
-
-      for (const file of files) {
-        const filePath = `${dirName}/${file.name}`;
-        const fileBuffer = await fs.promises.readFile(filePath);
-        // console.log("Файл для объединения загружен с пути:", filePath);
-
-        let pdfImage;
-        if (file.mimetype === "image/jpeg" || file.mimetype === "image/jpg") {
-          pdfImage = await pdfDoc.embedJpg(fileBuffer);
-          const page = pdfDoc.addPage([pdfImage.width, pdfImage.height]);
-          page.drawImage(pdfImage, {
-            x: 0,
-            y: 0,
-            width: pdfImage.width,
-            height: pdfImage.height,
-          });
-        } else if (file.mimetype === "image/png") {
-          pdfImage = await pdfDoc.embedPng(fileBuffer);
-          const page = pdfDoc.addPage([pdfImage.width, pdfImage.height]);
-          page.drawImage(pdfImage, {
-            x: 0,
-            y: 0,
-            width: pdfImage.width,
-            height: pdfImage.height,
-          });
-        } else if (file.mimetype === "application/pdf") {
-          const donorPdfDoc = await PDFDocument.load(fileBuffer);
-          const donorPages = await pdfDoc.copyPages(
-            donorPdfDoc,
-            donorPdfDoc.getPageIndices()
-          );
-          donorPages.forEach((page) => pdfDoc.addPage(page));
-        } else {
-          continue;
-        }
-      }
-
-      // const pdfBytes = await pdfDoc.save();
-      fileBase64 = await pdfDoc.saveAsBase64();
-      // const pdfFilename = `combined_document_${uuid}.pdf`;
-      // const pdfPath = `${dirName}/${pdfFilename}`;
-
-      // console.log("Созданный PDF сохраняется по пути:", pdfPath);
+      fileBase64 = await convertToPdf(dirName, files)
     }
 
 
