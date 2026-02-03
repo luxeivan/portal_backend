@@ -4,7 +4,7 @@ const cors = require("cors");
 const fs = require("fs");
 const path = require('path')
 const http = require("http");
-// const https = require("https");
+const https = require("https");
 require("dotenv").config();
 const logger = require("./logger");
 const rateLimit = require("express-rate-limit");
@@ -34,14 +34,14 @@ const gigaChatRouter = require("./routers/gigaChat");
 const secretSession = process.env.SECRET_SESSION;
 const port = process.env.PORT;
 const local = process.env.LOCAL;
-// const portSSL = process.env.PORT_SSL;
-// const cert = process.env.CERT;
-// const certKey = process.env.CERT_KEY;
+const portSSL = process.env.PORT_SSL;
+const cert = process.env.CERT;
+const certKey = process.env.CERT_KEY;
 
-// const options = {
-//   cert: fs.readFileSync(cert),
-//   key: fs.readFileSync(certKey),
-// };
+const options = {
+  cert: fs.readFileSync(cert),
+  key: fs.readFileSync(certKey),
+};
 
 const app = express();
 
@@ -135,9 +135,9 @@ app.use("/api/client-logs", clientLogs);
 swaggerSetup(app);
 
 const httpServer = http.createServer(app);
-// const httpsServer = https.createServer(options, app);
+const httpsServer = https.createServer(options, app);
 
 httpServer.listen(port, () => {
   console.log(`Зашли и вышли, приключения на ${port} порту`);
 });
-// httpsServer.listen(portSSL);
+httpsServer.listen(portSSL);
