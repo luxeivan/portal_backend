@@ -15,6 +15,9 @@ const headers = {
   Authorization: server1c_auth,
   "Content-Type": "application/json",
 };
+const sigExtensions = ["SIG", "P7S", "SIGN", "SGN", "PKCS7"];
+const allowedExtensions = ["JPEG", "JPG", "PDF", "PNG", "SIG", "P7S", "SIGN", "SGN"];
+const maxSizeFile = 10 * 1024 * 1024; // По умолчанию 10 МБ
 
 const pathFileStorage =
   process.env.PATH_FILESTORAGE ||
@@ -66,6 +69,24 @@ async function convertToPdf(dirName, files) {
 
   // console.log("Созданный PDF сохраняется по пути:", pdfPath);
 }
+function checkFiles(files) {
+  // Проверка расширений и размера файлов
+  let invalidFile = false;
+  for (const file of files) {
+    const fileExtension = file.name.split(".").pop().toUpperCase();
+    if (!allowedExtensions.includes(fileExtension)) {
+      invalidFile = "Неподдерживаемое расширение файла";
+      break;
+    }
+    if (file.size > maxSizeFile) {
+      invalidFile = "Превышен размер файла";
+      break;
+    }
+  }
+  console.log("checkFiles",invalidFile);
+  
+  return invalidFile
+}
 /**
  * @swagger
  * /api/cabinet/upload-file:
@@ -114,7 +135,7 @@ router.post("/", async function (req, res) {
   // const type = req.query.type;
   const dirName = `${pathFileStorage}/${userId}`;
 
-  console.log("Полный путь для сохранения файлов на сервере:", dirName);
+  // console.log("Полный путь для сохранения файлов на сервере:", dirName);
 
 
   if (!req.files || Object.keys(req.files).length === 0) {
@@ -130,28 +151,14 @@ router.post("/", async function (req, res) {
     : [req.files.files];
 
   // Получение допустимых расширений и максимального размера из 1С
-  let allowedExtensions = ["JPEG", "JPG", "PDF", "PNG", "SIG", "P7S", "SIGN", "SGN"];
-  let sigExtensions = ["SIG", "P7S", "SIGN", "SGN", "PKCS7"];
-  let maxSizeFile = 10 * 1024 * 1024; // По умолчанию 10 МБ
+
   const { categoryKey, saveToProfile } = req.body;
-  console.log("Полученный saveToProfile:", saveToProfile);
+  // console.log("Полученный saveToProfile:", saveToProfile);
   //  console.log("Полученный categoryKey:", categoryKey);
 
-  // Проверка расширений и размера файлов
-  let invalidFile = false;
-  for (const file of files) {
-    const fileExtension = file.name.split(".").pop().toUpperCase();
-    if (!allowedExtensions.includes(fileExtension)) {
-      invalidFile = "Неподдерживаемое расширение файла";
-      break;
-    }
-    if (file.size > maxSizeFile) {
-      invalidFile = "Превышен размер файла";
-      break;
-    }
-  }
+console.log("files",files);
 
-  if (invalidFile) {
+  if (checkFiles(files)) {
     logger.warn(
       `Один или несколько файлов не соответствуют требованиям. UUID: ${uuid}`
     );
