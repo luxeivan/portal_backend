@@ -48,7 +48,7 @@ router.get("/task/:id", async (req, res) => {
 router.post("/", sanitizeValues, async (req, res) => {
     const userId = req.userId;
     // const data = req.body
-    const { typeActionId, claimId, versionId, values, taskBasis } = req.body;
+    const { typeActionId, claimId, versionId, values, taskBasis, taskBaseFile, taskBasisType, taskBasisValue } = req.body;
 
     // 1. Валидация обязательных полей
     if (!typeActionId || typeof typeActionId !== 'string') {
@@ -60,28 +60,34 @@ router.post("/", sanitizeValues, async (req, res) => {
     if (!versionId || typeof versionId !== 'string') {
         return res.status(400).json({ error: "versionId required and must be string" });
     }
+    if (!taskBasisType || typeof taskBasisType !== 'string') {
+        return res.status(400).json({ error: "taskBasisType required and must be string" });
+    }
 
 
     try {
         // const task = await createNewTask(userId, data)
-        const task = false
-        console.log(userId,
-            {
-                typeActionId,
-                claimId,
-                taskBasis,
-                versionId,
-                values, // ← уже санитизированный!
-            }
-        );
+        // const task = false
+        // console.log(userId,
+        //     {
+        //         typeActionId,
+        //         claimId,
+        //         taskBasis,
+        //         versionId,
+        //         values, // ← уже санитизированный!
+        //     }
+        // );
 
-        // const task = await createNewTask(userId, {
-        //     typeActionId,
-        //     claimId,
-        //     taskBasis,
-        //     versionId,
-        //     values, // ← уже санитизированный!
-        // });
+        const task = await createNewTask(userId, {
+            typeActionId,
+            taskBasis,
+            taskBaseFile, 
+            taskBasisType, 
+            taskBasisValue,
+            claimId,
+            versionId,
+            values, // ← уже санитизированный!
+        });
         if (!task) {
             return res.json(false)
         }
