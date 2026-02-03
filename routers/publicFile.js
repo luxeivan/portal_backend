@@ -2,7 +2,7 @@ const express = require("express");
 const axios = require("axios");
 require("dotenv").config();
 const fs = require("fs");
-var Readable = require('stream').Readable
+const Readable = require('stream').Readable
 
 const router = express.Router();
 
@@ -80,7 +80,7 @@ router.get("/:key/:ext", async (req, res) => {
         if (response.data) {
             // const fileBlob = b64toBlob(response.data.data.base64)
             const imgBuffer = Buffer.from(response.data.data.base64, 'base64')
-            var s = new Readable()
+            const s = new Readable()
 
             s.push(imgBuffer)
             s.push(null)

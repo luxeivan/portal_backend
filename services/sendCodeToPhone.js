@@ -10,7 +10,7 @@ const campaign_id = '989295860'
 // }
 const sendCodeToPhone = async (phone) => {
     const authMegafon = process.env.AUTH_MEGAFON_SMS
-    var pincode = Math.floor(1000 + Math.random() * 9000);
+    const pincode = Math.floor(1000 + Math.random() * 9000);
     try {
         const response = await axios.post('https://a2p-api.megalabs.ru/sms/v1/sms', {
             from: "M-OBLENERGO",

@@ -1,7 +1,7 @@
 import http from "k6/http";
 import { check } from "k6";
 
-export let options = {
+export const options = {
   scenarios: {
     contacts: {
       executor: "constant-arrival-rate",
