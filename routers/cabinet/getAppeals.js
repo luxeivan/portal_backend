@@ -86,8 +86,8 @@ router.post("/", async (req, res) => {
 //Прочитать ответ на обращение
 router.post("/read", async (req, res) => {
     const userId = req.userId;
-    const id = req.body.id
-    console.log("id", id);
+    const id = encodeURIComponent(req.body.id)
+    // console.log("id", id);
     try {
         const readAnswer = await readAnswerOfAppeal(userId, id)
         if (!readAnswer) {

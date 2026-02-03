@@ -157,7 +157,7 @@ router.get("/by-id/:id", async function (req, res) {
 // Маршрут для получения файла по имени из файловой системы
 router.get("/by-filename/:filename", async function (req, res) {
   const userId = req.userId;
-  const filename = req.params.filename;
+  const filename = encodeURIComponent(req.params.filename);
 
   console.log(
     `Получен запрос на скачивание файла ${filename} для пользователя ${userId}`
