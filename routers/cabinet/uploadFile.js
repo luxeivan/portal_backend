@@ -83,7 +83,7 @@ function checkFiles(files) {
       break;
     }
   }
-  console.log("checkFiles",invalidFile);
+  // console.log("checkFiles",invalidFile);
   
   return invalidFile
 }
@@ -156,7 +156,7 @@ router.post("/", async function (req, res) {
   // console.log("Полученный saveToProfile:", saveToProfile);
   //  console.log("Полученный categoryKey:", categoryKey);
 
-console.log("files",files);
+// console.log("files",files);
 
   if (checkFiles(files)) {
     logger.warn(
@@ -221,7 +221,7 @@ console.log("files",files);
           name: req.body.documentName,
           typeFileId: categoryKey
         }, { headers })
-        console.log("resSaveDocsProfile", resSaveDocsProfile.data)
+        // console.log("resSaveDocsProfile", resSaveDocsProfile.data)
       } else {
         return res.json({ status: "ok", message: "Файл успешно загружен", fileId: resSaveFile?.data?.data?.fileId });
       }
