@@ -1,10 +1,5 @@
 const express = require("express");
 const router = express.Router();
-const {
-    createClaim,
-    getClaims,
-    getClaimItem,
-} = require("../../services/onec/claims");
 const logger = require("../../logger");
 const { getPrice } = require("../../services/onec/otherServices");
 
@@ -19,7 +14,7 @@ router.get("/:type/:nomenclature", async (req, res) => {
 
     try {
         const price = await getPrice(type, nomenclature)
-        if (typeof price === 'null') res.json(false)
+        if (!price) res.json(false)
         res.json(price)
     } catch (error) {
         logger.error(
