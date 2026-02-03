@@ -48,7 +48,7 @@ const headers = {
 // Маршрут для получения файла из 1С по ID
 router.get("/by-id/:id", async function (req, res) {
   const userId = req.userId;
-  const fileId = req.params.id;
+  const fileId = encodeURIComponent(req.params.id);
   const sig = req.query.sig;
 
   // console.log(

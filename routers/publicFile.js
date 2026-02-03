@@ -70,8 +70,8 @@ const headers = {
  */
 
 router.get("/:key/:ext", async (req, res) => {
-    const key = req.params.key;
-    const ext = req.params.ext;
+    const key = encodeURIComponent(req.params.key);
+    const ext = encodeURIComponent(req.params.ext);
     // const isFile = fs.existsSync(`./uploads/${key}.${ext}`)
     // console.log("isFile", isFile);
 

@@ -412,7 +412,7 @@ router.get("/getNameDocs", async function (req, res) {
 
 router.get("/:id", async function (req, res) {
   const userId = req.userId;
-  const idDocument = req.params.id;
+  const idDocument = encodeURIComponent(req.params.id);
 
   // logger.info(`Получен запрос на получение документа с id: ${idDocument}`);
 
@@ -489,7 +489,7 @@ router.get("/:id", async function (req, res) {
 
 router.put("/:id", async function (req, res) {
   const userId = req.userId;
-  const idDocument = req.params.id;
+  const idDocument = encodeURIComponent(req.params.id)
   const { documentName, files, nameDoc_Key } = req.body;
 
   // logger.info(
@@ -582,7 +582,7 @@ router.put("/:id", async function (req, res) {
 
 router.delete("/:id", async function (req, res) {
   const userId = req.userId;
-  const fileId = req.params.id;
+  const fileId = encodeURIComponent(req.params.id);
 
   try {
     // Шаг 1: Получаем существующую связь из 1С

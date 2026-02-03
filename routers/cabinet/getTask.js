@@ -7,7 +7,7 @@ const { getActionById, createNewTask,getTaskById } = require("../../services/one
 
 router.get("/:id", async (req, res) => {
     // const userId = req.userId;
-    const id = req.params.id
+    const id = encodeURIComponent(req.params.id)
 
     try {
         const action = await getActionById(id)
@@ -27,7 +27,7 @@ router.get("/:id", async (req, res) => {
 
 router.get("/task/:id", async (req, res) => {
     const userId = req.userId;
-    const id = req.params.id
+    const id = encodeURIComponent(req.params.id)
 
     try {
         const task = await getTaskById(userId, id)

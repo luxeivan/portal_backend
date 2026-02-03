@@ -7,7 +7,7 @@ const { getAppealsList, getAppeal, createNewAppeal, readAnswerOfAppeal } = requi
 
 router.get("/", async (req, res) => {
     // const userId = req.userId;
-    const id = req.params.id
+    const id = encodeURIComponent(req.params.id)
 
     try {
         const appeals = await getAppealsList(id)
@@ -26,7 +26,7 @@ router.get("/", async (req, res) => {
 });
 router.get("/:id", async (req, res) => {
     // const userId = req.userId;
-    const id = req.params.id
+    const id = encodeURIComponent(req.params.id)
 
     try {
         const appeal = await getAppeal(id)
