@@ -22,6 +22,7 @@ const remFile = (path) => {
   })
 }
 const getFile = async (userId, fileId, sig = false) => {
+
   let url = `${SERVER_1C_HTTP_SERVICE}/profile/${userId}/files/${fileId}`
   if (sig) url = `${SERVER_1C_HTTP_SERVICE}/profile/${userId}/files/signed/${fileId}`
   try {
@@ -41,7 +42,9 @@ const getFile = async (userId, fileId, sig = false) => {
 router.post("/", async (req, res) => {
   const userId = req.userId;
   const documentId = req.body.documentId
-  const sigId = req.body.sigId
+  const sigId = encodeURIComponent(req.body.sigId)
+  console.log(sigId);
+  
   // console.log("documentId", documentId);
   // console.log("sigId", sigId);
   let docFile
