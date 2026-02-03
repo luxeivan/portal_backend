@@ -2,7 +2,8 @@ const express = require("express");
 const router = express.Router();
 
 
-const { getActionById, createNewTask,getTaskById } = require("../../services/onec/tasks");
+const { getActionById, createNewTask, getTaskById } = require("../../services/onec/tasks");
+const { sanitizeValues } = require("../../middleware/sanitizeValues");
 
 
 router.get("/:id", async (req, res) => {
@@ -44,11 +45,43 @@ router.get("/task/:id", async (req, res) => {
         });
     }
 });
-router.post("/", async (req, res) => {
+router.post("/", sanitizeValues, async (req, res) => {
     const userId = req.userId;
-    const data = req.body
+    // const data = req.body
+    const { typeActionId, claimId, versionId, values, taskBasis } = req.body;
+
+    // 1. Валидация обязательных полей
+    if (!typeActionId || typeof typeActionId !== 'string') {
+        return res.status(400).json({ error: "typeActionId required and must be string" });
+    }
+    if (!claimId || typeof claimId !== 'string') {
+        return res.status(400).json({ error: "claimId required and must be string" });
+    }
+    if (!versionId || typeof versionId !== 'string') {
+        return res.status(400).json({ error: "versionId required and must be string" });
+    }
+
+
     try {
-        const task = await createNewTask(userId, data)
+        // const task = await createNewTask(userId, data)
+        const task = false
+        console.log(userId,
+            {
+                typeActionId,
+                claimId,
+                taskBasis,
+                versionId,
+                values, // ← уже санитизированный!
+            }
+        );
+
+        // const task = await createNewTask(userId, {
+        //     typeActionId,
+        //     claimId,
+        //     taskBasis,
+        //     versionId,
+        //     values, // ← уже санитизированный!
+        // });
         if (!task) {
             return res.json(false)
         }
