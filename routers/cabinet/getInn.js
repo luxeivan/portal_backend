@@ -9,7 +9,7 @@ const token = process.env.DADATA_TOKEN
 getInn.get('/:type',
     query('inn').notEmpty(),
     async (req, res) => {
-        const type = req.params.type
+        const type = encodeURIComponent(req.params.type)
         // Проверка-------------------------
         const result = validationResult(req);
         if (!result.isEmpty()) {

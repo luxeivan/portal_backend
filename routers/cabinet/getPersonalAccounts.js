@@ -89,7 +89,7 @@ router.get("/", async (req, res) => {
 
 router.get("/:key/claims", async (req, res) => {
   const userId = req.userId;
-  const key = req.params.key;
+  const key = encodeURIComponent(req.params.key);
   // logger.info(
   //   `Получен запрос на получение личных кабинетов пользователя с ID: ${userId}`
   // );
@@ -116,7 +116,7 @@ router.get("/:key/claims", async (req, res) => {
 
 router.get("/:key", async (req, res) => {
   const userId = req.userId;
-  const key = req.params.key;
+  const key = encodeURIComponent(req.params.key);
   // logger.info(`Получен запрос на получение заявки с ключом: ${key}`);
   // console.log("key");
 
