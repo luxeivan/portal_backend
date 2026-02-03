@@ -66,7 +66,7 @@ router.get("/:key", async (req, res) => {
   // logger.info(`Получен запрос на получение услуги с ключом: ${req.params.key}`);
 
   try {
-    const key = req.params.key;
+    const key = encodeURIComponent(req.params.key);
     const services = await getServicesByKey(key);
     // logger.info(`Услуга с ключом ${key} успешно получена`);
     if (services) {
@@ -113,7 +113,7 @@ router.get("/item/:key", async (req, res) => {
   // );
 
   try {
-    const key = req.params.key;
+    const key = encodeURIComponent(req.params.key);
     let withFields = req.query.withFields;
     if (withFields === "false") withFields = false;
     if (withFields === "true") withFields = true;

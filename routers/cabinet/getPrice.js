@@ -11,8 +11,8 @@ const { getPrice } = require("../../services/onec/otherServices");
 
 router.get("/:type/:nomenclature", async (req, res) => {
     const userId = req.userId;
-    const nomenclature = req.params.nomenclature
-    const type = req.params.type
+    const nomenclature = encodeURIComponent(req.params.nomenclature)
+    const type = encodeURIComponent(req.params.type)
     // logger.info(
     //     `Получен запрос на получение цены номенклатуры от пользователя: ${userId}`
     // );

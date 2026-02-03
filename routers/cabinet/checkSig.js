@@ -41,7 +41,7 @@ const getFile = async (userId, fileId, sig = false) => {
 
 router.post("/", async (req, res) => {
   const userId = req.userId;
-  const documentId = req.body.documentId
+  const documentId = encodeURIComponent(req.body.documentId)
   const sigId = encodeURIComponent(req.body.sigId)
   console.log(sigId);
   
