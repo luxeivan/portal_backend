@@ -5,6 +5,7 @@ const Log = require("./services/db/models/Log");
 const Transport = require("winston-transport");
 
 const timezone = "Europe/Moscow";
+const devLocal = process.env.DEV_LOCAL;
 
 const portalEnv = (
   process.env.PORTAL_ENV ||
@@ -25,14 +26,17 @@ const saveLogToDatabase = async (
   stack,
   env = portalEnv
 ) => {
-  try {
-    const localTimestamp = moment
-      .tz(timestamp, timezone)
-      .format("YYYY-MM-DD HH:mm:ss");
-    await Log.create({ level, message, timestamp: localTimestamp, stack, env });
-    console.log("Log saved to the database");
-  } catch (error) {
-    console.error("Failed to save log to the database", error);
+  if (devLocal !== 1) {
+
+    try {
+      const localTimestamp = moment
+        .tz(timestamp, timezone)
+        .format("YYYY-MM-DD HH:mm:ss");
+      await Log.create({ level, message, timestamp: localTimestamp, stack, env });
+      // console.log("Log saved to the database");
+    } catch (error) {
+      console.error("Failed to save log to the database", error);
+    }
   }
 };
 
@@ -57,17 +61,17 @@ class SequelizeTransport extends Transport {
       typeof stack === "string"
         ? stack.slice(0, 8000)
         : stack
-        ? String(stack).slice(0, 8000)
-        : null;
+          ? String(stack).slice(0, 8000)
+          : null;
 
     saveLogToDatabase(level, safeMessage, timestamp, safeStack, this.env)
-      .catch(() => {})
+      .catch(() => { })
       .finally(() => callback());
   }
 }
 
 const dailyRotateFileTransport = new transports.DailyRotateFile({
-  filename: `logs/${portalEnv}-error-%DATE%.log`, 
+  filename: `logs/${portalEnv}-error-%DATE%.log`,
   datePattern: "YYYY-MM-DD",
   zippedArchive: true,
   maxSize: "20m",

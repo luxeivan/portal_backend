@@ -63,7 +63,7 @@ const servicesOneC = {
               headers,
             }
           )
-      console.log('response.data: ', response.data);
+      // console.log('response.data: ', response.data);
 
       // if (!response[0].data) {
       //   return false;
@@ -171,7 +171,7 @@ const servicesOneC = {
         console.log("Услуги с таким ключом не существует.");
         throw new Error("Услуги с таким ключом не существует.");
       }
-      console.log(resp[1].data?.data);
+      // console.log(resp[1].data?.data);
 
       // serviceItem.tags = resp[2].data.value;
       // } catch (error) {
