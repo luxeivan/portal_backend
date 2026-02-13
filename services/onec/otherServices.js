@@ -11,10 +11,11 @@ const headers = {
     Authorization: server1c_auth,
 };
 
-"/InformationRegister_ЦеныНоменклатуры_RecordType/SliceLast(,Condition='ТипЦен_Key eq '[ТипЦены]' and Номенклатура_Key eq '[Номенклатура]'')/?$format=json&$select=Цена"
+// "/InformationRegister_ЦеныНоменклатуры_RecordType/SliceLast(,Condition='ТипЦен_Key eq '[ТипЦены]' and Номенклатура_Key eq '[Номенклатура]'')/?$format=json&$select=Цена"
 
 const otherServices = {
     getPrice: async (type, nomenclature) => {
+      // console.log("getPrice")
         try {
             const response = await axios.get(
                 `${server1c}/InformationRegister_ЦеныНоменклатуры_RecordType/SliceLast(,Condition='ТипЦен_Key eq guid'${type}' and Номенклатура_Key eq guid'${nomenclature}'')/?$format=json&$select=*&$expand=Валюта`,
@@ -31,7 +32,7 @@ const otherServices = {
                 return false;
             }
         } catch (error) {
-            console.log('getPrice: ', error.message);
+            // console.log('getPrice: ', error.message);
                  if (botNotifyUrl) {
                     try {
                       const errorDetails = {

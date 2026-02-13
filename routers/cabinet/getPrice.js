@@ -13,8 +13,7 @@ router.get("/:type/:nomenclature", async (req, res) => {
     // );
 
     try {
-        const price = await getPrice(type, nomenclature)
-        if (!price) res.json(false)
+        const price = await getPrice(type, nomenclature)        
         res.json(price)
     } catch (error) {
         logger.error(
@@ -22,7 +21,7 @@ router.get("/:type/:nomenclature", async (req, res) => {
         );
         res.status(500).json({
             status: "error",
-            message: "Ошибка при получении заявок",
+            message: "Ошибка при получении цен",
             error: error.message,
         });
     }
