@@ -84,7 +84,7 @@ function checkFiles(files) {
     }
   }
   // console.log("checkFiles",invalidFile);
-  
+
   return invalidFile
 }
 /**
@@ -139,14 +139,14 @@ router.post("/", async function (req, res) {
 
 
   if (!req.files || Object.keys(req.files).length === 0) {
-    logger.warn(`Запрос на загрузку файлов не содержит файлов. UUID: ${uuid}`);
+    logger.warn(`Запрос на загрузку файлов не содержит файлов. userId: ${userId}`);
     return res.status(400).json({
       status: "error",
       message: "Нет файлов для загрузки",
     });
   }
 
-  const files = Array.isArray(req.files.files)
+  let files = Array.isArray(req.files.files)
     ? req.files.files
     : [req.files.files];
 
@@ -156,11 +156,11 @@ router.post("/", async function (req, res) {
   // console.log("Полученный saveToProfile:", saveToProfile);
   //  console.log("Полученный categoryKey:", categoryKey);
 
-// console.log("files",files);
+  // console.log("files",files);
 
   if (checkFiles(files)) {
     logger.warn(
-      `Один или несколько файлов не соответствуют требованиям. UUID: ${uuid}`
+      `Один или несколько файлов не соответствуют требованиям. userId: ${userId}`
     );
     return res.status(400).json({
       status: "error",
@@ -172,7 +172,11 @@ router.post("/", async function (req, res) {
   try {
     // Создаём директорию, если она не существует
     await fs.promises.mkdir(dirName, { recursive: true });
-
+    files = files.map(file => {
+      file.name = uuidv4() + "." + file.name.split(".").pop()
+      file.originalName = file.name
+      return file
+    })
     // Сохраняем файлы во временную директорию
     for (const file of files) {
       const filePath = `${dirName}/${file.name}`;
@@ -182,12 +186,14 @@ router.post("/", async function (req, res) {
 
     let fileBase64 = ""
     let extForSave = "pdf"
+    let originalName = ""
 
     if (files.length === 1 && sigExtensions.includes(files[0].name.split(".").pop().toUpperCase())) {
 
       const filePath = `${dirName}/${files[0].name}`;
       const fileBuffer = await fs.promises.readFile(filePath);
       extForSave = files[0].name.split(".").pop()
+      originalName = files[0].originalName
       fileBase64 = fileBuffer.toString('base64')
 
 
@@ -198,8 +204,16 @@ router.post("/", async function (req, res) {
 
     const resSaveFile = await axios.post(`${SERVER_1C_HTTP_SERVICE}/profile/${userId}/file`, {
       base64: fileBase64,
-      ext: extForSave
+      ext: extForSave,
+      originalName
     }, { headers })
+
+  console.log({     
+      ext: extForSave,
+      originalName
+    });
+  
+
     // console.log("res", res.data)
 
 
@@ -207,7 +221,7 @@ router.post("/", async function (req, res) {
     try {
       for (const file of files) {
         const filePath = `${dirName}/${file.name}`;
-        await fs.promises.unlink(filePath);
+        // await fs.promises.unlink(filePath);
       }
     } catch (err) {
       logger.error(`Не удалось удалить файлы. Ошибка: ${err.message}`);
@@ -242,7 +256,7 @@ router.post("/", async function (req, res) {
   } catch (error) {
     console.log("error", error)
     logger.error(
-      `Ошибка при обработке файлов. UUID: ${uuid}. Ошибка: ${error.message}`
+      `Ошибка при обработке файлов. userId: ${userId}. Ошибка: ${error.message}`
     );
     return res.status(500).json({
       status: "error",
