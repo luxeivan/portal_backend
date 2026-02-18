@@ -221,7 +221,7 @@ router.post("/", async function (req, res) {
     try {
       for (const file of files) {
         const filePath = `${dirName}/${file.name}`;
-        // await fs.promises.unlink(filePath);
+        await fs.promises.unlink(filePath);
       }
     } catch (err) {
       logger.error(`Не удалось удалить файлы. Ошибка: ${err.message}`);
