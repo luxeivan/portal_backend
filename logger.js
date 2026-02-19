@@ -26,7 +26,7 @@ const saveLogToDatabase = async (
   stack,
   env = portalEnv
 ) => {
-  if (devLocal !== 1) {
+  if (devLocal !== '1') {
 
     try {
       const localTimestamp = moment
