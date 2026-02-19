@@ -79,7 +79,7 @@ function checkFiles(files) {
       break;
     }
     if (file.size > maxSizeFile) {
-      invalidFile = "Превышен размер файла";
+      invalidFile = "Превышен размер файла. Максимально 10 МБ";
       break;
     }
   }
@@ -157,8 +157,8 @@ router.post("/", async function (req, res) {
   //  console.log("Полученный categoryKey:", categoryKey);
 
   // console.log("files",files);
-
-  if (checkFiles(files)) {
+const invalidFile = checkFiles(files)
+  if (invalidFile) {
     logger.warn(
       `Один или несколько файлов не соответствуют требованиям. userId: ${userId}`
     );
