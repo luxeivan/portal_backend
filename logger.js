@@ -3,9 +3,16 @@ require("winston-daily-rotate-file");
 const moment = require("moment-timezone");
 const Log = require("./services/db/models/Log");
 const Transport = require("winston-transport");
+const { default: axios } = require("axios");
 
 const timezone = "Europe/Moscow";
 const devLocal = process.env.DEV_LOCAL;
+const SERVER_1C_HTTP_SERVICE = process.env.SERVER_1C_HTTP_SERVICE;
+const server1c_auth = process.env.SERVER_1C_AUTHORIZATION;
+const headers = {
+  Authorization: server1c_auth,
+  "Content-Type": "application/json",
+};
 
 const portalEnv = (
   process.env.PORTAL_ENV ||
@@ -67,6 +74,25 @@ class SequelizeTransport extends Transport {
     saveLogToDatabase(level, safeMessage, timestamp, safeStack, this.env)
       .catch(() => { })
       .finally(() => callback());
+
+    axios.post(`${SERVER_1C_HTTP_SERVICE}/profile/00000000-0000-0000-0000-000000000000/errorPortal`,
+      {
+        level,
+        safeMessage,
+        timestamp,
+        safeStack,
+        env: this.env
+      },
+      {
+        headers
+      })
+      .then(res => {
+        console.log("res", res);
+      })
+      .catch(err => {
+        console.log(err);
+      })
+
   }
 }
 

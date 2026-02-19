@@ -5,10 +5,10 @@ const { v4: uuidv4 } = require("uuid");
 const logger = require("../../logger");
 const { PDFDocument } = require("pdf-lib");
 const axios = require("axios");
-const moment = require("moment");
+// const moment = require("moment");
 require("dotenv").config();
 
-const SERVER_1C = process.env.SERVER_1C;
+// const SERVER_1C = process.env.SERVER_1C;
 const SERVER_1C_HTTP_SERVICE = process.env.SERVER_1C_HTTP_SERVICE;
 const server1c_auth = process.env.SERVER_1C_AUTHORIZATION;
 const headers = {
