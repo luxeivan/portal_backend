@@ -74,24 +74,26 @@ class SequelizeTransport extends Transport {
     saveLogToDatabase(level, safeMessage, timestamp, safeStack, this.env)
       .catch(() => { })
       .finally(() => callback());
-
-    axios.post(`${SERVER_1C_HTTP_SERVICE}/profile/00000000-0000-0000-0000-000000000000/errorPortal`,
-      {
-        level,
-        safeMessage,
-        timestamp,
-        safeStack,
-        env: this.env
-      },
-      {
-        headers
-      })
-      .then(res => {
-        console.log("res", res);
-      })
-      .catch(err => {
-        console.log(err);
-      })
+      
+    if (level !== "info") {
+      axios.post(`${SERVER_1C_HTTP_SERVICE}/profile/00000000-0000-0000-0000-000000000000/errorPortal`,
+        {
+          level,
+          safeMessage,
+          timestamp,
+          safeStack,
+          env: this.env
+        },
+        {
+          headers
+        })
+        .then(res => {
+          console.log("res", res);
+        })
+        .catch(err => {
+          console.log(err);
+        })
+    }
 
   }
 }
