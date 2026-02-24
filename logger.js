@@ -74,9 +74,13 @@ class SequelizeTransport extends Transport {
     saveLogToDatabase(level, safeMessage, timestamp, safeStack, this.env)
       .catch(() => { })
       .finally(() => callback());
-      
+
     if (level !== "info") {
-      axios.post(`${SERVER_1C_HTTP_SERVICE}/profile/00000000-0000-0000-0000-000000000000/errorPortal`,
+      let url = "errorPortal"
+      if (level === "warning") {
+        url = "warningPortal"
+      }
+      axios.post(`${SERVER_1C_HTTP_SERVICE}/profile/00000000-0000-0000-0000-000000000000/${url}`,
         {
           level,
           safeMessage,
