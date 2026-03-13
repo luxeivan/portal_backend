@@ -3,6 +3,7 @@ const router = express.Router();
 const {
   getServicesByKey,
   getServiceItemByKey,
+  getServicesAll
 } = require("../services/onec/services");
 const logger = require("../logger");
 
@@ -24,12 +25,43 @@ const logger = require("../logger");
  */
 
 router.get("/", async (req, res) => {
-  // logger.info("Получен запрос на получение списка услуг");
-
   try {
     const services = await getServicesByKey();
-    // logger.info("Услуги успешно получены");
-    console.log("services", services);
+    if (services) {
+      res.json(services);
+    } else {
+      throw new Error("Ошибка получения данных с БД");
+    }
+  } catch (error) {
+    logger.error(`Ошибка при получении услуг: ${error.message}`);
+    res.status(500).json({
+      status: "error",
+      message: "Ошибка при получении услуг",
+      error: error.message,
+    });
+  }
+});
+
+/**
+ * @swagger
+ * /api/services/all:
+ *   get:
+ *     summary: Список структуры всех услуг
+ *     tags: ["🌐 Services"]
+ *     responses:
+ *       200:
+ *         description: Услуги найдены
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items: { type: object }
+ *       500: { description: Ошибка при получении услуг }
+ */
+
+router.get("/all", async (req, res) => {
+  try {
+    const services = await getServicesAll();
     if (services) {
       res.json(services);
     } else {
@@ -63,12 +95,9 @@ router.get("/", async (req, res) => {
  */
 
 router.get("/:key", async (req, res) => {
-  // logger.info(`Получен запрос на получение услуги с ключом: ${req.params.key}`);
-
   try {
     const key = encodeURIComponent(req.params.key);
     const services = await getServicesByKey(key);
-    // logger.info(`Услуга с ключом ${key} успешно получена`);
     if (services) {
       res.json(services);
     } else {
@@ -108,20 +137,13 @@ router.get("/:key", async (req, res) => {
  */
 
 router.get("/item/:key", async (req, res) => {
-  // logger.info(
-  //   `Получен запрос на получение элемента услуги с ключом: ${req.params.key}`
-  // );
-
   try {
     const key = encodeURIComponent(req.params.key);
     let withFields = req.query.withFields;
     if (withFields === "false") withFields = false;
     if (withFields === "true") withFields = true;
 
-    // console.log('withFields: ', withFields)
     const services = await getServiceItemByKey(key, withFields);
-    // logger.info(`Элемент услуги с ключом ${key} успешно получен`);
-    // console.log('services: ', services)
     res.json(services);
   } catch (error) {
     logger.error(
