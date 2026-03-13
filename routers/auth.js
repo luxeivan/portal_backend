@@ -303,7 +303,7 @@ router.post("/checkjwt", async function (req, res) {
     if (!user) throw new Error("Пользователь не найден");
     res.json({ id: user.Ref_key, email: user.email, phone: user.phone });
   } catch (error) {
-    logger.error("Ошибка проверки JWT", { error: error.message });
+    // logger.error("Ошибка проверки JWT", { error: error.message });
     res.status(401).json({ status: "unauthorized" });
   }
 });
