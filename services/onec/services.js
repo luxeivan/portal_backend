@@ -26,91 +26,39 @@ const servicesOneC = {
       return response.data;
     } catch (error) {
       return false;
-
     }
   },
-  
 
   getServicesByKey: async (key = "00000000-0000-0000-0000-000000000000") => {
     try {
-      // const response = await Promise.all([
-      //   axios
-      //     .get(`${server1cHttpService}/services/folder/${key}`,
-      //       // `${server1c}/Catalog_services?$format=json&$filter=DeletionMark eq false and usage eq true and Parent_Key eq guid'${key}' and (( year(beginDate) eq 0001 or (year(beginDate) le ${moment().year()} and month(beginDate) le ${
-      //       //   moment().month() + 1
-      //       // } and day(beginDate) le ${moment().date()})) and ( year(endDate) eq 0001 or (year(endDate) ne 0001 and year(endDate) ge ${moment().year()} and month(endDate) ge ${moment().month()} and day(endDate) ge ${moment().date()})))`,
-      //       {
-      //         headers,
-      //       }
-      //     )
-      //     .catch((err) => {
-      //       throw new Error("Ошибка получения услуг");
-      //     }),
-      //   // axios
-      //   //   .get(`${server1c}/Catalog_tags?$format=json&$expand=color`, {
-      //   //     headers,
-      //   //   })
-      //   //   .catch((err) => {
-      //   //     throw new Error("Ошибка получения тэгов услуги");
-      //   //   }),
-      // ]);
-       const response = await axios
-          .get(`${server1cHttpService}/services/folder/${key}`,
-            // `${server1c}/Catalog_services?$format=json&$filter=DeletionMark eq false and usage eq true and Parent_Key eq guid'${key}' and (( year(beginDate) eq 0001 or (year(beginDate) le ${moment().year()} and month(beginDate) le ${
-            //   moment().month() + 1
-            // } and day(beginDate) le ${moment().date()})) and ( year(endDate) eq 0001 or (year(endDate) ne 0001 and year(endDate) ge ${moment().year()} and month(endDate) ge ${moment().month()} and day(endDate) ge ${moment().date()})))`,
-            {
-              headers,
-            }
-          )
-      // console.log('response.data: ', response.data);
-
-      // if (!response[0].data) {
-      //   return false;
-      // }
-      // response[0].data.value = response[0].data.value.map((item) => {
-      //   item.tags = item.tags.map((item) => {
-      //     item.tag = response[1].data.value.find(
-      //       (tag) => item.tag_Key === tag.Ref_Key
-      //     );
-      //     return item;
-      //   });
-      //   return item;
-      // });
-      // await Promise.all(response.data.value.map(async item => {
-      //   return new Promise(async (resolve, reject) => {
-      //     if (item.picture_Key && item.picture_Key !== '00000000-0000-0000-0000-000000000000') item.picture = await servicesOneC.getPictureFile(item.picture_Key)
-      //     resolve(item);
-      //   })
-      // }))
-      // console.log("response[1].data.value",response[1].data.value);
+      const response = await axios
+        .get(`${server1cHttpService}/services/folder/${key}`,
+          {
+            headers,
+          }
+        )
 
       return response.data;
     } catch (error) {
       console.log("getServicesByKey: ", error.message);
-      // if (botNotifyUrl) {
-      //   try {
-      //     const errorDetails = {
-      //       message: `Ошибка при получении данных из 1C: ${error.message}`,
-      //       error: {
-      //         config: {
-      //           url: error?.config?.url,
-      //           method: error?.config?.method,
-      //         },
-      //         response: {
-      //           status: error?.response?.status,
-      //           statusText: error?.response?.statusText,
-      //           data: error?.response?.data,
-      //         },
-      //         code: error?.code,
-      //         message: error?.message || error?.response?.data?.message,
-      //       },
-      //     };
-      //     await axios.post(botNotifyUrl, errorDetails);
-      //   } catch (notifyErr) {
-      //     console.error("Не смогли оповестить бота:", notifyErr);
-      //   }
-      // }
+
+      return false;
+    }
+  },
+
+  getServicesAll: async () => {
+    console.log("getServicesAll...");
+    try {
+      const response = await axios
+        .get(`${server1cHttpService}/services/folder/all`,
+          {
+            headers,
+          }
+        )
+
+      return response.data;
+    } catch (error) {
+      console.log("getServicesAll: ", error.message);
       return false;
     }
   },
@@ -134,52 +82,25 @@ const servicesOneC = {
           }),
         withFields
           ? axios
-              .get(`${server1cHttpService}/portalFields/services/${key}'`, {
-                headers,
-              })
-              .catch((err) => {
-                throw new Error("Ошибка получения полей услуги");
-              })
+            .get(`${server1cHttpService}/portalFields/services/${key}'`, {
+              headers,
+            })
+            .catch((err) => {
+              throw new Error("Ошибка получения полей услуги");
+            })
           : false,
-        // withFields ? axios.get(
-        //   `${server1c}/InformationRegister_portalFields?$format=json&$select=*&$expand=name,component,dependName,dependСondition&$filter=cast(object,'Catalog_services') eq guid'${key}'`,
-        //   {
-        //     headers,
-        //   }
-        // ).catch(err => { throw new Error("Ошибка получения полей услуги") }) : false,
-        // axios
-        //   .get(
-        //     `${server1c}/Catalog_services_tags?$format=json&$expand=tag/color&$filter=Ref_Key eq guid'${key}'`,
-        //     {
-        //       headers,
-        //     }
-        //   )
-        //   .catch((err) => {
-        //     throw new Error("Ошибка получения тэгов услуги");
-        //   }),
       ]);
 
-      if (!resp[0].data ) {
-        
-        // console.log("Что-то пошло не так при получении данных.");
+      if (!resp[0].data) {
         throw new Error("Что-то пошло не так при получении данных.");
       } else {
         serviceItem = resp[0].data;
       }
-      
+
       if (resp[0].data.length === 0) {
         console.log("Услуги с таким ключом не существует.");
         throw new Error("Услуги с таким ключом не существует.");
       }
-      // console.log(resp[1].data?.data);
-
-      // serviceItem.tags = resp[2].data.value;
-      // } catch (error) {
-      //   console.log('getServiceItemByKey: ', error.message);
-      //   throw new Error("Что-то пошло не так при получении данных заявки.");
-      // }
-      // // console.log(resp[1].data.value)
-      // try {
       // -------------Функция получения группы-------------------------------------------
       const getGroupInput = async (guid, item) => {
         const groupFields = await axios.get(
@@ -231,14 +152,11 @@ const servicesOneC = {
             })
           );
         }
-        // console.log('item in group: ', item.label)
         return item;
       };
 
       // -------------Функция получения LinkInput-------------------------------------------
       const getLinkInput = async (item) => {
-        // console.log(item.component_Expanded.linkUrl);
-
         const allValues = await axios.get(
           `${server1c}${item.component_Expanded.linkUrl}`,
           {
@@ -246,7 +164,6 @@ const servicesOneC = {
           }
         );
         if (allValues.data && allValues.data.value) {
-          // console.log(allValues.data.value[0])
           item.component_Expanded.options = allValues.data.value
             .sort((a, b) => {
               if (a.Description?.toLowerCase() < b.Description?.toLowerCase()) {
@@ -274,7 +191,6 @@ const servicesOneC = {
             headers,
           }
         );
-        // console.log('tableFields: ',tableFields)
         if (tableFields.data && tableFields.data.value) {
           tableFields.data.value = await Promise.all(
             tableFields.data.value.map((tableField) => {
@@ -283,7 +199,6 @@ const servicesOneC = {
                   tableField.component_Type.includes("LinkInput") &&
                   tableField.component_Expanded?.allValues
                 ) {
-                  // console.log(item)
                   return resolve(await getLinkInput(tableField));
                 }
                 resolve(tableField);
@@ -304,63 +219,34 @@ const servicesOneC = {
         serviceItem.data.links = resp[1].data.data.links;
         serviceItem.data.externalService = resp[1].data.data.externalService;
         serviceItem.data.versionId = resp[1].data.data.versionId;
-        // await Promise.all(resp[1].data.value.map(item => {
 
-        //   return new Promise(async (resolve, reject) => {
-
-        //     if (item.component_Type.includes("GroupFieldsInput")) {
-        //       try {
-        //         return resolve(await getGroupInput(item.component, item))
-        //       } catch (error) {
-        //         return reject(new Error("Ошибка получения группы"))
-        //       }
-        //     }
-        //     if (item.component_Type.includes("TableInput")) {
-        //       try {
-        //         return resolve(await getTableInput(item.component, item))
-        //       } catch (error) {
-        //         return reject(new Error("Ошибка получения таблицы"))
-        //       }
-        //     }
-        //     // -------------Если LinkInput (ссылка на справочник и установлен флаг allValues)
-        //     if (item.component_Type.includes("LinkInput") && item.component_Expanded.allValues) {
-        //       try {
-        //         return resolve(await getLinkInput(item))
-        //       } catch (error) {
-        //         return reject(new Error("Ошибка получения справочника ссылочного типа"))
-        //       }
-        //     }
-        //     return resolve(item)
-        //   })
-
-        // }))
       }
       return serviceItem;
     } catch (error) {
       console.log("error: ", error.message);
-            if (botNotifyUrl) {
-              try {
-                const errorDetails = {
-                  message: `Ошибка при получении данных из 1C: ${error.message}`,
-                  error: {
-                    config: {
-                      url: error?.config?.url,
-                      method: error?.config?.method,
-                    },
-                    response: {
-                      status: error?.response?.status,
-                      statusText: error?.response?.statusText,
-                      data: error?.response?.data,
-                    },
-                    code: error?.code,
-                    message: error?.message || error?.response?.data?.message,
-                  },
-                };
-                await axios.post(botNotifyUrl, errorDetails);
-              } catch (notifyErr) {
-                console.error("Не смогли оповестить бота:", notifyErr);
-              }
-            }
+      if (botNotifyUrl) {
+        try {
+          const errorDetails = {
+            message: `Ошибка при получении данных из 1C: ${error.message}`,
+            error: {
+              config: {
+                url: error?.config?.url,
+                method: error?.config?.method,
+              },
+              response: {
+                status: error?.response?.status,
+                statusText: error?.response?.statusText,
+                data: error?.response?.data,
+              },
+              code: error?.code,
+              message: error?.message || error?.response?.data?.message,
+            },
+          };
+          await axios.post(botNotifyUrl, errorDetails);
+        } catch (notifyErr) {
+          console.error("Не смогли оповестить бота:", notifyErr);
+        }
+      }
       throw new Error(error.message);
     }
   },
