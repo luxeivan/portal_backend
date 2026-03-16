@@ -47,7 +47,7 @@ const servicesOneC = {
   },
 
   getServicesAll: async () => {
-    console.log("getServicesAll...");
+    // console.log("getServicesAll...");
     try {
       const response = await axios
         .get(`${server1cHttpService}/services/folder/all`,
