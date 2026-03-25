@@ -10,8 +10,6 @@ const server1c_auth = process.env.SERVER_1C_AUTHORIZATION;
 
 // Адрес, по которому будем оповещать бота
 // (если бот и бэкенд на одном сервере, указывайте http://127.0.0.1:3001/notifyError)
-const botNotifyUrl =
-  process.env.BOT_NOTIFY_URL || "http://127.0.0.1:3001/notifyError";
 
 // Заголовки для авторизации на 1С
 const headers = {
@@ -88,39 +86,39 @@ router.get("/", async (req, res) => {
     }
 
     // 2) Тянем фотки
-    const photosResponse = await axios.get(
-      `${SERVER_1C}/Catalog_РайоныЭлектрическихСетейПрисоединенныеФайлы?$format=json&$expand=Том&$select=Ref_Key,Description,ВладелецФайла_Key,ПутьКФайлу,РеквизитДопУпорядочивания,Том,ТипХраненияФайла,Том/ПолныйПутьWindows,ФайлХранилище&$filter=DeletionMark%20eq%20false`,
-      { headers }
-    );
+    // const photosResponse = await axios.get(
+    //   `${SERVER_1C}/Catalog_РайоныЭлектрическихСетейПрисоединенныеФайлы?$format=json&$expand=Том&$select=Ref_Key,Description,ВладелецФайла_Key,ПутьКФайлу,РеквизитДопУпорядочивания,Том,ТипХраненияФайла,Том/ПолныйПутьWindows,ФайлХранилище&$filter=DeletionMark%20eq%20false`,
+    //   { headers }
+    // );
 
-    if (photosResponse.status !== 200) {
-      throw new Error(
-        `Ожидали статус 200 по фоткам, а получили ${photosResponse.status}`
-      );
-    }
+    // if (photosResponse.status !== 200) {
+    //   throw new Error(
+    //     `Ожидали статус 200 по фоткам, а получили ${photosResponse.status}`
+    //   );
+    // }
 
-    const photos = photosResponse.data?.value;
-    if (!Array.isArray(photos)) {
-      throw new Error("Неверный формат данных от 1С (нет массива photos)");
-    }
+    // const photos = photosResponse.data?.value;
+    // if (!Array.isArray(photos)) {
+    //   throw new Error("Неверный формат данных от 1С (нет массива photos)");
+    // }
 
-    // 3) Склеиваем данные
-    const combinedData = contactInfo.map((contact) => {
-      // Находим все фотки для текущего контакта
-      const matchedPhotos = photos.filter(
-        (photo) => photo.ВладелецФайла_Key === contact.object
-      );
-      return {
-        ...contact,
-        photos: matchedPhotos.map((photo) => ({
-          ПутьКФайлу: photo.ПутьКФайлу,
-          ПолныйПутьWindows: photo.Том?.ПолныйПутьWindows,
-        })),
-      };
-    });
+    // // 3) Склеиваем данные
+    // const combinedData = contactInfo.map((contact) => {
+    //   // Находим все фотки для текущего контакта
+    //   const matchedPhotos = photos.filter(
+    //     (photo) => photo.ВладелецФайла_Key === contact.object
+    //   );
+    //   return {
+    //     ...contact,
+    //     photos: matchedPhotos.map((photo) => ({
+    //       ПутьКФайлу: photo.ПутьКФайлу,
+    //       ПолныйПутьWindows: photo.Том?.ПолныйПутьWindows,
+    //     })),
+    //   };
+    // });
 
     // 4) Отдаём данные на фронт
-    res.status(200).json(combinedData);
+    res.status(200).json(contactInfo);
   } catch (error) {
     // 5) Ловим любую ошибку (включая наши throw new Error)
     console.error("Ошибка при получении данных из 1C:", error);
@@ -128,30 +126,7 @@ router.get("/", async (req, res) => {
     // 6) Сообщаем фронту, что случилась ошибка
     res.status(500).json({ message: "Ошибка при получении данных из 1C" });
 
-    // 7) Шлём в бот
-    if (botNotifyUrl) {
-      try {
-        const errorDetails = {
-          message: `Ошибка при получении данных из 1C: ${error.message}`,
-          error: {
-            config: {
-              url: error?.config?.url,
-              method: error?.config?.method,
-            },
-            response: {
-              status: error?.response?.status,
-              statusText: error?.response?.statusText,
-              data: error?.response?.data,
-            },
-            code: error?.code,
-            message: error?.message || error?.response?.data?.message,
-          },
-        };
-        await axios.post(botNotifyUrl, errorDetails);
-      } catch (notifyErr) {
-        console.error("Не смогли оповестить бота:", notifyErr);
-      }
-    }
+    
   }
 });
 
