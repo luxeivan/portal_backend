@@ -43,8 +43,8 @@ router.post("/", async (req, res) => {
   const userId = req.userId;
   const documentId = encodeURIComponent(req.body.documentId)
   const sigId = encodeURIComponent(req.body.sigId)
-  console.log(sigId);
-  
+  // console.log("sigId",sigId);
+
   // console.log("documentId", documentId);
   // console.log("sigId", sigId);
   let docFile
@@ -64,71 +64,49 @@ router.post("/", async (req, res) => {
     } catch (error) {
       console.log("Ошибка записи файла на диск", error);
     }
-  }else{
+  } else {
     console.log("Чтото не так с файлами");
-    return res.status(500).json({status:"error",message:"Чтото не так с файлами"})    
+    return res.status(500).json({ status: "error", message: "Чтото не так с файлами" })
   }
-  // cms.mv(cmsPath, (err) => {
-  //   if (err) {
-  //     return res.status(500).send(err);
-  //   }
-  //   // return res.send({ status: "success", path: path });
-  // });
-  // data.mv(dataPath, (err) => {
-  //   if (err) {
-  //     return res.status(500).send(err);
-  //   }
-  //   // return res.send({ status: "success", path: path });
-  // });
 
+  const checkFor1C = async () => {
+    try {
+      const response = await axios.post(`${SERVER_1C_HTTP_SERVICE}/profile/${userId}/verifySignature/${documentId}`,
+        {
+          "dataSetSign": "base64",
+          "signBase64": sigFile.base64
+        },
+        { headers }
+      )
+      res.json({ status: "OK", data: response.data.data })
+    } catch (error) {
+      console.log(error)
+      res.json({ status: "error" })
 
-
-
-
-  // const data = req.body
-  // console.log("body", body)
-  // console.log("files", files)
-  // console.log("data", data)
-  // const body = new FormData()
-  // body.append("captchaText", "00")
-  // body.append("captchaUuid", "a7c98e54-9c24-4e9b-bf69-58b678fcec95")
-  // body.append("VerifySignatureOnly", false)
-  // body.append("methodName", "verifyCMSSignatureDetached")
-  // // body.append("cms", "")
-  // // body.append("data", "")
-  // console.log("readStream", fs.readFileSync(cmsPath));
-
-  // body.append("cms", fs.readFileSync(cmsPath))
-  // body.append("data", fs.readFileSync(dataPath))
-  // // console.log("body", Object.fromEntries(body.entries()))
-  // try {
-  //     const response = await axios.post(url, body, { headers: { "Content-Type": "multipart/form-data","User-Agent":"PostmanRuntime/7.49.1" } })
-  //     console.log(response.data)
-
-  // } catch (error) {
-  //     console.log("error", error)
-  // }
-
-
-
-  const command = `curl -X POST ${urlCheckSig} -F "data=@${docPath}" -F "cms=@${sigPath}"`
-  // console.log("command", command);
-
-  exec(command, (error, stdout) => {
-    if (error) {
-      console.log(`error: ${error.message}`);
-      remFile(sigPath)
-      remFile(docPath)
-      return res.json({ status: "error", message: error.message });
     }
-    // if (stderr) {
-    //     console.log(`stderr: ${stderr}`); return res.json({ status: "error", message: stderr });
-    // }
-    // console.log(`stdout: ${stdout}`);
-    remFile(sigPath)
-    remFile(docPath)
-    res.json({ status: "OK", data: stdout })
-  });
+  }
+
+  checkFor1C()
+  // const command = `curl -X POST ${urlCheckSig} -F "data=@${docPath}" -F "cms=@${sigPath}"`
+  // // console.log("command", command);
+
+  // exec(command, (error, stdout) => {
+  //   if (error) {
+  //     console.log(`error: ${error.message}`);
+  //     remFile(sigPath)
+  //     remFile(docPath)
+  //     return res.json({ status: "error", message: error.message });
+  //   }
+  //   // if (stderr) {
+  //   //     console.log(`stderr: ${stderr}`); return res.json({ status: "error", message: stderr });
+  //   // }
+  //   // console.log(`stdout: ${stdout}`);
+  //   remFile(sigPath)
+  //   remFile(docPath)
+  //   res.json({ status: "OK", data: stdout })
+  // });
+
+
 
 });
 
