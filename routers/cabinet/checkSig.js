@@ -47,34 +47,36 @@ router.post("/", async (req, res) => {
 
   // console.log("documentId", documentId);
   // console.log("sigId", sigId);
-  let docFile
-  let sigFile
-  if (sigId && documentId) {
-    docFile = await getFile(userId, documentId)
-    sigFile = await getFile(userId, sigId, true)
-  }
-  // console.log("docFile", docFile);
-  // console.log("sigFile", sigFile);
-  const docPath = path.join(__dirname, "..", "..", "files", v4())
-  const sigPath = path.join(__dirname, "..", "..", "files", v4())
-  if (docFile?.base64 && sigFile?.base64) {
-    try {
-      await fs.writeFile(docPath, docFile.base64, 'base64')
-      await fs.writeFile(sigPath, sigFile.base64, 'base64')
-    } catch (error) {
-      console.log("Ошибка записи файла на диск", error);
-    }
-  } else {
-    console.log("Чтото не так с файлами");
-    return res.status(500).json({ status: "error", message: "Чтото не так с файлами" })
-  }
+  // let docFile
+  // let sigFile
+  // if (sigId && documentId) {
+  //   docFile = await getFile(userId, documentId)
+  //   sigFile = await getFile(userId, sigId, true)
+  // }
+  // // console.log("docFile", docFile);
+  // // console.log("sigFile", sigFile);
+  // const docPath = path.join(__dirname, "..", "..", "files", v4())
+  // const sigPath = path.join(__dirname, "..", "..", "files", v4())
+  // if (docFile?.base64 && sigFile?.base64) {
+  //   try {
+  //     await fs.writeFile(docPath, docFile.base64, 'base64')
+  //     await fs.writeFile(sigPath, sigFile.base64, 'base64')
+  //   } catch (error) {
+  //     console.log("Ошибка записи файла на диск", error);
+  //   }
+  // } else {
+  //   console.log("Чтото не так с файлами");
+  //   return res.status(500).json({ status: "error", message: "Чтото не так с файлами" })
+  // }
 
   const checkFor1C = async () => {
     try {
       const response = await axios.post(`${SERVER_1C_HTTP_SERVICE}/profile/${userId}/verifySignature/${documentId}`,
         {
-          "dataSetSign": "base64",
-          "signBase64": sigFile.base64
+          // "dataSetSign": "base64",
+          // "signBase64": sigFile.base64
+          "dataSetSign": "id",
+          "signId": sigId,
         },
         { headers }
       )
