@@ -3,6 +3,7 @@ const axios = require("axios");
 require("dotenv").config();
 const fs = require("fs");
 const Readable = require('stream').Readable
+const path = require('path')
 
 const router = express.Router();
 
@@ -74,10 +75,11 @@ router.get("/:key/:ext", async (req, res) => {
     const ext = encodeURIComponent(req.params.ext);
     // const isFile = fs.existsSync(`./uploads/${key}.${ext}`)
     // console.log("isFile", isFile);
-
+    // console.log("file: ", key, ext)
     try {
         const response = await axios.get(`${server1cHttpService}/public/files/${key}`, { headers })
         if (response.data) {
+            
             // const fileBlob = b64toBlob(response.data.data.base64)
             const imgBuffer = Buffer.from(response.data.data.base64, 'base64')
             const s = new Readable()
@@ -85,7 +87,21 @@ router.get("/:key/:ext", async (req, res) => {
             s.push(imgBuffer)
             s.push(null)
 
-            s.pipe(fs.createWriteStream(`./uploads/${response.data.data.checksum}.${response.data.data.ext}`));
+            const uploadDir = path.join(__dirname, '..', 'uploads');
+
+            // 2. Создаём имя файла
+            const fileName = `${response.data.data.checksum}.${response.data.data.ext}`;
+
+            // 3. Собираем полный путь к файлу
+            const filePath = path.join(uploadDir, fileName);
+
+            // console.log('Полный путь для сохранения:', filePath);
+            const writeStream = fs.createWriteStream(filePath);                  
+
+            s.pipe(writeStream);
+
+            // Опционально: дождитесь завершения записи, если нужно гарантировать сохранение перед ответом
+            // s.pipe(fs.createWriteStream(`./uploads/${response.data.data.checksum}.${response.data.data.ext}`));
             // const fileBlob = atob(response.data.data.base64);
             // await fs.writeFile(`/uploads/${response.data.data.id}.${response.data.data.ext}`, fileBlob)
             // console.log(response.data)
@@ -93,7 +109,7 @@ router.get("/:key/:ext", async (req, res) => {
         }
         return res.status(500).json({ status: "error", message: "Ошибка получения файла" })
     } catch (error) {
-        console.log(error);
+        console.log("error", error);
         res.status(500).json({ status: "error", message: "Ошибка получения файла" })
     }
 })
