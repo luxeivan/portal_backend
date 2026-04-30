@@ -14,10 +14,10 @@ const headers = {
 };
 
 const claimsOneC = {
-  getClaims: async (userId) => {
+  getClaims: async (userId, page = 1, size = 15) => {
     try {
       const response = await axios.get(
-        `${server1cHttpService}/profile/${userId}/claims`,
+        `${server1cHttpService}/profile/${userId}/claims?page=${page}&size=${size}`,
         {
           headers,
         }
@@ -96,7 +96,8 @@ const claimsOneC = {
       return error;
     }
   },
-  getClaimItem: async (userId, Ref_key, dataSet = false) => {
+  getClaimItem: async (userId, Ref_key, dataSet = 'first') => {
+    
     try {
       const response = await axios.get(
         `${server1cHttpService}/profile/${userId}/claims/${Ref_key}${dataSet ? '?dataSet=' + dataSet : ''}`,
@@ -108,7 +109,7 @@ const claimsOneC = {
       if (!response.data) {
         return false;
       }
-      // console.log(response.data)
+      // console.log("response", response.data)
       return response.data;
     } catch (error) {
       console.log(error);
