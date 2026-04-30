@@ -141,11 +141,13 @@ router.post("/", async (req, res) => {
 
 router.get("/", async (req, res) => {
   const userId = req.userId;
+  const page = req.query.page
+  const size = req.query.size
   const requestId = uuidv4();
   const ctx = buildCtx(req, { scope: "claims.list", requestId, userId });
 
   try {
-    const claims = await getClaims(userId);
+    const claims = await getClaims(userId, page, size);
     logger.info(
       `[Claims] Заявки пользователя ${userId} успешно получены`,
       { stack: buildStack({ ...ctx, count: Array.isArray(claims) ? claims.length : null }) }
@@ -186,7 +188,7 @@ router.get("/", async (req, res) => {
 router.get("/:key", async (req, res) => {
   const userId = req.userId;
   const key = encodeURIComponent(req.params.key);
-  const dataSet = req.query.dataSet
+  const dataSet = req.query.dataSet  
   const requestId = uuidv4();
   const ctx = buildCtx(req, { scope: "claims.item", requestId, userId, key });
 
