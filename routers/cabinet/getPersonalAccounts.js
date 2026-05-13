@@ -90,7 +90,7 @@ router.get("/", async (req, res) => {
 router.get("/:key/claims", async (req, res) => {
   const userId = req.userId;
   const page = req.query.page
-  const size = req.query.size
+  const pageSize = req.query.pageSize
   const key = encodeURIComponent(req.params.key);
   // logger.info(
   //   `Получен запрос на получение личных кабинетов пользователя с ID: ${userId}`
@@ -102,7 +102,7 @@ router.get("/:key/claims", async (req, res) => {
       userId,
       key,
       page,
-      size
+      pageSize
     );
     // logger.info(`Заявки успешно получены для пользователя с ID: ${userId}`);
     res.json(сlaimsByPersonalAccount);
