@@ -14,10 +14,10 @@ const headers = {
 };
 
 const claimsOneC = {
-  getClaims: async (userId, page = 1, size = 15) => {
+  getClaims: async (userId, page = 1, pageSize = 10) => {
     try {
       const response = await axios.get(
-        `${server1cHttpService}/profile/${userId}/claims?page=${page}&size=${size}`,
+        `${server1cHttpService}/profile/${userId}/claims?page=${page}&pageSize=${pageSize}`,
         {
           headers,
         }
