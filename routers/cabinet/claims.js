@@ -143,11 +143,14 @@ router.get("/", async (req, res) => {
   const userId = req.userId;
   const page = req.query.page
   const pageSize = req.query.pageSize
+  const filters = req.query.filters
+  const sort = req.query.sort
+  const dataset = req.query.dataset
   const requestId = uuidv4();
   const ctx = buildCtx(req, { scope: "claims.list", requestId, userId });
 
   try {
-    const claims = await getClaims(userId, page, pageSize);
+    const claims = await getClaims(userId, page, pageSize, filters, sort, dataset);
     logger.info(
       `[Claims] Заявки пользователя ${userId} успешно получены`,
       { stack: buildStack({ ...ctx, count: Array.isArray(claims) ? claims.length : null }) }
