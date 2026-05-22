@@ -96,14 +96,13 @@ const personalAccountsOneC = {
             return error;
         }
     },
-    getClaimsByPersonalAccount: async (userId,key) => {
+    getClaimsByPersonalAccount: async (userId, key, page = 1, pageSize = 10) => {
         try {
-            // console.log(`${server1cHttpService}/profile/${userId}/personalAccounts/${key}/сlaims/`);
-            
+            const url = `${server1cHttpService}/profile/${userId}/personalAccounts/${key}/claims?page=${page}&pageSize=${pageSize}`
+            console.log("url", url);
+
             const response = await axios.get(
-                // `${server1cHttpService}/personalAccounts/${key}/claims/`,
-                `${server1cHttpService}/profile/${userId}/personalAccounts/${key}/claims/`,
-                
+                url,
                 {
                     headers,
                 }
