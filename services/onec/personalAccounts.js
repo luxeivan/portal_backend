@@ -15,9 +15,10 @@ const headers = {
 
 const personalAccountsOneC = {
     getPersonalAccounts: async (userId) => {
+        const url = `${server1cHttpService}/profile/${userId}/personalAccounts`
         try {
             const response = await axios.get(
-                `${server1cHttpService}/profile/${userId}/personalAccounts`,
+                url,
                 {
                     headers,
                 }
@@ -25,32 +26,10 @@ const personalAccountsOneC = {
             if (!response.data) {
                 return false;
             }
-            // console.log("getPersonalAccounts", response.data);
+            console.log("url", url);
+            console.log("getPersonalAccounts", response.data);
             return response.data;
-        } catch (error) {
-            if (botNotifyUrl) {
-                try {
-                    const errorDetails = {
-                        message: `Ошибка при получении данных из 1C: ${error.message}`,
-                        error: {
-                            config: {
-                                url: error?.config?.url,
-                                method: error?.config?.method,
-                            },
-                            response: {
-                                status: error?.response?.status,
-                                statusText: error?.response?.statusText,
-                                data: error?.response?.data,
-                            },
-                            code: error?.code,
-                            message: error?.message || error?.response?.data?.message,
-                        },
-                    };
-                    await axios.post(botNotifyUrl, errorDetails);
-                } catch (notifyErr) {
-                    console.error("Не смогли оповестить бота:", notifyErr);
-                }
-            }
+        } catch (error) {           
             console.log(error);
             return error;
         }
