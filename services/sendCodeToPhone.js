@@ -25,9 +25,13 @@ const sendCodeToPhone = async (phone) => {
         if (response.data.result.status.code === 0) {
             return pincode
         } else {
+            console.log('Не удалось отправить код: status.code != 0');
+            
             throw new Error('Не удалось отправить код')
         }
     } catch (error) {
+        console.error(error);
+        
         throw new Error('Не удалось отправить код')
 
     }
