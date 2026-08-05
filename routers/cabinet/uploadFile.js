@@ -157,7 +157,7 @@ router.post("/", async function (req, res) {
   //  console.log("Полученный categoryKey:", categoryKey);
 
   // console.log("files",files);
-const invalidFile = checkFiles(files)
+  const invalidFile = checkFiles(files)
   if (invalidFile) {
     logger.warn(
       `Один или несколько файлов не соответствуют требованиям. userId: ${userId}`
@@ -200,19 +200,24 @@ const invalidFile = checkFiles(files)
     } else {
       fileBase64 = await convertToPdf(dirName, files)
     }
+    try {
 
+      const resSaveFile = await axios.post(`${SERVER_1C_HTTP_SERVICE}/profile/${userId}/file`, {
+        base64: fileBase64,
+        ext: extForSave,
+        originalName
+      }, { headers })
 
-    const resSaveFile = await axios.post(`${SERVER_1C_HTTP_SERVICE}/profile/${userId}/file`, {
-      base64: fileBase64,
-      ext: extForSave,
-      originalName
-    }, { headers })
+      console.log({
+        ext: extForSave,
+        originalName
+      });
 
-    console.log({
-      ext: extForSave,
-      originalName
-    });
-
+    } catch (error) {
+      logger.error(
+        `Ошибка при сохранении файла в 1С. userId: ${userId}. Ошибка: ${error.message || typeof error === 'string' ? error : JSON.parse(error)}`
+      );
+    }
 
     // console.log("res", res.data)
 
