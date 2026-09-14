@@ -78,13 +78,13 @@ router.post("/phone", async (req, res) => {
     req.session.phone = req.body.phone;
     req.session.phoneCheck = false;
     req.session.phoneCount = attempts;
-    console.log("смс отправлено")
+    // console.log("смс отправлено")
     let code = "1234"; // LOCAL=1 → фиксированный код; в проде перезапишем ниже
     if (local !== "1") {
       code = await sendCodeToPhone(req.body.phone);
     }
     logger.info(
-      `Код подтверждения отправлен на номер телефона: ${req.body.phone}, код: ${code}`
+      `Код подтверждения отправлен на номер телефона: ${req.body.phone}`
     );
 
     req.session.phoneBlock = true;
@@ -237,7 +237,7 @@ router.post("/email", async (req, res) => {
   // console.log("userIP", userIP)
   try {
     logger.info(
-      `Получен запрос на подтверждение email: ${JSON.stringify(req.body)}`
+      `Получен запрос на подтверждение email`
     );
     if (!req.body.email) {
       logger.error("Отсутствует поле 'email' в теле запроса");
@@ -327,7 +327,7 @@ router.post("/email", async (req, res) => {
 router.post("/emailcode", async (req, res) => {
   try {
     logger.info(
-      `Получен запрос на подтверждение email-кода: ${JSON.stringify(req.body)}`
+      `Получен запрос на подтверждение email-кода`
     );
     if (!req.body.emailCode) {
       logger.error("Отсутствует поле 'emailCode' в теле запроса");
@@ -406,9 +406,7 @@ router.post("/emailcode", async (req, res) => {
 router.post("/newuser", async (req, res) => {
   try {
     logger.info(
-      `Получен запрос на создание нового пользователя: ${JSON.stringify(
-        req.body
-      )}`
+      `Получен запрос на создание нового пользователя`
     );
 
     if (!req.body.password) {
