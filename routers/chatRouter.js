@@ -61,22 +61,14 @@ const preview = (s, len = 500) => {
 const getAccessToken = async (logCtxBase = {}) => {
   const now = Date.now();
   if (accessTokenCache && tokenExpiresAt && now < tokenExpiresAt) {
-    logger.info("[GigaChat OAuth] Используем кэшированный токен", {
-      stack: buildStack({ ...logCtxBase, cacheHit: true }),
-    });
+    logger.info("[GigaChat OAuth] Используем кэшированный токен");
     return accessTokenCache;
   }
 
   const authData = `${clientId}:${clientSecret}`;
   const encodedAuthData = Buffer.from(authData).toString("base64");
 
-  logger.info("[GigaChat OAuth] Запрашиваем новый токен", {
-    stack: buildStack({
-      ...logCtxBase,
-      clientId,
-      basicAuthLen: encodedAuthData.length,
-    }),
-  });
+  logger.info("[GigaChat OAuth] Запрашиваем новый токен");
 
   try {
     const started = Date.now();
@@ -100,13 +92,7 @@ const getAccessToken = async (logCtxBase = {}) => {
     accessTokenCache = access_token;
     tokenExpiresAt = now + 29 * 60 * 1000;
 
-    logger.info("[GigaChat OAuth] Токен получен", {
-      stack: buildStack({
-        ...logCtxBase,
-        took_ms: took,
-        tokenPresent: !!access_token,
-      }),
-    });
+    logger.info("[GigaChat OAuth] Токен получен");
 
     return access_token;
   } catch (error) {
@@ -136,9 +122,7 @@ const sendMessageToGigachat = async (message, logCtxBase = {}) => {
     };
 
     const started = Date.now();
-    logger.info(`[GigaChat API] Входящее сообщение: ${message}`, {
-      stack: buildStack({ ...logCtxBase, msg_len: String(message || "").length }),
-    });
+    logger.info(`[GigaChat API] Входящее сообщение:`);
 
     const response = await axios.post(
       "https://gigachat.devices.sberbank.ru/api/v1/chat/completions",
@@ -156,22 +140,11 @@ const sendMessageToGigachat = async (message, logCtxBase = {}) => {
     const took = Date.now() - started;
     const botResponse = response.data?.choices?.[0]?.message?.content || "";
 
-    logger.info(`[GigaChat API] Ответ модели сформирован: ${botResponse}`, {
-      stack: buildStack({ ...logCtxBase, answer_len: botResponse.length }),
-    });
+    logger.info(`[GigaChat API] Ответ модели сформирован: `);
 
     return botResponse;
   } catch (error) {
-    logger.error("[GigaChat API] Ошибка при отправке сообщения", {
-      stack: buildStack(
-        {
-          ...logCtxBase,
-          status: error?.response?.status,
-          data: error?.response?.data,
-        },
-        error
-      ),
-    });
+    logger.error("[GigaChat API] Ошибка при отправке сообщения");
     throw error;
   }
 };
@@ -187,27 +160,19 @@ router.post("/", async (req, res) => {
     requestId,
   });
 
-  logger.info(`[GigaChat API] Входящее сообщение: ${userMessage}`, {
-    stack: buildStack({ ...ctx, msg_len: String(userMessage || "").length }),
-  });
+  logger.info(`[GigaChat API] Входящее сообщение`);
 
   if (!userMessage) {
-    logger.warn("[GigaChat API] Пустое сообщение от клиента", {
-      stack: buildStack(ctx),
-    });
+    logger.warn("[GigaChat API] Пустое сообщение от клиента");
     return res.status(400).json({ error: "Сообщение не должно быть пустым" });
   }
 
   try {
     const answer = await sendMessageToGigachat(userMessage, ctx);
-    logger.info(`[GigaChat API] Ответ модели сформирован: ${answer}`, {
-      stack: buildStack({ ...ctx, answer_len: (answer || "").length }),
-    });
+    logger.info(`[GigaChat API] Ответ модели сформирован`);
     res.json({ response: answer });
   } catch (error) {
-    logger.error("[GigaChat API] Сбой при обработке запроса клиента", {
-      stack: buildStack(ctx, error),
-    });
+    logger.error("[GigaChat API] Сбой при обработке запроса клиента");
     res.status(500).json({ error: "Ошибка при обращении к GigaChat API" });
   }
 });
