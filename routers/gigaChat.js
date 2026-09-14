@@ -66,20 +66,14 @@ gigaChatRouter.post("/", async (req, res) => {
   const message = req.body?.message;
   const ctx = buildCtx(req, { scope: "gigachat-service", requestId });
 
-  logger.info(`[GigaChat API] Входящее сообщение: ${message}`, {
-    stack: buildStack({ ...ctx, msg_len: String(message || "").length }),
-  });
+  logger.info(`[GigaChat API] Входящее сообщение`);
 
   try {
     const answer = await sendMessageToGigachat(message);
-    logger.info(`[GigaChat API] Ответ модели сформирован: ${answer}`, {
-      stack: buildStack({ ...ctx, answer_len: (answer || "").length }),
-    });
+    logger.info(`[GigaChat API] Ответ модели сформирован: `);
     res.json({ status: "ОК", answer });
   } catch (error) {
-    logger.error("[GigaChat API] Ошибка обработки сообщения", {
-      stack: buildStack(ctx, error),
-    });
+    logger.error("[GigaChat API] Ошибка обработки сообщения");
     res.json({ status: "error", error: error.message });
   }
 });
