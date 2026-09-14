@@ -26,8 +26,8 @@ const personalAccountsOneC = {
             if (!response.data) {
                 return false;
             }
-            console.log("url", url);
-            console.log("getPersonalAccounts", response.data);
+            // console.log("url", url);
+            // console.log("getPersonalAccounts", response.data);
             return response.data;
         } catch (error) {           
             console.log(error);
