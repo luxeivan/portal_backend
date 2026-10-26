@@ -91,7 +91,7 @@ const strapiSubjects = {
       });
       return newSubject.data;
     } catch (error) {
-      console.error("Ошибка создания субъекта", error);
+      console.error("Ошибка создания субъекта:", error?.message || "unknown");
       return error;
     }
   },
@@ -106,7 +106,7 @@ const strapiSubjects = {
         })
         .then((res) => res.data.attributes.subjects.data);
     } catch (error) {
-      console.error("Error getting subjects", error);
+      console.error("Error getting subjects:", error?.message || "unknown");
       throw error;
     }
   },
@@ -123,7 +123,7 @@ const strapiSubjects = {
           return res.data;
         });
     } catch (error) {
-      console.error("Error getting subjects", error);
+      console.error("Error getting subjects:", error?.message || "unknown");
       throw error;
     }
   },
@@ -136,7 +136,7 @@ const strapiSubjects = {
         return res.data;
       });
     } catch (error) {
-      console.error("Error delete subject", error);
+      console.error("Error delete subject:", error?.message || "unknown");
       throw error;
     }
   },

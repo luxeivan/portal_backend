@@ -54,7 +54,7 @@ getCadastral.get("/", query("addressObject").notEmpty(), async (req, res) => {
       res.json({ status: "ok", data: result.data });
     })
     .catch((error) => {
-      console.log("error", error);
+      console.log("Ошибка Cadastral:", error?.message || "unknown");
       res.json({ status: "error", message: "ошибка получения организации" });
     });
 });

@@ -22,7 +22,6 @@ router.get("/:type/:nomenclature", async (req, res) => {
         res.status(500).json({
             status: "error",
             message: "Ошибка при получении цен",
-            error: error.message,
         });
     }
 });

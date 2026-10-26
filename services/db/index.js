@@ -27,5 +27,5 @@ sequelize
     console.log("Таблица error_1c: ошибка успешно записана!");
   })
   .catch((error) => {
-    console.error("Ошибка синхронизации базы данных:", error);
+    console.error("Ошибка синхронизации базы данных:", error?.message || "unknown");
   });

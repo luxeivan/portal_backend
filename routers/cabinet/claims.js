@@ -114,7 +114,6 @@ router.post("/", async (req, res) => {
     res.status(500).json({
       status: "error",
       message: "Ошибка при создании заявки",
-      error: error.message,
     });
   }
 });
@@ -164,7 +163,6 @@ router.get("/", async (req, res) => {
     res.status(500).json({
       status: "error",
       message: "Ошибка при получении заявок",
-      error: error.message,
     });
   }
 });
@@ -211,7 +209,6 @@ router.get("/:key", async (req, res) => {
     res.status(500).json({
       status: "error",
       message: "Ошибка при получении заявки",
-      error: error.message,
     });
   }
 });

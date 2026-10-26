@@ -26,7 +26,7 @@ const strapiObjects = {
       const newObject = await strapi.create("objects", objectData);
       return newObject.data;
     } catch (error) {
-      console.error("Ошибка создания объекта", error);
+      console.error("Ошибка создания объекта:", error?.message || "unknown");
       return error;
     }
   },
@@ -41,7 +41,7 @@ const strapiObjects = {
         })
         .then((res) => res.data.attributes.objects.data);
     } catch (error) {
-      console.error("Error getting objects", error);
+      console.error("Error getting objects:", error?.message || "unknown");
       throw error;
     }
   },
@@ -58,7 +58,7 @@ const strapiObjects = {
           return res.data;
         });
     } catch (error) {
-      console.error("Error getting objects", error);
+      console.error("Error getting objects:", error?.message || "unknown");
       throw error;
     }
   },
@@ -70,7 +70,7 @@ const strapiObjects = {
         return res.data;
       });
     } catch (error) {
-      console.error("Error delete object", error);
+      console.error("Error delete object:", error?.message || "unknown");
       throw error;
     }
   },
@@ -81,7 +81,7 @@ const strapiObjects = {
       console.log("id'шник", id);
       return await strapi.update("objects", id, data).then((res) => res.data);
     } catch (error) {
-      console.error("Ошибка обновления объекта", error);
+      console.error("Ошибка обновления объекта:", error?.message || "unknown");
       throw error;
     }
   },

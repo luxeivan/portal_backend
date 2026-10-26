@@ -73,8 +73,11 @@ gigaChatRouter.post("/", async (req, res) => {
     logger.info(`[GigaChat API] Ответ модели сформирован: `);
     res.json({ status: "ОК", answer });
   } catch (error) {
-    logger.error("[GigaChat API] Ошибка обработки сообщения");
-    res.json({ status: "error", error: error.message });
+    logger.error(`[GigaChat API] Ошибка обработки сообщения: ${error.message}`);
+    res.status(500).json({
+      status: "error",
+      error: "Ошибка при обращении к GigaChat API",
+    });
   }
 });
 

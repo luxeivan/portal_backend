@@ -21,7 +21,6 @@ router.get("/", async (req, res) => {
     res.status(500).json({
       status: "error",
       message: "Ошибка при получении версии",
-      error: error.message,
     });
   }
 });

@@ -25,7 +25,10 @@ const getAccessToken = async () => {
 
     return response.data;
   } catch (error) {
-    console.error("Ошибка при получении токена доступа:", error);
+    console.error(
+      "Ошибка при получении токена доступа:",
+      error?.message || "unknown"
+    );
     throw error;
   }
 };
@@ -296,7 +299,10 @@ const sendMessageToGigachat = async (message) => {
     const botResponse = response.data.choices[0].message.content;
     return botResponse;
   } catch (error) {
-    console.error("Ошибка при отправке сообщения в GigaChat:", error);
+    console.error(
+      "Ошибка при отправке сообщения в GigaChat:",
+      error?.message || "unknown"
+    );
     throw error;
   }
 };

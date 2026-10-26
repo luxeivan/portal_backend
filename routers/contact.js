@@ -121,7 +121,10 @@ router.get("/", async (req, res) => {
     res.status(200).json(contactInfo);
   } catch (error) {
     // 5) Ловим любую ошибку (включая наши throw new Error)
-    console.error("Ошибка при получении данных из 1C:", error);
+    console.error(
+      "Ошибка при получении данных из 1C:",
+      error?.message || "unknown"
+    );
 
     // 6) Сообщаем фронту, что случилась ошибка
     res.status(500).json({ message: "Ошибка при получении данных из 1C" });

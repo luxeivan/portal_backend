@@ -42,7 +42,7 @@ const saveLogToDatabase = async (
       await Log.create({ level, message, timestamp: localTimestamp, stack, env });
       // console.log("Log saved to the database");
     } catch (error) {
-      console.error("Failed to save log to the database", error);
+      console.error("Failed to save log to the database:", error?.message || "unknown");
     }
   }
 };
@@ -97,7 +97,7 @@ class SequelizeTransport extends Transport {
           // console.log("res", res);
         })
         .catch(err => {
-          console.log(err);
+          console.log("Не удалось отправить лог в 1С:", err?.message || "unknown");
         })
     }
 

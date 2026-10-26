@@ -42,7 +42,6 @@ router.get("/", async (req, res) => {
     res.status(500).json({
       status: "error",
       message: "Ошибка при получении личных кабинетов",
-      error: error.message,
     });
   }
 });
@@ -113,7 +112,6 @@ router.get("/:key/claims", async (req, res) => {
     res.status(500).json({
       status: "error",
       message: "Ошибка при получении заявок по личному кабинету",
-      error: error.message,
     });
   }
 });
@@ -135,7 +133,6 @@ router.get("/:key", async (req, res) => {
     res.status(500).json({
       status: "error",
       message: "Ошибка при получении заявки",
-      error: error.message,
     });
   }
 });

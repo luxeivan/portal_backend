@@ -66,7 +66,7 @@ getFmsUnit.get(
         res.json({ status: "ok", data: result.data.suggestions });
       })
       .catch((error) => {
-        console.log("error", error);
+        console.log("Ошибка ФМС:", error?.message || "unknown");
         res.json({ status: "error", message: "ошибка получения организации" });
       });
   }

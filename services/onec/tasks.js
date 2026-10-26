@@ -68,7 +68,7 @@ const tasksOneC = {
             }
             return response.data.data;
         } catch (error) {
-            console.log(error);
+            console.log("createNewTask:", error?.message || "unknown");
             return false;
 
         }

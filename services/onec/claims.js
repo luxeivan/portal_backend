@@ -26,16 +26,20 @@ const claimsOneC = {
       url = url + `&dataset=${dataset}`
     }
 
-    console.log("urlclaimsOneC", url)
+    // console.log("urlclaimsOneC", url)
     try {
       const response = await axios.get(url, { headers, });
       if (!response.data) {
         return false;
       }
+      if (!response.data.status === 500) {
+        return false;
+      }
       return response.data;
     } catch (error) {
-      console.log(error);
-      return error;
+
+      console.error("getClaims:", error.message);
+      throw error;
     }
   },
 
@@ -71,8 +75,8 @@ const claimsOneC = {
       // console.log("response", response.data)
       return response.data;
     } catch (error) {
-      console.log(error);
-      return error;
+      console.error("getClaimItem:", error.message);
+      throw error;
     }
   },
   // ---------------------------------------------------------------------------------
@@ -86,7 +90,7 @@ const claimsOneC = {
       // console.log("newClaim.data", newClaim.data);
       return newClaim.data;
     } catch (error) {
-      console.log(error);
+      console.error("createNewClaim1:", error.message);
       throw error;
     }
   },
