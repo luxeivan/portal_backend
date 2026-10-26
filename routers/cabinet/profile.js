@@ -2,7 +2,6 @@ const express = require("express");
 const router = express.Router();
 const { getUserById, updateUser } = require("../../services/onec/users");
 const logger = require("../../logger");
-const { getAllUsers } = require("../../services/db/userService");
 
 /**
  * @swagger
@@ -184,52 +183,6 @@ router.post("/newphone", async (req, res) => {
     logger.error(
       `Ошибка при смене пароля пользователя с id: ${userId}. Ошибка: ${error.message}`
     );
-    res.status(500).json({ message: "Внутренняя ошибка сервера" });
-  }
-});
-
-/**
- * @swagger
- * /api/cabinet/profile/allusers:
- *   get:
- *     summary: Список всех пользователей
- *     description: >
- *       Сервисный эндпоинт. Доступен только административным JWT.
- *     tags: ["🔒 Profile"]
- *     security:
- *       - bearerAuth: []
- *     responses:
- *       200:
- *         description: Массив профилей
- *         content:
- *           application/json:
- *             schema:
- *               type: array
- *               items:
- *                 type: object
- *                 properties:
- *                   id:
- *                     type: string
- *                     example: "8a6c…"
- *                   email:
- *                     type: string
- *                     example: user@example.com
- *                   phone:
- *                     type: string
- *                     example: "+7 900 123-45-67"
- *       401:
- *         description: Доступ запрещён / неверный JWT
- *       500:
- *         description: Внутренняя ошибка сервера
- */
-
-router.get("/allusers", async (req, res) => {
-  try {
-    const users = await getAllUsers();
-    res.json(await getAllUsers());
-  } catch (error) {
-    console.log("error", error.message);
-    logger.error(`Ошибка при получении всех пользователей: ${error.message}`);
     res.status(500).json({ message: "Внутренняя ошибка сервера" });
   }
 });
