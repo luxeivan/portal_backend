@@ -38,7 +38,7 @@ const claimsOneC = {
       return response.data;
     } catch (error) {
       console.log(error);
-      return error;
+      return error.message;
     }
   },
 
