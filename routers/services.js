@@ -37,7 +37,6 @@ router.get("/", async (req, res) => {
     res.status(500).json({
       status: "error",
       message: "Ошибка при получении услуг",
-      error: error.message,
     });
   }
 });
@@ -72,7 +71,6 @@ router.get("/all", async (req, res) => {
     res.status(500).json({
       status: "error",
       message: "Ошибка при получении услуг",
-      error: error.message,
     });
   }
 });
@@ -107,7 +105,6 @@ router.get("/:key", async (req, res) => {
     res.status(500).json({
       status: "error",
       message: "Ошибка при получении услуги",
-      error: error.message,
     });
     logger.error(
       `Ошибка при получении услуги с ключом ${req.params.key}: ${error.message}`
@@ -152,7 +149,6 @@ router.get("/item/:key", async (req, res) => {
     res.status(500).json({
       status: "error",
       message: "Ошибка при получении элемента услуги",
-      error: error.message,
     });
   }
 });

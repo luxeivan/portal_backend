@@ -46,9 +46,11 @@ paySber.post("/", async (req, res) => {
     const formUrl = await registerOrderSber(zakaz, amount);
     return res.json({ status: "ok", formUrl });
   } catch (e) {
-    console.log(e);
-    
-    return res.status(500).json({ status: "error", message: e.message });
+    console.error("paySber:", e?.message || "unknown");
+    return res.status(500).json({
+      status: "error",
+      message: "Ошибка при инициализации оплаты",
+    });
   }
 });
 
