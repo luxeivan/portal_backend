@@ -26,10 +26,13 @@ const claimsOneC = {
       url = url + `&dataset=${dataset}`
     }
 
-    console.log("urlclaimsOneC", url)
+    // console.log("urlclaimsOneC", url)
     try {
       const response = await axios.get(url, { headers, });
       if (!response.data) {
+        return false;
+      }
+      if (!response.data.status === 500) {
         return false;
       }
       return response.data;
