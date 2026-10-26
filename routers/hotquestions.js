@@ -109,9 +109,9 @@ router.get("/", async (req, res) => {
 
     res.status(200).json(formattedQuestions);
   } catch (error) {
-    console.log(
+    console.error(
       "Ошибка при получении данных о 'Горячих ответах' из 1С:",
-      error
+      error?.message || "unknown"
     );
     res.status(500).json({
       message: "Ошибка при получении данных о 'Горячих ответах' из 1С",

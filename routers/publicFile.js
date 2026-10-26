@@ -109,7 +109,7 @@ router.get("/:key/:ext", async (req, res) => {
         }
         return res.status(500).json({ status: "error", message: "Ошибка получения файла" })
     } catch (error) {
-        console.log("error", error);
+        console.log("Ошибка получения публичного файла:", error?.message || "unknown");
         res.status(500).json({ status: "error", message: "Ошибка получения файла" })
     }
 })

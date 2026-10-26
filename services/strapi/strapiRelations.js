@@ -17,7 +17,7 @@ const strapiRelations = {
         })
         .then((res) => res.data.attributes.relations.data);
     } catch (error) {
-      console.error("Error getting relations", error);
+      console.error("Error getting relations:", error?.message || "unknown");
       throw error;
     }
   },
@@ -34,7 +34,7 @@ const strapiRelations = {
           return res.data;
         });
     } catch (error) {
-      console.error("Error getting relations", error);
+      console.error("Error getting relations:", error?.message || "unknown");
       throw error;
     }
   },
@@ -47,7 +47,7 @@ const strapiRelations = {
         return res.data;
       });
     } catch (error) {
-      console.error("Error delete relation", error);
+      console.error("Error delete relation:", error?.message || "unknown");
       throw error;
     }
   },

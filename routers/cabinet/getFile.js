@@ -74,7 +74,7 @@ router.get("/by-id/:id", async function (req, res) {
       ...connectionResponse.data
     });
   } catch (error) {
-    console.log("Ошибка получения файла", error);
+    console.log("Ошибка получения файла:", error?.message || "unknown");
     return res.json({
       status: "error",
       message: "Ошибка получения файла",

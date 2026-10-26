@@ -29,9 +29,9 @@ const personalAccountsOneC = {
             // console.log("url", url);
             // console.log("getPersonalAccounts", response.data);
             return response.data;
-        } catch (error) {           
-            console.log(error);
-            return error;
+        } catch (error) {
+            console.error("getPersonalAccounts:", error.message);
+            throw error;
         }
     },
     getPersonalAccountItem: async (userId, key) => {
@@ -71,8 +71,8 @@ const personalAccountsOneC = {
                     console.error("Не смогли оповестить бота:", notifyErr);
                 }
             }
-            console.log(error);
-            return error;
+            console.error("getPersonalAccountItem:", error.message);
+            throw error;
         }
     },
     getClaimsByPersonalAccount: async (userId, key, page = 1, pageSize = 10) => {
@@ -115,8 +115,8 @@ const personalAccountsOneC = {
                     console.error("Не смогли оповестить бота:", notifyErr);
                 }
             }
-            console.log(error);
-            return error;
+            console.error("getClaimsByPersonalAccount:", error.message);
+            throw error;
         }
     },
 };

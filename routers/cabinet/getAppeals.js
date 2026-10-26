@@ -20,7 +20,6 @@ router.get("/", async (req, res) => {
         res.status(500).json({
             status: "error",
             message: "Ошибка при получении списка шаблонов обращений",
-            error: error.message,
         });
     }
 });
@@ -40,7 +39,6 @@ router.get("/:id", async (req, res) => {
         res.status(500).json({
             status: "error",
             message: "Ошибка при получении формы обращения",
-            error: error.message,
         });
     }
 });
@@ -78,7 +76,6 @@ router.post("/", async (req, res) => {
         res.status(500).json({
             status: "error",
             message: "Ошибка при создании обращения",
-            error: error.message,
         });
     }
 })
@@ -98,7 +95,6 @@ router.post("/read", async (req, res) => {
         res.status(500).json({
             status: "error",
             message: "Ошибка при прочтении ответа",
-            error: error.message,
         });
     }
 })

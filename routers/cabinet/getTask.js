@@ -21,7 +21,6 @@ router.get("/:id", async (req, res) => {
         res.status(500).json({
             status: "error",
             message: "Ошибка при получении экшена",
-            error: error.message,
         });
     }
 });
@@ -41,7 +40,6 @@ router.get("/task/:id", async (req, res) => {
         res.status(500).json({
             status: "error",
             message: "Ошибка при получении задачи",
-            error: error.message,
         });
     }
 });
@@ -97,7 +95,6 @@ router.post("/", sanitizeValues, async (req, res) => {
         res.status(500).json({
             status: "error",
             message: "Ошибка при создании задачи",
-            error: error.message,
         });
     }
 })

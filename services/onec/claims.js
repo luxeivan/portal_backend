@@ -37,8 +37,9 @@ const claimsOneC = {
       }
       return response.data;
     } catch (error) {
-      console.log(error);
-      return error.message;
+
+      console.error("getClaims:", error.message);
+      throw error;
     }
   },
 
@@ -74,8 +75,8 @@ const claimsOneC = {
       // console.log("response", response.data)
       return response.data;
     } catch (error) {
-      console.log(error);
-      return error;
+      console.error("getClaimItem:", error.message);
+      throw error;
     }
   },
   // ---------------------------------------------------------------------------------
@@ -89,7 +90,7 @@ const claimsOneC = {
       // console.log("newClaim.data", newClaim.data);
       return newClaim.data;
     } catch (error) {
-      console.log(error);
+      console.error("createNewClaim1:", error.message);
       throw error;
     }
   },

@@ -30,7 +30,7 @@ const sendCodeToPhone = async (phone) => {
             throw new Error('Не удалось отправить код')
         }
     } catch (error) {
-        console.error(error);
+        console.error("sendCodeToPhone:", error?.message || "unknown");
         
         throw new Error('Не удалось отправить код')
 

@@ -87,7 +87,10 @@ router.get("/categories", async function (req, res) {
       categories: categoriesData,
     });
   } catch (error) {
-    console.error("Ошибка при получении категорий документов из 1С:", error);
+    console.error(
+      "Ошибка при получении категорий документов из 1С:",
+      error?.message || "unknown"
+    );
 
     const errorDetails = {
       config: {
@@ -181,7 +184,7 @@ router.post("/", async function (req, res) {
       data: document,
     });
   } catch (error) {
-    console.error("Ошибка при сохранении документа:", error);
+    console.error("Ошибка при сохранении документа:", error?.message || "unknown");
     res.status(500).json({
       status: "error",
       message: "Ошибка при сохранении документа",
@@ -627,9 +630,6 @@ router.delete("/:id", async function (req, res) {
     });
   } catch (error) {
     console.error(`Ошибка при удалении документа: ${error.message}`);
-    if (error.response) {
-      console.error("Ответ от сервера 1С:", error.response.data);
-    }
     res.status(500).json({
       status: "error",
       message: "Ошибка при удалении документа",

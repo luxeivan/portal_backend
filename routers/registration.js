@@ -447,7 +447,6 @@ router.post("/newuser", async (req, res) => {
         return res.status(500).json({
           status: "error",
           message: "ошибка обновления пользователя",
-          error: error.message,
         });
       }
     } else {
@@ -474,7 +473,6 @@ router.post("/newuser", async (req, res) => {
         return res.status(500).json({
           status: "error",
           message: "ошибка создания пользователя",
-          error: error.message,
         });
       }
     }

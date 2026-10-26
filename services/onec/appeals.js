@@ -85,7 +85,7 @@ const appealsOneC = {
             }
             return response.data.data;
         } catch (error) {
-            console.log(error);
+            console.log("createNewAppeal:", error?.message || "unknown");
             return false;
 
         }
@@ -107,7 +107,7 @@ const appealsOneC = {
             }
             return true;
         } catch (error) {
-            console.log(error);
+            console.log("readAnswerOfAppeal:", error?.message || "unknown");
             return false;
         }
     }

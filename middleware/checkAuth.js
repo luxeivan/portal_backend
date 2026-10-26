@@ -16,7 +16,7 @@ module.exports = (req, res, next) => {
         next();
 
     } catch (e) {
-        console.log(e)
+        console.log("Ошибка проверки JWT:", e?.message || "unknown")
         return res.status(401).json({ status: 'error', message: 'нет авторизации' });
     }
 };
