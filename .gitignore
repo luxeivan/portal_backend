@@ -5,3 +5,4 @@
 logs/
 yarn.lock
 uploads
+SECURITY_AUDIT.md
