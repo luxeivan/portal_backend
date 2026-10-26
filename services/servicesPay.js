@@ -35,7 +35,7 @@ const requestPay = async (zakaz, amount) => {
             return false
         }
     } catch (error) {
-        console.log(error)
+        console.log("requestPay:", error?.message || "unknown")
         throw new Error('Не удалось совершить оплату')
     }
 }

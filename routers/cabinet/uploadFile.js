@@ -244,7 +244,9 @@ const invalidFile = checkFiles(files)
     } catch (error) {
       console.error(
         "Ошибка при отправке файла в 1С:",
-        error.response ? error.response.data : error.message
+        error?.response?.status
+          ? `status=${error.response.status} | ${error?.message || "unknown"}`
+          : error?.message || "unknown"
       );
       return res.status(500).json({
         status: "error",

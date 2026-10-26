@@ -31,7 +31,7 @@ getInn.get('/:type',
                 res.json({ status: "ok", data: result.data.suggestions })
             })
             .catch(error => {
-                console.log("error", error)
+                console.log("Ошибка ИНН:", error?.message || "unknown")
                 res.json({ status: "error", message: "ошибка получения организации" })
             });
     })

@@ -160,7 +160,7 @@ getDaData.get(
 
       res.json({ status: "ok", data: result.data.suggestions });
     } catch (error) {
-      console.error("Ошибка запроса к DaData:", error);
+      console.error("Ошибка запроса к DaData:", error?.message || "unknown");
       res
         .status(500)
         .json({ status: "error", message: "Ошибка запроса к DaData" });

@@ -22,7 +22,7 @@ const versionOneC = {
       }
       return response.data;
     } catch (error) {
-        console.log(error);
+        console.log("getVersion:", error?.message || "unknown");
       return false;
       
     }

@@ -7,7 +7,10 @@ async function addUser(email, phone, tempCode, attempts) {
     console.log("Пользователь успешно добавлен:", email);
     return newUser
   } catch (error) {
-    console.error("Ошибка при добавлении пользователя:", error);
+    console.error(
+      "Ошибка при добавлении пользователя:",
+      error?.message || "unknown"
+    );
   }
 }
 async function getAllUsers() {
@@ -16,7 +19,10 @@ async function getAllUsers() {
     console.log(allUsers)
     return allUsers
   } catch (error) {
-    console.error("Ошибка при добавлении пользователя:", error);
+    console.error(
+      "Ошибка при получении пользователей:",
+      error?.message || "unknown"
+    );
   }
 }
 
@@ -28,7 +34,10 @@ async function deleteUserByEmail(email) {
     });
     console.log("Пользователь успешно удален:", email);
   } catch (error) {
-    console.error("Ошибка при удалении пользователя:", error);
+    console.error(
+      "Ошибка при удалении пользователя:",
+      error?.message || "unknown"
+    );
   }
 }
 

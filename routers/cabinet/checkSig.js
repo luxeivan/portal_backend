@@ -34,7 +34,7 @@ const getFile = async (userId, fileId, sig = false) => {
     // console.log("fileId", connectionResponse.data);
     return connectionResponse?.data?.data
   } catch (error) {
-    console.log("Ошибка получения файла", error);
+    console.log("Ошибка получения файла:", error?.message || "unknown");
     return false
   }
 }
@@ -82,7 +82,7 @@ router.post("/", async (req, res) => {
       )
       res.json({ status: "OK", data: response.data.data })
     } catch (error) {
-      console.log(error)
+      console.log("Ошибка проверки подписи:", error?.message || "unknown")
       res.json({ status: "error" })
 
     }
