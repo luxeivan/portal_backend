@@ -254,26 +254,24 @@ const invalidFile = checkFiles(files)
 
     return res.json({ status: "ok", message: "Файл успешно загружен" });
   } catch (error) {
-    // console.log("typeof", typeof error)
-    // console.log("errorMessage", error.message)
+    const errorMessage =
+      typeof error === "string" ? error : error?.message || "unknown";
     logger.error(
-      `Ошибка при обработке файлов. userId: ${userId}. Ошибка: ${error.message || typeof error === 'string' ? error : JSON.parse(error)}`
+      `Ошибка при обработке файлов. userId: ${userId}. Ошибка: ${errorMessage}`
     );
-    let message = "Ошибка при обработке файлов"
-    if (error === "The input is not a PNG file!") {
-      message = "Файл не является PNG"
-    } else if (error === "The input is not a JPG file!" || error === "The input is not a JPEG file!") {
-      message = "Файл не является JPG"
-    } else if (typeof error === 'object' && error.message.includes("Failed to parse PDF document")) {
-      message = "Файл не является PDF"
-    } else {
-
+    let message = "Ошибка при обработке файлов";
+    if (errorMessage.includes("not a PNG file")) {
+      message = "Файл не является PNG";
+    } else if (
+      errorMessage.includes("not a JPG file") ||
+      errorMessage.includes("not a JPEG file")
+    ) {
+      message = "Файл не является JPG";
+    } else if (errorMessage.includes("Failed to parse PDF document")) {
+      message = "Файл не является PDF";
     }
-    return res.status(500).json({
-      status: "error",
-      message,
-      error
-    });
+    // Клиенту отдаём только безопасное сообщение, без config/response/request
+    return res.status(500).json({ status: "error", message });
   }
 });
 
